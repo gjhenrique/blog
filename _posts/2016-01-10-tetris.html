@@ -1,0 +1,252 @@
+---
+layout: post
+title: A modular tetris library
+comments: true
+categories:
+  - programming
+tags:
+  - programming
+  - modularity
+---
+<p>
+To identify the correct boundaries among the software components is a hard task. 
+A good modular and extensible structure is one of the features that identifies a healthy code base.
+</p>
+
+<p>
+To show an example software reusability, this post will show you the architecture and the details
+of a simple and extensible tetris game library.
+</p>
+
+<div id="outline-container-orgheadline1" class="outline-2">
+<h2 id="orgheadline1">Goals</h2>
+<div class="outline-text-2" id="text-orgheadline1">
+<p>
+First of all, the main requirement of this library is that it should be able to communicate with as many programming languages and environments as possible.
+To accomplish this, we have the following options:the
+</p>
+
+<ul class="org-ul">
+<li><b>Language binding</b>: Also called wrapper code or glue code, it is the middle layer that allows the programming language to talk to each other in the <b>same</b> process. The software libraries are generally written in C and you must write the middle layer to enable this communication. Examples: Java Native Interface (JNI) for Java and ctypes for python.</li>
+<li><b>Inter Process Communication</b>: Mechanism that allows different and <b>separate</b> running processes to manage data. Examples: Sockets, message queues, RMI.</li>
+</ul>
+
+<p>
+Between these choices, the C approach fits better our requirements because it will keep our code more simple and portable.
+</p>
+
+<p>
+So, in short, our architecture will consist of a library with the core logic in C, 
+the bindings to connect the library with other languages and the usage of this library in multiple programming languages.
+In fact, this architecture reminds of the movie <a href="http://www.imdb.com/title/tt0060196/">The Good, The Bad and The Ugly</a>. 
+</p>
+
+
+<div class="figure">
+<p><img src="./res/tetris/good_bad_ugly.gif" alt="good_bad_ugly.gif" />
+</p>
+</div>
+
+<p>
+Why? Because writing stuff in C usually leads to <b>bad</b> behavior, the binding code tends to be <b>ugly</b> and the <b>good</b> part is that you can reuse it in many programming languages.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline2" class="outline-2">
+<h2 id="orgheadline2">C Library</h2>
+<div class="outline-text-2" id="text-orgheadline2">
+<p>
+Writing stuff in C is painful. You always have to be careful about managing memory, dangling pointers and undefined behavior.
+But, C is fast, has a simple design (<a href="http://www.eecs.berkeley.edu/~necula/cil/cil016.html">kind of</a>) and, together with C++, are the de facto languages for libraries that are shared with other languages.
+</p>
+
+<p>
+Our C code will not have anything fancy. The good ol' C <a href="https://github.com/gjhenrique/modulartetris/blob/master/tetris/model.h">structs</a> to model our data (board, blocks, color) and 
+<a href="https://github.com/gjhenrique/modulartetris/blob/master/tetris/board.h">functions</a> to change the data, like create_board(width, height), rotate(board), move_to_bottom(board).
+</p>
+
+<p>
+For the unit tests, the C library <a href="https://github.com/silentbicycle/greatest">greatest</a> is used to automate our tests, so it will be safer to perform any future refactorings or improvements in the library.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline3" class="outline-2">
+<h2 id="orgheadline3">Language Binding</h2>
+<div class="outline-text-2" id="text-orgheadline3">
+<p>
+The next sections will cover some techniques and tools related with the development of the language bindings.
+</p>
+</div>
+
+<div id="outline-container-orgheadline4" class="outline-3">
+<h3 id="orgheadline4">C languages</h3>
+<div class="outline-text-3" id="text-orgheadline4">
+<p>
+It is pretty trivial to call our library functions with C compatible languages (C, C++ and Objective-C) and no additional code is required.
+To use it, just compile all the files into a single executable or link the library as a shared library.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline5" class="outline-3">
+<h3 id="orgheadline5">SWIG</h3>
+<div class="outline-text-3" id="text-orgheadline5">
+<p>
+Generally, writing the glue code by hand is error prone and complex and the final code tends to be hard to write.
+To automate this process, <a href="http://www.swig.org/">SWIG</a> automagically generates the wrapper code of multiple programming languages.
+It currently supports Ruby, Python, Java, Javascript and <a href="http://www.swig.org/compat.html#SupportedLanguages">many, many others</a>.
+</p>
+
+<p>
+SWIG, of course, is far from being a silver bullet. 
+For example, this <a href="https://stackoverflow.com/questions/135834/python-swig-vs-ctypes">answer</a> from Stackoverflow summarizes that one of the disadvantages is that the generated C code is ugly and may be tricky to setup a complex interface files.
+On the other hand, the advantages are the support for multiple languages and time savings when using simple functions.
+</p>
+
+<p>
+Let's suppose that you have a C file that calculates the power of a number
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C"><span class="org-type">int</span> <span class="org-function-name">pow</span><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-type">int</span> <span class="org-variable-name">n</span><span class="org-rainbow-delimiters-depth-1">)</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+  <span class="org-keyword">return</span> n * n;
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+
+<p>
+To generate this glue code, we have to write an input interface file containing the desired functions to be exported.
+The first section is called the preamble and provides declarations to get the code to compile.
+The second declaration contains every functions that you will be included in the wrapper code.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-C">%module example
+%<span class="org-rainbow-delimiters-depth-1">{</span>
+  <span class="org-keyword">extern</span> <span class="org-type">int</span> <span class="org-variable-name">pow</span><span class="org-rainbow-delimiters-depth-2">(</span><span class="org-type">int</span> <span class="org-variable-name">n</span><span class="org-rainbow-delimiters-depth-2">)</span>;
+%<span class="org-rainbow-delimiters-depth-1">}</span>
+
+<span class="org-keyword">extern</span> <span class="org-type">int</span> <span class="org-function-name">pow</span><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-type">int</span> <span class="org-variable-name">n</span><span class="org-rainbow-delimiters-depth-1">)</span>;
+</pre>
+</div>
+
+<p>
+To use this module in Python:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-bash"><span class="org-comment-delimiter"># </span><span class="org-comment">Will create example.py and example_wrap.c</span>
+&#10140; swig -python example.i
+&#10140; gcc -shared -fPIC example.c example_wrap.c <span class="org-string">\ </span>
+  -I/usr/include/python2.7 -o _example.so
+&#10140; python2
+&gt;&gt;&gt;&gt; import example
+&gt;&gt;&gt;&gt; example.power<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-highlight-numbers-number">3</span><span class="org-rainbow-delimiters-depth-1">)</span>
+<span class="org-highlight-numbers-number">9</span>
+</pre>
+</div>
+
+<p>
+To use this module in Ruby:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ruby"><span class="org-comment-delimiter"># </span><span class="org-comment">Content of extconf.rb</span>
+<span class="org-builtin">require</span> <span class="org-string">'mkmf'</span>
+create_makefile<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-string">'example'</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-bash"><span class="org-comment-delimiter"># </span><span class="org-comment">In shell</span>
+&#10140; swig -ruby example.i
+<span class="org-comment-delimiter"># </span><span class="org-comment">This command will create the Makefile</span>
+&#10140; ruby extconf.rb
+&#10140; make
+&#10140; irb
+<span class="org-function-name">irb</span><span class="org-rainbow-delimiters-depth-1">(</span>main<span class="org-rainbow-delimiters-depth-1">)</span>:001:0&gt; require <span class="org-string">'./example'</span>
+<span class="org-function-name">irb</span><span class="org-rainbow-delimiters-depth-1">(</span>main<span class="org-rainbow-delimiters-depth-1">)</span>:001:0&gt; Example.power<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-highlight-numbers-number">2</span><span class="org-rainbow-delimiters-depth-1">)</span>
+=&gt; <span class="org-highlight-numbers-number">9</span>
+</pre>
+</div>
+
+<p>
+Nice! We saw that with the special SWIG interface file,
+we can create the binding code easily into the supported languages and SWIG will handle all the particularities of each language binding.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline6" class="outline-3">
+<h3 id="orgheadline6">Web Browsers</h3>
+<div class="outline-text-3" id="text-orgheadline6">
+<p>
+SWIG is pretty useful, but has one big downside. It is not possible to use it to target web browsers.
+To run our C code in them, we would have to rewrite the library in Javascript or use it with a plugin (<a href="https://www.apple.com/hotnews/thoughts-on-flash/">Flash</a>, <a href="https://developer.chrome.com/native-client">NaCl</a>).
+</p>
+
+<p>
+However, there is a better alternative.
+With the <a href="https://kripken.github.io/emscripten-site/">Emscripten</a> project, we can compile C and C++ code into Javascript that runs in the browsers without any external plugins.
+</p>
+
+<p>
+Basically, this image show how this source-to-source compilation works:
+</p>
+
+
+<div class="figure">
+<p><img src="res/tetris/asm_js.png" alt="asm_js.png" />
+</p>
+</div>
+
+<p>
+First, Emscripten calls <a href="http://clang.llvm.org/">clang</a> to compile your C files and generate the <a href="https://en.wikipedia.org/wiki/LLVM#LLVM_Intermediate_Representation">LLVM bitcode</a> from them.
+Then, the resulting bitcode is fed to the Emscripten LLVM backend called <a href="https://github.com/kripken/emscripten-fastcomp">Fastcomp</a>,
+which is translated to Javascript code. 
+All these operations are wrapped into the emcc command, so all this process is transparent to the user.
+</p>
+
+<p>
+The resulting Javascript is in the <a href="http://asmjs.org/faq.html">asm.js</a> format, which is, in short,
+a strict subset of Javascript that is optimized for performance.
+For more information about it, check this <a href="http://ejohn.org/blog/asmjs-javascript-compile-target/">post</a> by John Resig. 
+</p>
+
+<p>
+The <a href="https://gjhenrique.github.io/modulartetris/">demo game</a> was adapted from <a href="https://github.com/jakesgordon/javascript-tetris">javascript-tetris</a> and reuses its visual components, only replacing the tetris game logic.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline7" class="outline-3">
+<h3 id="orgheadline7">Everything else</h3>
+<div class="outline-text-3" id="text-orgheadline7">
+<p>
+If the programming language you are looking for is not yet supported by SWIG (Rust, Go or Nim),
+you will have to write the binding code by hand. ='(
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline8" class="outline-2">
+<h2 id="orgheadline8">Library Usage</h2>
+<div class="outline-text-2" id="text-orgheadline8">
+<p>
+After the wrapper code of your desired language is done, it is only a matter of calling the binding functions or methods
+and focus on the user interface of your game. 
+To learn more, check other demo games in the <a href="https://github.com/gjhenrique/modulartetris">github repository</a>.
+</p>
+
+<p>
+Also, leave a comment if you have any suggestions.
+</p>
+</div>
+</div>

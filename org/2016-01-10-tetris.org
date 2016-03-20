@@ -1,0 +1,202 @@
+#+BEGIN_HTML
+---
+layout: post
+title: A modular tetris library
+comments: true
+categories:
+  - programming
+tags:
+  - programming
+  - modularity
+---
+#+END_HTML
+#+OPTIONS: ^:nil
+  
+To identify the correct boundaries among the software components is a hard task. 
+A good modular and extensible structure is one of the features that identifies a healthy code base.
+
+To show an example software reusability, this post will show you the architecture and the details
+of a simple and extensible tetris game library.
+
+* Goals
+
+First of all, the main requirement of this library is that it should be able to communicate with as many programming languages and environments as possible.
+To accomplish this, we have the following options:
+
+- *Language binding*: Also called wrapper code or glue code, it is the middle layer that allows the programming language to talk to each other in the *same* process. The software libraries are generally written in C and you must write the middle layer to enable this communication. Examples: Java Native Interface (JNI) for Java and ctypes for python.
+- *Inter Process Communication*: Mechanism that allows different and *separate* running processes to manage data. Examples: Sockets, message queues, RMI.
+
+Between these choices, the C approach fits better our requirements because it will keep our code more simple and portable.
+
+So, in short, our architecture will consist of a library with the core logic in C, 
+the bindings to connect the library with other languages and the usage of this library in multiple programming languages.
+In fact, this architecture reminds of the movie [[http://www.imdb.com/title/tt0060196/][The Good, The Bad and The Ugly]]. 
+
+[[./res/tetris/good_bad_ugly.gif]]
+
+Why? Because writing stuff in C usually leads to *bad* behavior, the binding code tends to be *ugly* and the *good* part is that you can reuse it in many programming languages.
+
+* C Library
+
+Writing stuff in C is painful. You always have to be careful about managing memory, dangling pointers and undefined behavior.
+But C is fast, has a simple design ([[http://www.eecs.berkeley.edu/~necula/cil/cil016.html][kind of]]) and, together with C++, is the de facto language for libraries that must be shared with other languages.
+
+# and, mainly, because every _major or famous_ programming languages have some way to interact with it.
+# The architecture will be inspired in  movie and will have these components:
+# Who says C is simple?
+
+Our C code will not have anything fancy. The good ol' C [[https://github.com/gjhenrique/modulartetris/blob/master/tetris/model.h][structs]] to model our data (board, blocks, color) and 
+[[https://github.com/gjhenrique/modulartetris/blob/master/tetris/board.h][functions]] to change the data, like create_board(width, height), rotate(board), move_to_bottom(board).
+
+For the unit tests, the C library [[https://github.com/silentbicycle/greatest][greatest]] is used to automate our tests, so it will be safer to perform any future refactorings or improvements in the library.
+ 
+* Language Binding
+
+The next sections will cover some techniques and tools related with the development of the language bindings.
+
+** C languages
+It is pretty trivial to call our library functions with C compatible languages (C, C++ and Objective-C) and no additional code is required.
+To use it, just compile all the files into a single executable or link the library as a shared library.
+
+** SWIG
+
+Generally, writing the glue code by hand is error prone and complex and the final code tends to be hard to write.
+To automate this process, [[http://www.swig.org][SWIG]] automagically generates the wrapper code of multiple programming languages.
+It currently supports Ruby, Python, Java, Javascript and [[http://www.swig.org/compat.html#SupportedLanguages][many, many others]].
+
+SWIG, of course, is far from being a silver bullet. 
+For example, this [[https://stackoverflow.com/questions/135834/python-swig-vs-ctypes][answer]] from Stackoverflow summarizes that one of the disadvantages is that the generated C code is ugly and may be tricky to setup a complex interface files.
+On the other hand, the advantages are the support for multiple languages and time savings when using simple functions.
+
+Let me show a brief demo that you have a C file that calculates the power of a number
+#+BEGIN_SRC C
+int pow(int n) {
+  return n * n;
+}
+#+END_SRC
+
+To generate this glue code, we have to write an input interface file containing the desired functions to be exported.
+The first section is called the preamble and provides declarations to get the code to compile.
+The second declaration contains every functions that you will be included in the wrapper code.
+
+#+BEGIN_SRC C
+%module example
+%{
+  extern int pow(int n);
+%}
+
+extern int pow(int n);
+#+END_SRC
+
+To use this module in Python:
+
+#+BEGIN_SRC bash
+# Will create example.py and example_wrap.c
+➜ swig -python example.i
+➜ gcc -shared -fPIC example.c example_wrap.c \ 
+  -I/usr/include/python2.7 -o _example.so
+➜ python2
+>>>> import example
+>>>> example.power(3)
+9
+#+END_SRC
+
+To use this module in Ruby:
+
+#+BEGIN_SRC ruby
+# Content of extconf.rb
+require 'mkmf'
+create_makefile('example')
+#+END_SRC
+
+# mkmf library will generate a Makefile wich will correctly comple and link the C files into a ruby extension.
+# We could generate the module by hand with gcc.
+#+BEGIN_SRC bash
+# In shell
+➜ swig -ruby example.i
+# This command will create the Makefile
+➜ ruby extconf.rb
+➜ make
+➜ irb
+irb(main):001:0> require './example'
+irb(main):001:0> Example.power(2)
+=> 9
+#+END_SRC
+
+Nice! We saw that with the special SWIG interface file,
+we can create the binding code easily into the supported languages and SWIG will handle all the particularities of each language binding.
+Check the SWIG [[https://github.com/gjhenrique/modulartetris/blob/master/tetris/modular_tetris.i][interface file of the library]] if you are curious about it.
+
+** Web Browsers
+
+SWIG is pretty useful, but has one big downside. It is not possible to use it to target web browsers.
+To run our C code in them, we would have to rewrite the library in Javascript or use it with a plugin ([[https://www.apple.com/hotnews/thoughts-on-flash/][Flash]], [[https://developer.chrome.com/native-client][NaCl]]).
+
+However, there is a better alternative.
+With the [[https://kripken.github.io/emscripten-site/][Emscripten]] project, we can compile C and C++ code into Javascript that runs in the browsers without any external plugins.
+
+Basically, this image show how this source-to-source compilation works:
+
+#+BEGIN_SRC dot :file res/tetris/asm_js.png :cmdline -Kdot -Tpng
+digraph {
+    // graph from left to right
+    rankdir=LR;
+    bgcolor="transparent";
+    node [shape=box];
+
+    graph [fontname = "helvetica"];
+    node [fontname = "helvetica"];
+    edge [fontname = "helvetica"]; 
+
+    subgraph cluster_0 {
+      style=filled
+      label="Emscripten compiler"
+      color=lightgrey
+		  node  [style=filled,color=white];
+
+      c_file [label=".c file"]
+      llvm_ir [label="LLVM Bitcode"]
+      js_file [label=".js file"] 
+
+      c_file -> llvm_ir [label="clang"]
+      llvm_ir -> js_file [label="Fastcomp"]
+    }
+    
+    browser [label="Web Browsers", shape=ellipse]
+    node_js [label="Node.js", shape=ellipse]
+
+    js_file -> browser
+    js_file -> node_js
+
+    /*emcc_1 [style=invis]
+    emcc_2 [style=invis]
+    {rank = same; emcc_1 ; c_file } 
+    {rank = same; emcc_2; js_file }
+    emcc_1 -> emcc_2 [label="emcc"; arrowtail=dot]*/
+}
+ 
+#+END_SRC
+
+First, Emscripten calls [[http://clang.llvm.org/][clang]] to compile your C files and generate the [[https://en.wikipedia.org/wiki/LLVM#LLVM_Intermediate_Representation][LLVM bitcode]] from them.
+Then, the resulting bitcode is fed to the Emscripten LLVM backend called [[https://github.com/kripken/emscripten-fastcomp][Fastcomp]],
+which is translated to Javascript code. 
+All these operations are wrapped into the emcc command, so all this process is transparent to the user.
+
+The resulting Javascript is in the [[http://asmjs.org/faq.html][asm.js]] format, which is, in short,
+a strict subset of Javascript that is optimized for performance.
+For more information about it, check this [[http://ejohn.org/blog/asmjs-javascript-compile-target/][post]] by John Resig. 
+
+The [[https://gjhenrique.github.io/modulartetris/][demo game]] was adapted from [[https://github.com/jakesgordon/javascript-tetris][javascript-tetris]] and reuses its visual components, only replacing the tetris game logic.
+
+** Everything else
+If the programming language you are looking for is not yet supported by SWIG (Rust, Go or Nim),
+you will have to write the binding code by hand. ='(
+
+* Library Usage
+After the wrapper code of your desired language is done, it is only a matter of calling the binding functions or methods
+and focus on the user interface of your game. 
+If you want to learn more about this architecture, check other demo games in the [[https://github.com/gjhenrique/modulartetris][github repository]].
+
+Thanks for your time and leave a comment if you have any suggestions.
+# To learn more about the library, try to implement a tetris game using the language you want.
+
