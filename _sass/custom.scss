@@ -5,3 +5,12 @@
 .underline {
     text-decoration: underline;
 }
+
+.org-src-container {
+    overflow-y: auto;
+    margin-bottom: 2em;
+}
+
+.org-src-container + .org-src-container {
+    margin-top: -1.5em;
+}
