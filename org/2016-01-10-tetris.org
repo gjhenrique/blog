@@ -1,13 +1,14 @@
 #+BEGIN_HTML
 ---
 layout: post
-title: A modular tetris library
+title: A Modular Tetris Library
 comments: true
 categories:
   - programming
 tags:
   - programming
   - modularity
+  - projects
 ---
 #+END_HTML
 #+OPTIONS: ^:nil
@@ -68,7 +69,7 @@ SWIG, of course, is far from being a silver bullet.
 For example, this [[https://stackoverflow.com/questions/135834/python-swig-vs-ctypes][answer]] from Stackoverflow summarizes that one of the disadvantages is that the generated C code is ugly and may be tricky to setup a complex interface files.
 On the other hand, the advantages are the support for multiple languages and time savings when using simple functions.
 
-Let me show a brief demo that you have a C file that calculates the power of a number
+Let me show a brief demo of a function that calculates the power of a number
 #+BEGIN_SRC C
 int pow(int n) {
   return n * n;
@@ -195,7 +196,7 @@ you will have to write the binding code by hand. ='(
 * Library Usage
 After the wrapper code of your desired language is done, it is only a matter of calling the binding functions or methods
 and focus on the user interface of your game. 
-If you want to learn more about this architecture, check other demo games in the [[https://github.com/gjhenrique/modulartetris][github repository]].
+If you want to learn more about SWIG, the game logic and the architecture, check other demo games in the [[https://github.com/gjhenrique/modulartetris][github repository]].
 
 Thanks for your time and leave a comment if you have any suggestions.
 # To learn more about the library, try to implement a tetris game using the language you want.

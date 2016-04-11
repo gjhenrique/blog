@@ -1,12 +1,13 @@
 ---
 layout: post
-title: A modular tetris library
+title: A Modular Tetris Library
 comments: true
 categories:
   - programming
 tags:
   - programming
   - modularity
+  - projects
 ---
 <p>
 To identify the correct boundaries among the software components is a hard task. 
@@ -23,7 +24,7 @@ of a simple and extensible tetris game library.
 <div class="outline-text-2" id="text-orgheadline1">
 <p>
 First of all, the main requirement of this library is that it should be able to communicate with as many programming languages and environments as possible.
-To accomplish this, we have the following options:the
+To accomplish this, we have the following options:
 </p>
 
 <ul class="org-ul">
@@ -58,7 +59,7 @@ Why? Because writing stuff in C usually leads to <b>bad</b> behavior, the bindin
 <div class="outline-text-2" id="text-orgheadline2">
 <p>
 Writing stuff in C is painful. You always have to be careful about managing memory, dangling pointers and undefined behavior.
-But, C is fast, has a simple design (<a href="http://www.eecs.berkeley.edu/~necula/cil/cil016.html">kind of</a>) and, together with C++, are the de facto languages for libraries that are shared with other languages.
+But C is fast, has a simple design (<a href="http://www.eecs.berkeley.edu/~necula/cil/cil016.html">kind of</a>) and, together with C++, is the de facto language for libraries that must be shared with other languages.
 </p>
 
 <p>
@@ -106,7 +107,7 @@ On the other hand, the advantages are the support for multiple languages and tim
 </p>
 
 <p>
-Let's suppose that you have a C file that calculates the power of a number
+Let me show a brief demo of a function that calculates the power of a number
 </p>
 <div class="org-src-container">
 
@@ -179,6 +180,7 @@ create_makefile<span class="org-rainbow-delimiters-depth-1">(</span><span class=
 <p>
 Nice! We saw that with the special SWIG interface file,
 we can create the binding code easily into the supported languages and SWIG will handle all the particularities of each language binding.
+Check the SWIG <a href="https://github.com/gjhenrique/modulartetris/blob/master/tetris/modular_tetris.i">interface file of the library</a> if you are curious about it.
 </p>
 </div>
 </div>
@@ -242,11 +244,11 @@ you will have to write the binding code by hand. ='(
 <p>
 After the wrapper code of your desired language is done, it is only a matter of calling the binding functions or methods
 and focus on the user interface of your game. 
-To learn more, check other demo games in the <a href="https://github.com/gjhenrique/modulartetris">github repository</a>.
+If you want to learn more about SWIG, the game logic and the architecture, check other demo games in the <a href="https://github.com/gjhenrique/modulartetris">github repository</a>.
 </p>
 
 <p>
-Also, leave a comment if you have any suggestions.
+Thanks for your time and leave a comment if you have any suggestions.
 </p>
 </div>
 </div>
