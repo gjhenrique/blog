@@ -1,0 +1,160 @@
+---
+layout: post
+title: A Trivial(-ish) Application - The Beginning of the Journey
+comments: true
+categories:
+  - programming
+tags:
+  - programming
+  - ruby
+  - projects
+---
+<p>
+The main objective of this series is to show the steps and 
+struggles to build a <span class="underline">not so simple and not so complex</span> application from the ground up until production.
+This system will not be a life changer or a startup product, but I hope it will be useful to someone.
+</p>
+
+<p>
+Disclaimer: I don't have much experience in the programming world, so you will see some bad practices.
+This will be a collaborative project and, if you feel the urge to change something, give a comment or send a pull request.
+It's more about the learning process (mine and yours) =).
+</p>
+
+<div id="outline-container-orgheadline1" class="outline-2">
+<h2 id="orgheadline1">Idea</h2>
+<div class="outline-text-2" id="text-orgheadline1">
+<p>
+When I was in college, my friend <a href="https://github.com/pedro-stanaka">Pedro Tanaka </a>had the idea to build an Android app that showed the <span class="underline">menu of our university cafeteria</span>.
+Nothing better to explain the problem that this app solves with a classic rage comic.
+</p>
+
+
+<div class="figure">
+<p><img src="./res/easymenu/rage-1.png" alt="rage-1.png" />
+</p>
+</div>
+
+<p>
+The above situation may happen, but the most common situation is the below:
+</p>
+
+
+<div class="figure">
+<p><img src="./res/easymenu/rage-2.png" alt="rage-2.png" />
+</p>
+</div>
+
+<p>
+To help Derp, this app would scrap the university website to fetch the menu, store this information into the device and <span class="underline">shows the weekly meals without a Internet connection when the user wants</span>.
+</p>
+
+<p>
+<span class="underline">In fact</span>, we started building it, but due to other obligations, the project <span class="underline">estacionou</span>&#x2026;
+due to other life obligations.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline2" class="outline-2">
+<h2 id="orgheadline2">Architecture</h2>
+<div class="outline-text-2" id="text-orgheadline2">
+<p>
+With the initial development of the Android app, me and Pedro identified that our app could had a bigger scope and the potential to reach more universities.
+</p>
+
+<p>
+The only difference, besides the name, between for example, University A and B apps  is
+the website format and, consequently, the parser code that translates the HTML to the <span class="underline">model</span> of our software. 
+Just like StackExchange built <span class="underline">several forum</span> based in the same <span class="underline">codebase (Link do atwood)</span>, 
+the same code would fit several universities and the only thing that would change among these apps is the parser component.
+</p>
+
+<p>
+Another issue we found was related to the maintainance of the parser.
+Let's suppose that, in case we wanted to make an iOS app, the logic parser would have to be rewritten in Swift.
+Also, web scraping is not really maintainable because anytime the site changes, we would have to update all the projects to support the new <span class="underline">format</span>.
+</p>
+
+<p>
+Besides those issues, some universities provide its menu in other medias, like a PDF file or Facebook posts.
+<span class="underline">A little impractical for a cell phone device</span>, isn't?!.
+</p>
+
+<p>
+Archer image
+Do you want to build an API?
+Because that's how you have to build an API
+</p>
+
+<p>
+Providing an API would be a clean solution to these problems, because all the clients would fetch the information in a single place (our server).
+All the parsers would sit in a unique code base and, in case of any update of the web page format, 
+<span class="underline">it would be reflected to our clients</span> immediately without the need to involve Play Store or App Store.
+</p>
+
+
+<p>
+Our app now would communicate with our API instead of fetching the web site directly.
+Besides, the parsers would be <span class="underline">unified in a single place</span> and could handle PDF formats or other oddities without a problem.
+Anyway, a good API could be something like that.
+</p>
+
+
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./res/easymenu/diagram.svg" >
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+
+<ol class="org-ol">
+<li>There should be two main components: The parser service</li>
+<li>The API should read</li>
+<li>de brinde, ganhamos um web site</li>
+</ol>
+
+<p>
+Nice!!! The initial idea was to build an Android app that showed the weekly menu for a single university,
+but it turned into an API that could reach Android, iOS apps and Smart TVs (why not?!).
+<span class="underline">xkcd comic</span>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline3" class="outline-2">
+<h2 id="orgheadline3">The Beginning of the Journey</h2>
+<div class="outline-text-2" id="text-orgheadline3">
+<p>
+The first decision about the code of our project are the tools we are gonna use.
+Since this is a side project and I won't have much time to fiddle around with it, 
+we have to prioritize tools that are <span class="underline">simple and easy to use</span> (Sorry, Java and <span class="underline">EJB</span>. Maybe next time).
+Off the top of my head, the Ruby ecosystem is a nice choice because it's a concise programming language, has a nice community to back you up and <span class="underline">is one of the languages that does not step into your toes</span>. 
+</p>
+
+<p>
+After settling up, we have to match the architecture components with the right tools from Ruby. 
+Scheduler: Several flavors of schedulers. <span class="underline">whenever</span>, <span class="underline">rufus-scheduler</span> or <span class="underline">resque-scheduler</span>
+Parser: Nokogiri. The most famous and popular HTML reader. It offers Xpath and CSS selector support.
+Database: Postgres is nice, but it is too big for this. Sqlite fits like a glove
+Database and Domain Model: The choice is between an ORM or <span class="underline">jooQ</span> ActiveRecord familiarity could be a choice. 
+API: Forget Rails. <span class="underline">Sinatra</span> is the best <span class="underline">framework for this project</span>.
+Web client: This project does not match JS. Could be <span class="underline">Erb</span> or <span class="underline">Slime</span> used with Sinatra. We can serve html and json ala Rails content_type. 
+Android and iOS clients: Don't know yet. Let's not hurry ourselves up.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline4" class="outline-2">
+<h2 id="orgheadline4">Conclusion</h2>
+<div class="outline-text-2" id="text-orgheadline4">
+<p>
+It will be a fun journey and this is just the beginning.
+Any doubts or improvements, don't forget to give a comment.
+</p>
+
+<p>
+Thanks very much for reading this. See you in the next post.
+</p>
+</div>
+</div>
