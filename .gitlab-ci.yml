@@ -1,0 +1,19 @@
+image: gjhenrique/blog
+
+stages:
+  - blog
+
+pages:
+  stage: blog
+  before_script:
+    - gem install jekyll
+    - gem install jekyll-paginate
+    - pushd syntax-extractor && npm install && popd
+  script:
+    - node syntax-extractor/index.js
+    - jekyll build -d public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master

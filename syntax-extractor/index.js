@@ -15,7 +15,7 @@ function getSrcClasses(file) {
     $('.org-src-container').each(function(index, element) {
       var set = addClassesToSet(element, classes);
     });
-    a = searchClasses(classes);
+    searchClasses(classes);
   });
 }
 
@@ -33,7 +33,6 @@ function searchClasses(classes) {
 
     cssDeclarations.stylesheet.rules = tokens;
     var fileContent = css.stringify(cssDeclarations);
-    console.log(fileContent);
     fs.writeFile(syntaxFinalFile, fileContent, function(err){
       if(err) {
         console.log("File not saved " + err);
