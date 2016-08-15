@@ -13,10 +13,11 @@ github: https://github.com/gjhenrique
 markdown: kramdown
 source: .
 destination: ./_site
-permalink: /:title
+permalink: /:title.html
 paginate: 8
 paginate_path: /page:num/
 gems: ["jekyll-paginate"]
+exclude: [syntax-extractor, org]
 
 # Default values
 defaults:
