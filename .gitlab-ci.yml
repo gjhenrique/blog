@@ -1,7 +1,21 @@
-image: gjhenrique/blog
+image: gjhenrique/blog:latest
 
 stages:
+  - cv
   - blog
+
+cv:
+  stage: cv
+  before_script:
+    - cd cv
+    - npm install
+  script:
+    npm run all
+  artifacts:
+    paths:
+      - .
+  only:
+    - master
 
 pages:
   stage: blog
@@ -17,3 +31,5 @@ pages:
       - public
   only:
     - master
+
+

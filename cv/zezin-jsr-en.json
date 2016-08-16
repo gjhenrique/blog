@@ -1,0 +1,134 @@
+{
+  "basics": {
+    "name": "Guilherme J. Henrique",
+    "label": "Software Developer",
+    "website": "http://gjhenrique.com",
+    "phone": "+55 (11) 98557-1993",
+    "email": "gjhenrique@gmail.com",
+    "location": {
+      "address": "Liberdade",
+      "city": "São Paulo",
+      "countryCode": "Brasil"
+    },
+    "profiles": [
+      {
+        "network": "Github",
+        "username": "gjhenrique",
+        "url": "https://github.com/gjhenrique"
+      }
+    ]
+  },
+  "work": [
+    {
+      "company": "LSI-TEC",
+      "website": "http://www.lsitec.org.br",
+      "position": "Technical Leader",
+      "startDate": "2015-12",
+      "highlights": [
+        "Critical technical decision-making",
+        "Evaluation of best coding practices for the development team",
+        "Development of Android applications",
+        "Web development: Ruby on Rails and Javascript",
+        "Code review with Git and Gerrit"
+      ]
+    },
+    {
+      "company": "LSI-TEC",
+      "website": "http://www.lsitec.org.br",
+      "position": "Software Developer",
+      "startDate": "2014-11",
+      "endDate": "2015-12",
+      "highlights": [
+        "Development of Android applications",
+        "Web development: Ruby on Rails, Javascript e Java/Struts2",
+        "Maintenance of the company's Gerrit server",
+        "Internal system for the automatization of commits cherry-picking: Python"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Londrina State University (UEL)",
+      "startDate": "2010-03",
+      "endDate": "2013-01",
+      "studyType": "Bachelor of Computer Science"
+    },
+    {
+      "institution": "Londrina State University (UEL)",
+      "startDate": "2014-03",
+      "endDate": "2014-07",
+      "studyType": "MSc in Computer Science (Interrupted)"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Programming Languages",
+      "keywords": [
+        "Ruby",
+        "Java",
+        "Javascript",
+        "C",
+        "Clojure",
+        "SQL"
+      ]
+    },
+    {
+      "name": "Technologies",
+      "keywords": [
+        "GNU/Linux",
+        "Ruby on Rails",
+        "Android",
+        "Git",
+        "PostgreSQL",
+        "Backbone.js"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "English (Advanced)"
+    }
+  ],
+  "projects": [
+    {
+      "title": "Bandejao",
+      "category": "Open Source",
+      "description": "Project that provides an API and Android applications for the menu of multiple university cafeterias",
+      "url": "https://bandejao.gjhenrique.com",
+      "highlights": [
+        "Server side written in Ruby with Sinatra and ActiveRecord",
+        "Nokogiri to parse the meals of the universities website and scheduled jobs with whenever/cron",
+        "Server tests with RSpec and factory_girl",
+        "Nginx as a reverse proxy for the application server Puma",
+        "DevOps with Ansible and Capistrano. Test environment with Vagrant and production with Digital Ocean",
+        "HTTPS certificate issued by Let's Encrypt (Grade A+ in SSLLabs)",
+        "Responsive layout with Pure.CSS minified and concatenaded using Sprockets",
+        "Android with Dagger2, EventBus, Crashlytics and Google Cloud Messaging",
+        "Android tests with Robolectric and Espresso",
+        "Automated upload of the apks and resources in Play Store with the plugin gradle-play-publisher"
+      ]
+    },
+    {
+      "title": "modulartetris",
+      "category": "Open Source",
+      "description": "Tetris DRY em múltiplas linguagens",
+      "url": "https://github.com/gjhenrique/modulartetris",
+      "highlights": [
+        "Game logic in C generated as an library with GNU Make as the build tool",
+        "Binding of Node.js, Python and Android games with the library in C",
+        "Browser execution via transpilation from C to Javascript (asm.js format)"
+      ]
+    },
+    {
+      "title": "Image Rank",
+      "category": "Open Source",
+      "url": "https://github.com/gjhenrique/ImageRank",
+      "description": "Feature extractors and distance functions classification on an image dataset",
+      "highlights": [
+        "Java with jOOQ, Maven and Guice",
+        "Images processing with ImageJ, JWave and LIRE",
+        "Chart generation with GNUPlot"
+      ]
+    }
+  ]
+}
