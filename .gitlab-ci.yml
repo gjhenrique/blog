@@ -1,19 +1,21 @@
-image: gjhenrique/blog:latest
+image: mwallasch/docker-ruby-node
 
 stages:
   - cv
   - blog
 
 cv:
+  image: gjhenrique/blog
   stage: cv
   before_script:
     - cd cv
     - npm install
   script:
-    npm run all
+    - npm run all
+    - cd ..
   artifacts:
     paths:
-      - .
+      - cv
   only:
     - master
 
