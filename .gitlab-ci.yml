@@ -22,10 +22,7 @@ cv:
 pages:
   stage: blog
   before_script:
-    - gem install jekyll
-    - gem install jekyll-paginate
-    - gem install jekyll-assets
-    - gem install font-awesome-sass
+    - bundle install
     - pushd syntax-extractor && npm install && popd
   script:
     - node syntax-extractor/index.js
