@@ -24,10 +24,12 @@ pages:
   before_script:
     - gem install jekyll
     - gem install jekyll-paginate
+    - gem install jekyll-assets
+    - gem install font-awesome-sass
     - pushd syntax-extractor && npm install && popd
   script:
     - node syntax-extractor/index.js
-    - jekyll build -d public
+    - JEKYLL_ENV=production jekyll build -d public
   artifacts:
     paths:
       - public

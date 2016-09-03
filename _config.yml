@@ -16,7 +16,9 @@ destination: ./_site
 permalink: /:title.html
 paginate: 8
 paginate_path: /page:num/
-gems: ["jekyll-paginate"]
+gems:
+  - jekyll-paginate
+  - jekyll-assets
 exclude: [syntax-extractor, org]
 
 # Default values
