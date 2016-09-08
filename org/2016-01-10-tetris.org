@@ -42,10 +42,6 @@ Why? Because writing stuff in C usually leads to *bad* behavior, the binding cod
 Writing stuff in C is painful. You always have to be careful about managing memory, dangling pointers and undefined behavior.
 But C is fast, has a simple design ([[http://www.eecs.berkeley.edu/~necula/cil/cil016.html][kind of]]) and, together with C++, is the de facto language for libraries that must be shared with other languages.
 
-# and, mainly, because every _major or famous_ programming languages have some way to interact with it.
-# The architecture will be inspired in  movie and will have these components:
-# Who says C is simple?
-
 Our C code will not have anything fancy. The good ol' C [[https://github.com/gjhenrique/modulartetris/blob/master/tetris/model.h][structs]] to model our data (board, blocks, color) and 
 [[https://github.com/gjhenrique/modulartetris/blob/master/tetris/board.h][functions]] to change the data, like create_board(width, height), rotate(board), move_to_bottom(board).
 
@@ -199,5 +195,4 @@ and focus on the user interface of your game.
 If you want to learn more about SWIG, the game logic and the architecture, check other demo games in the [[https://github.com/gjhenrique/modulartetris][github repository]].
 
 Thanks for your time and leave a comment if you have any suggestions.
-# To learn more about the library, try to implement a tetris game using the language you want.
 
