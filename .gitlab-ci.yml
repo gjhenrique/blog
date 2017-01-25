@@ -1,36 +1,19 @@
-image: mwallasch/docker-ruby-node
+image: gjhenrique/blog
 
 stages:
-  - cv
   - blog
 
-cv:
-  image: gjhenrique/blog
-  stage: cv
-  before_script:
-    - cd cv
-    - npm install
-  script:
-    - npm run all
-    - cd ..
-  artifacts:
-    paths:
-      - cv
-  only:
-    - master
-
 pages:
-  stage: blog
+  stage: jekyll
   before_script:
     - bundle install
     - pushd syntax-extractor && npm install && popd
   script:
-    - node syntax-extractor/index.js
+    - emacs -batch -q -l export.el -f org-publish-all
+    - node syntax-extractor/index.js darktooth
     - JEKYLL_ENV=production jekyll build -d public
   artifacts:
     paths:
       - public
   only:
     - master
-
-

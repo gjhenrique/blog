@@ -1,4 +1,4 @@
-#+BEGIN_HTML
+#+BEGIN_EXPORT html
 ---
 layout: post
 title: A Modular Tetris Library
@@ -10,9 +10,9 @@ tags:
   - modularity
   - projects
 ---
-#+END_HTML
+#+END_EXPORT
 #+OPTIONS: ^:nil
-  
+ 
 To identify the correct boundaries among the software components is a hard task. 
 A good modular and extensible structure is one of the features that identifies a healthy code base.
 

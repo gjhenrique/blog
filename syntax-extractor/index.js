@@ -5,7 +5,7 @@ var Set = require('jsclass/src/set').Set;
 
 var postsPath  = __dirname + '/../_posts';
 
-var syntaxOrgFile  = __dirname + '/org-syntax.css';
+var syntaxOrgFile  = __dirname + '/' + process.argv.slice(2)[0] + '.css';
 var syntaxFinalFile = __dirname + '/../_assets/css/syntax.scss';
 
 function getSrcClasses(file) {

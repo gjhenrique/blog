@@ -9,6 +9,8 @@
 .org-src-container {
     overflow-y: auto;
     margin-bottom: 2em;
+    padding: 0 1em;
+    font-size: 0.9em;
 }
 
 .org-src-container + .org-src-container {
