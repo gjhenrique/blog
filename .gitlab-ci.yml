@@ -4,7 +4,7 @@ stages:
   - blog
 
 pages:
-  stage: jekyll
+  stage: blog
   before_script:
     - bundle install
     - pushd syntax-extractor && npm install && popd
