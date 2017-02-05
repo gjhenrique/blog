@@ -1,11 +1,11 @@
 # Site settings
 title: Personal Blog
 description: "A simple blog"
-url: "http://gjhenrique.com"
+url: "https://gjhenrique.com"
 author:
   name: "Guilherme Henrique"
   email: "gjhenrique@gmail.com"
-  url: "http://gjhenrique.com"
+  url: "https://gjhenrique.com"
 
 # Build settings
 baseurl: / # Change this to your relative path (ex: /blog/), or leave just a /
