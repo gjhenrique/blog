@@ -14,6 +14,10 @@
 (require 'htmlize)
 (require 'rainbow-delimiters)
 
+(defun org-publish-all-with-different-directory ()
+  (setq org-publish-timestamp-directory ".timestamps/")
+  (org-publish-all))
+
 (with-eval-after-load 'rainbow-delimiters
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 

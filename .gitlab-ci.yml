@@ -1,17 +1,21 @@
 image: gjhenrique/blog
 
-stages:
-  - blog
-
 pages:
-  stage: blog
+  cache:
+    paths:
+      - .timestamps
+      - .bundle_cache/
+      - .npm_cache/
   before_script:
-    - bundle install
+    - du -h --max-depth=1
+    - bundle install --path .bundle_cache/
+    - npm config set cache $(pwd)/.npm_cache
     - pushd syntax-extractor && npm install && popd
   script:
-    - emacs -batch -q -l export.el -f org-publish-all
+    - emacs -batch -q -l export.el -f org-publish-all-with-different-directory
     - node syntax-extractor/index.js darktooth
     - JEKYLL_ENV=production jekyll build -d public
+    - du -h --max-depth=1
   artifacts:
     paths:
       - public
