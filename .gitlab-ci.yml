@@ -1,6 +1,6 @@
 stages:
   - build-org
-  - extract-css-classes
+  - filter-css-classes
   - publish
 
 org-generation:
@@ -20,7 +20,7 @@ org-generation:
     paths:
       - _posts
   script:
-    - emacs -batch -q -l export.el -f org-publish-all-with-different-directory
+    - emacs -batch -q -l export.el -f org-publish-with-different-timestamp-directory
     # Copy elpa packages to current directory for cache
     - cp -rf /root/.emacs.d/elpa/ .
   stage: build-org
@@ -39,7 +39,7 @@ css-theme:
   artifacts:
     paths:
       - _assets/css/syntax.scss
-  stage: extract-css-classes
+  stage: filter-css-classes
 
 pages:
   image: ruby:2.4-alpine3.6

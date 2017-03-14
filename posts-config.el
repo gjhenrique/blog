@@ -21,3 +21,16 @@
            :recursive t
            :publishing-function org-publish-attachment)
           ("zezin" :components ("org-zezin" "org-static-zezin")))))
+
+;; Shinning face
+(defface shinning-face
+  '((t (:background "white" :foreground "red")))
+  "Face to highlight the Axe word")
+
+(defun axe-highlight ()
+  (font-lock-add-keywords nil
+			  '(("\\<\\(Axe\\|axe\\)\\>" 1
+			     'shinning-face t))))
+
+(add-hook 'ruby-mode-hook 'axe-highlight)
+(add-hook 'python-mode-hook 'axe-highlight)

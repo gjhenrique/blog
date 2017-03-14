@@ -14,7 +14,7 @@
 (require 'htmlize)
 (require 'rainbow-delimiters)
 
-(defun org-publish-all-with-different-directory ()
+(defun org-publish-with-different-timestamp-directory ()
   (setq org-publish-timestamp-directory ".timestamps/")
   (org-publish-all))
 

@@ -2456,6 +2456,11 @@
   /* shadow */
   color: #b3b3b3;
 }
+.org-shinning {
+  /* shinning-face */
+  color: #ff0000;
+  background-color: #ffffff;
+}
 .org-show-paren-match {
   /* show-paren-match */
   color: #FDF4C1;

@@ -1,4 +1,4 @@
-#+BEGIN_EXPORT html
+#+BEGIN_EXPORT html 
 ---
 layout: post
 title: A Modular Tetris Library
@@ -58,7 +58,7 @@ For example, this [[https://stackoverflow.com/questions/135834/python-swig-vs-ct
 On the other hand, the advantages are the support for multiple languages and time savings when using simple functions.
 
 Let me show a brief demo of a function that calculates the power of a number
-#+BEGIN_SRC C
+#+BEGIN_SRC C :exports result
 int pow(int n) {
   return n * n;
 }
@@ -68,7 +68,7 @@ To generate this glue code, we have to write an input interface file containing 
 The first section is called the preamble and provides declarations to get the code to compile.
 The second declaration contains all the functions that you will be included in the wrapper code.
 
-#+BEGIN_SRC C
+#+BEGIN_SRC C :exports result
 %module example
 %{
   extern int pow(int n);
@@ -79,7 +79,7 @@ extern int pow(int n);
 
 To use this module in Python:
 
-#+BEGIN_SRC bash
+#+BEGIN_SRC python :exports result
 # Will create example.py and example_wrap.c
 ➜ swig -python example.i
 ➜ gcc -shared -fPIC example.c example_wrap.c \ 
@@ -92,7 +92,7 @@ To use this module in Python:
 
 To use this module in Ruby:
 
-#+BEGIN_SRC ruby
+#+BEGIN_SRC ruby :exports result
 # Content of extconf.rb
 require 'mkmf'
 create_makefile('example')
@@ -100,7 +100,7 @@ create_makefile('example')
 
 # mkmf library will generate a Makefile wich will correctly comple and link the C files into a ruby extension.
 # We could generate the module by hand with gcc.
-#+BEGIN_SRC bash
+#+BEGIN_SRC bash :exports result
 # In shell
 ➜ swig -ruby example.i
 # This command will create the Makefile
