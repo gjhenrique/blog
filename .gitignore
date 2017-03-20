@@ -56,3 +56,4 @@ _posts
 res
 .bundle_cache/
 .timestamps/
+/res/*
