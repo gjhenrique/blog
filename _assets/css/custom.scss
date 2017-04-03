@@ -16,3 +16,9 @@
 .org-src-container + .org-src-container {
     margin-top: -1.5em;
 }
+
+#icons {
+  a + a  {
+    margin-left: 20px;
+  }
+}
