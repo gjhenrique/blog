@@ -17,7 +17,7 @@ To identify the correct boundaries among the software components is a hard task.
 A good modular and extensible structure is one of the features that identifies a healthy code base.
 
 To show an example software reusability, this post will show you the architecture and the details
-of a simple and extensible tetris game library.
+of a simple and extensible Tetris game library.
 
 * Goals
 
@@ -28,14 +28,6 @@ To accomplish this, we have the following options:
 - *Inter Process Communication*: Mechanism that allows different and *separate* running processes to manage data. Examples: Sockets, message queues, RMI.
 
 Between these choices, the C approach fits better our requirements because it will keep our code more simple and portable.
-
-So, in short, our architecture will consist of a library with the core logic in C, 
-the bindings to connect the library with other languages and the usage of this library in multiple programming languages.
-In fact, this architecture reminds of the movie [[http://www.imdb.com/title/tt0060196/][The Good, The Bad and The Ugly]]. 
-
-[[./res/tetris/good_bad_ugly.gif]]
-
-Why? Because writing stuff in C usually leads to *bad* behavior, the binding code tends to be *ugly* and the *good* part is that you can reuse it in many programming languages.
 
 * C Library
 
@@ -49,10 +41,10 @@ For the unit tests, the C library [[https://github.com/silentbicycle/greatest][g
  
 * Language Binding
 
-The next sections will cover some techniques and tools related with the development of the language bindings.
+The next sections will cover some techniques and tools related to the development of the language bindings.
 
 ** C languages
-It is pretty trivial to call our library functions with C compatible languages (C, C++ and Objective-C) and no additional code is required.
+It is pretty trivial to call our library functions with C-compatible languages (C, C++ and Objective-C) and no additional code is required.
 To use it, just compile all the files into a single executable or link the library as a shared library.
 
 ** SWIG
@@ -62,7 +54,7 @@ To automate this process, [[http://www.swig.org][SWIG]] automagically generates 
 It currently supports Ruby, Python, Java, Javascript and [[http://www.swig.org/compat.html#SupportedLanguages][many, many others]].
 
 SWIG, of course, is far from being a silver bullet. 
-For example, this [[https://stackoverflow.com/questions/135834/python-swig-vs-ctypes][answer]] from Stackoverflow summarizes that one of the disadvantages is that the generated C code is ugly and may be tricky to setup a complex interface files.
+For example, this [[https://stackoverflow.com/questions/135834/python-swig-vs-ctypes][answer]] from Stackoverflow summarizes that one of the disadvantages is that the generated C code is ugly and may be tricky to set up a complex interface file.
 On the other hand, the advantages are the support for multiple languages and time savings when using simple functions.
 
 Let me show a brief demo of a function that calculates the power of a number
@@ -74,7 +66,7 @@ int pow(int n) {
 
 To generate this glue code, we have to write an input interface file containing the desired functions to be exported.
 The first section is called the preamble and provides declarations to get the code to compile.
-The second declaration contains every functions that you will be included in the wrapper code.
+The second declaration contains all the functions that you will be included in the wrapper code.
 
 #+BEGIN_SRC C
 %module example
@@ -126,7 +118,7 @@ Check the SWIG [[https://github.com/gjhenrique/modulartetris/blob/master/tetris/
 
 ** Web Browsers
 
-SWIG is pretty useful, but has one big downside. It is not possible to use it to target web browsers.
+SWIG is pretty useful but has one big downside. It is not possible to use it to target web browsers.
 To run our C code in them, we would have to rewrite the library in Javascript or use it with a plugin ([[https://www.apple.com/hotnews/thoughts-on-flash/][Flash]], [[https://developer.chrome.com/native-client][NaCl]]).
 
 However, there is a better alternative.
@@ -177,13 +169,13 @@ digraph {
 First, Emscripten calls [[http://clang.llvm.org/][clang]] to compile your C files and generate the [[https://en.wikipedia.org/wiki/LLVM#LLVM_Intermediate_Representation][LLVM bitcode]] from them.
 Then, the resulting bitcode is fed to the Emscripten LLVM backend called [[https://github.com/kripken/emscripten-fastcomp][Fastcomp]],
 which is translated to Javascript code. 
-All these operations are wrapped into the emcc command, so all this process is transparent to the user.
+All these operations are wrapped into the ~emcc~ command, so all this process is transparent to the user.
 
 The resulting Javascript is in the [[http://asmjs.org/faq.html][asm.js]] format, which is, in short,
 a strict subset of Javascript that is optimized for performance.
 For more information about it, check this [[http://ejohn.org/blog/asmjs-javascript-compile-target/][post]] by John Resig. 
 
-The [[https://gjhenrique.github.io/modulartetris/][demo game]] was adapted from [[https://github.com/jakesgordon/javascript-tetris][javascript-tetris]] and reuses its visual components, only replacing the tetris game logic.
+The [[https://gjhenrique.github.io/modulartetris/][demo game]] was adapted from [[https://github.com/jakesgordon/javascript-tetris][javascript-tetris]] and reuses its visual components, only replacing the Tetris game logic.
 
 ** Everything else
 If the programming language you are looking for is not yet supported by SWIG (Rust, Go or Nim),
