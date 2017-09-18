@@ -1,23 +1,61 @@
-image: gjhenrique/blog
+stages:
+  - build-org
+  - extract-css-classes
+  - publish
 
-pages:
+org-generation:
+  image:
+    name: iquiw/alpine-emacs
+  before_script:
+    - apk update
+    - apk add graphviz
+    # If cache succeeded, copy to emacs home
+    - if [ -d elpa ]; then cp -rf elpa /root/.emacs.d; fi
   cache:
+    key: org-files
     paths:
       - .timestamps
-      - .bundle_cache/
-      - .npm_cache/
-  before_script:
-    - du -h --max-depth=1
-    - bundle install --path .bundle_cache/
-    - npm config set cache $(pwd)/.npm_cache
-    - pushd syntax-extractor && npm install && popd
+      - elpa/
+  artifacts:
+    paths:
+      - _posts
   script:
     - emacs -batch -q -l export.el -f org-publish-all-with-different-directory
+    # Copy elpa packages to current directory for cache
+    - cp -rf /root/.emacs.d/elpa/ .
+  stage: build-org
+
+css-theme:
+  image: node:6.11.3-alpine
+  cache:
+    key: node-libraries
+    paths:
+      - .npm_cache/
+  before_script:
+    - npm config set cache $(pwd)/.npm_cache
+    - cd syntax-extractor && npm install && cd ..
+  script:
     - node syntax-extractor/index.js darktooth
+  artifacts:
+    paths:
+      - _assets/css/syntax.scss
+  stage: extract-css-classes
+
+pages:
+  image: ruby:2.4-alpine3.6
+  cache:
+    key: jekyll
+    paths:
+      - .bundle_cache/
+  before_script:
+    - apk update
+    - apk add build-base
+    - bundle install --path .bundle_cache/
+  script:
     - JEKYLL_ENV=production jekyll build -d public
-    - du -h --max-depth=1
   artifacts:
     paths:
       - public
+  stage: publish
   only:
     - master
