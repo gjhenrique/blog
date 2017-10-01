@@ -9,10 +9,12 @@
 (package-install 'org-plus-contrib)
 (package-install 'htmlize)
 (package-install 'rainbow-delimiters)
+(package-install 'yaml-mode)
 
 (require 'org)
 (require 'htmlize)
 (require 'rainbow-delimiters)
+(require 'yaml-mode)
 
 (defun org-publish-with-different-timestamp-directory ()
   (setq org-publish-timestamp-directory ".timestamps/")
