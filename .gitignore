@@ -53,7 +53,7 @@ flycheck_*.el
 .dir-locals.el
 
 _posts
-res
+/res
 .bundle_cache/
 .timestamps/
 /res/*
