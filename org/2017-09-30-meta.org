@@ -74,7 +74,7 @@ If, instead of ~org-html-publish-to-html~, we had specified ~org-beamer-publish-
 This is a programming blog, so the way that code snippets are presented here is really important.
 There are tons of methods of displaying code in a blog: with [[https://github.com/isagalaev/highlight.js][Javascript]], [[https://github.com/jneen/rouge][Ruby]] or [[https://gist.github.com][Github gist]].
 
-But, with org-mode, there's a more fun way to highlight the code.
+But, with org-mode, there's a funnier way to highlight the code.
 With the [[https://www.emacswiki.org/emacs/Htmlize][htmlize]] package and org-mode itself, it's possible to take a "snapshot" of the Emacs appearance and translate it to the browser.
 
 Basically, htmlize converts all existing [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Faces.html][Emacs faces]] into CSS properties.
