@@ -19,6 +19,7 @@ org-generation:
   artifacts:
     paths:
       - _posts
+      - res
   script:
     - emacs -batch -q -l export.el -f org-publish-with-different-timestamp-directory
     # Copy elpa packages to current directory for cache
