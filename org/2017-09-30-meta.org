@@ -2,15 +2,16 @@
 ---
 layout: post
 title: Blogging with org-mode and Gitlab Pages
-comments: true
+comments: false
 categories:
   - programming
 tags:
-  - programming
-  - modularity
-  - projects
+  - gitlab-ci
+  - org-mode
+  - blog
 ---
 #+END_EXPORT
+#+OPTIONS: ^:nil
 
 I invested a little of my time to setup this blog so, in this post, I'm going to tell you my experiences so far.
 

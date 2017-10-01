@@ -2,7 +2,7 @@
 ---
 layout: post
 title: A Modular Tetris Library
-comments: true
+comments: false
 categories:
   - programming
 tags:
@@ -185,6 +185,3 @@ you will have to write the binding code by hand. ='(
 After the wrapper code of your desired language is done, it is only a matter of calling the binding functions or methods
 and focus on the user interface of your game. 
 If you want to learn more about SWIG, the game logic and the architecture, check other demo games in the [[https://github.com/gjhenrique/modulartetris][github repository]].
-
-Thanks for your time and leave a comment if you have any suggestions.
-
