@@ -150,7 +150,7 @@ You can host your blog here with any static website generator that you want as l
 #+END_QUOTE
 
 After the html files are ready with your juicy content, you need a place to host it.
-The most popular option is to host it in [[https://pages.github.com/][Github Pages]];
+A popular option is to host it in [[https://pages.github.com/][Github Pages]];
 however, a major drawback is that you can only use Jekyll and, to make it worse, they limit you with only a [[https://pages.github.com/versions][collection of plugins]].
 
 This is where[[https://pages.gitlab.io/][ Gitlab Pages]] really shines.
