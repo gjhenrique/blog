@@ -27,6 +27,7 @@
    '((dot . t)))
   (defun my-org-confirm-babel-evaluate (lang body)
     (not (string= lang "dot")))
+  (setq org-export-with-sub-superscripts nil)
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
   (setq org-html-htmlize-output-type 'css)
   (load-file "posts-config.el")
