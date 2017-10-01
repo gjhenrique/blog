@@ -263,7 +263,7 @@ Just like with Github Pages, in the end, you'll have your website hosted in ~use
 * HTTPs and other niceties
 Beyond the freedom that Gitlab CI gives to you, Gitlab Pages also supports HTTPs for [[https://about.gitlab.com/2016/04/07/gitlab-pages-setup/#custom-domains][custom domains]].
 With [[https://www.letsencrypt.org/][Let's Encrypt]] you can semi-automate the process of certificate renewal [[https://github.com/rolodato/gitlab-letsencrypt][manually]] or [[https://github.com/JustinAiken/jekyll-gitlab-letsencrypt][with Jekyll]].
-In the future, maybe we won't need to do this since there's an [[https://gitlab.com/gitlab-org/gitlab-ee/issues/474][open issue]] to automate this part of the process.
+In the future, maybe we won't need to do this since there's an [[https://gitlab.com/gitlab-org/gitlab-ce/issues/28996][open issue]] to automate this part of the process.
 
 If this process is too manual and if you trust Cloudflare owning your keys,
 a fire and forget option is to let [[https://blog.cloudflare.com/quantifying-the-impact-of-cloudbleed/][Cloudflare manage your certificates]].
