@@ -21,3 +21,8 @@
     margin-left: 20px;
   }
 }
+
+// Workaround to hide figure_numbers in captions
+.figure-number {
+    display: none;
+}
