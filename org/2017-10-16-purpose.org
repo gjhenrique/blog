@@ -1,0 +1,92 @@
+#+BEGIN_EXPORT html 
+---
+layout: post
+title: Giving (emacs-)purpose to i3wm (or any other tiling window manager)
+comments: false
+categories:
+  - programming
+tags:
+  - emacs
+  - i3wm
+  - window-purpose
+---
+#+END_EXPORT
+#+OPTIONS: ^:nil
+
+
+https://github.com/bmag/emacs-purpose
+
+
+I'll try to show you a way to have a clean environment not only with 
+that's perfect for multiple frames and monitors setup.
+Sorry single monitor manifesto signers?
+
+You know when you have everything setup correctly and you mess up with your configuration.
+Purpose may help you with that use case of not messing up with your windows configuration
+
+clutter your buffer and frame configuration
+
+or even better
+
+* dafuq's purpose?
+
+the main motivation for purpose was to not mess up with the window layout, but it can with
+briefly, you can dedicate a buffer or a buffer to a window.
+just to remember, a frame is an instance, a window is a frame and a buffer is a window, kind of
+
+picture of frames window and all of the rest
+
+to enable it, use this
+purpose-user-mode-purposes
+
+first gif is ruby purpose and magit purpose
+focused on ruby and opening another magit buffer, it will open the magit buffer automatically
+
+second gif is ruby purpose and magit is the other buffer, but it'll dedicate the window to the buffer, so the magit buffer is never surplaced
+
+third gif is with multiple frames, dedicate window to magit buffer, guess what, it won't open because we 
+
+fourth gif is with multiple frames, but with reusable-frames, now, it'll open into the other frame
+
+
+it attaches into an advice of opening into a buffer
+foundation for your emacs frame
+explain how window-purpose works
+give the link to internals
+such a nice wiki, it's worth a read
+
+That was the foundation, but now let's make it into more interesting
+
+# if you're curious, the implementation of buffer dedication and window dedication is like this:
+
+* my daily workflow
+alt-tab sucks, you have to see it as an enemy
+enable to have multiple workspaces
+if you don't use a tiling window manager, you'll be tired to press alt-tab so many times
+
+show the desired setup
+1st is primary coding
+2nd is second coding
+3rd is browser
+4th is terminal
+6th is notes
+7th is magit
+8th is compilation
+9th is conky to show the time, memory, network and other stats
+
+* open all frames automatically
+zezin-frames variable
+assign to workspaces
+
+/usr/share/applications
+
+assign to multiple monitor as well (todo in emacs)
+assign to the workspaces in i3wm
+
+* conclusion
+
+hope you like it
+i'm using it for a couple of months and i'm enjoying a lot because it does not mess up my window configuratio
+it's better for productivity
+
+i'm a newbie in emacs lisp, feel free to give me any advices in reddit
