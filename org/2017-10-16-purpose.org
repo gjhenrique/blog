@@ -13,80 +13,302 @@ tags:
 #+END_EXPORT
 #+OPTIONS: ^:nil
 
+Imagine you're studying what a python file does in Emacs. 
+You fire up a python shell in another frame on the side monitor and starts to make assertions about the code you see it.
+You're full of questions about what this code does and decides to open a new python file that looks interesting.
+Unfortunately, if you don't move the cursor back to the python buffer, 
+it'd override the current window that you're in, which is the python shell, 
+but you don't want that because you still want to visit the python shell later.
 
-https://github.com/bmag/emacs-purpose
+In this post, I'll try to show you how the awesome tool [[https://github.com/bmag/emacs-purpose][purpose]] can help you with these kind of problems related with the window layout.
+Together with a tiling window manager, you can easily have multiple frames each one with their own meaning and _not interfering_ with each other.
 
+# In a summary, if you join the purpose, multiple frames, tiling window manager and more than one monitor to boost productivity.
 
-I'll try to show you a way to have a clean environment not only with 
-that's perfect for multiple frames and monitors setup.
-Sorry single monitor manifesto signers?
+# A better option would be to always have a frame assigned to the python shell and all the times you try to open it,
+# it'd be automatically called in the new frame. If you're using, it's just a matter of pressing the 
 
-You know when you have everything setup correctly and you mess up with your configuration.
-Purpose may help you with that use case of not messing up with your windows configuration
+# Unfortunately, this new buffer overrides the python shell, but you wanted this buffer to be opened in the window of A.py.
+# What if this python shell automatically was in another frame and it would be automatically be called.
 
-clutter your buffer and frame configuration
+# In this article, I'll try to show you a possibility with the purpose library
+# responsability in each frame to don't override
 
-or even better
+# What if you want to let the python shell in another window and never closes it.
+# having each frame with a single responsability to don't clutch your current
+# Now, you're interested
+# setup window and frame layout
 
-* dafuq's purpose?
+# I'll try to show you a way to have a clean environment not only with 
+# that's perfect for multiple frames and monitors setup.
+# Sorry single monitor manifesto signers?
 
-the main motivation for purpose was to not mess up with the window layout, but it can with
-briefly, you can dedicate a buffer or a buffer to a window.
-just to remember, a frame is an instance, a window is a frame and a buffer is a window, kind of
+# You know when you have everything setup correctly and you mess up with your configuration.
+# Purpose may help you with that use case of not messing up with your windows configuration
 
-picture of frames window and all of the rest
+# clutter your buffer and frame configuration
 
-to enable it, use this
-purpose-user-mode-purposes
+# or even better
 
-first gif is ruby purpose and magit purpose
+* how purpose can help?
+# Managing window layouts in the way you want in Emacs is really hard.
+# We have a lot of packages to deal with it
+
+# Imagine you're programming and you wonder if there's something you can do
+
+# the main motivation for purpose was to not mess up with the window layout, but it can with
+# briefly, you can dedicate a buffer or a buffer to a window.
+# just to remember, a frame is an instance, a window is a frame and a buffer is a window, kind of
+
+# picture of frames window and all of the rest
+Managing window and frame layout with purpose is easy. 
+You assign a purpose to a certain window and purpose will allow only related buffers to be opened in that window.
+For example, you create a python purpose and determine that only buffers with ~python-mode~ activated can be opened in that window.
+
+There's also a more restrictive option: You say to purpose that only the buffer ~file.py~ is allowed in a window.
+Purpose will not allow any buffer, even other python files, to be opened in that window
+
+I'll try to make it clearer with a few gif animations. 
+Let's get back with the example about our python file and the python shell from last section.
+
+Let's start with the default behavior. 
+which is Emacs not having any notion about which buffer will be opened.
+
+#+BEGIN_SRC
+gif with shell overriding the python file 
+#+END_SRC
+
+First of all, we have to bring some awareness about your desires to purpose.
+
+#+BEGIN_SRC emacs-lisp :exports result
+
+;; python-mode buffers will have the python purpose
+(add-to-list 'purpose-user-mode-purposes '(python-mode . python))
+;; *Python* buffer will have the python-shell purpose
+(add-to-list 'purpose-user-name-purposes '("*Python*" . python-shell))
+#+END_SRC
+
+# to enable it, use this
+# purpose-user-mode-purposes
+Surprisingly, without taking any more action, we can see purpose bringing some advantages for us.
+When opening a new buffer, purpose will try to reuse a window in the frame if it has the purpose.
+# _If you have two different windows with different purposes in the same frame and try to open a new buffer that already have the same purpose_, 
+# the library will reuse that window.
+# Notice that after that, purpose will 
+
+#+BEGIN_SRC 
+1. two python files
+2. open python shell
+3. tries to open a python file in cursor with shell, it opens in other buffer
+4. go to the other 
+
+first gif is python purpose and python shell purpose
 focused on ruby and opening another magit buffer, it will open the magit buffer automatically
+#+END_SRC
 
-second gif is ruby purpose and magit is the other buffer, but it'll dedicate the window to the buffer, so the magit buffer is never surplaced
+Now, imagine that, during your coding session, you want to only open python code in the *left* window no matter what.
+Now, you have to be active and ask for purpose to assign the window to that specific purpose.
 
-third gif is with multiple frames, dedicate window to magit buffer, guess what, it won't open because we 
+#+BEGIN_SRC 
+1. two python files
+2. assign purpose to current window
+3. open shell with the cursor the "purposed" window
+4. it'll open in the other buffer
+#+END_SRC
 
-fourth gif is with multiple frames, but with reusable-frames, now, it'll open into the other frame
+In the last example you make it explicit that the left window would only have python buffers related with code, 
+but there's a possibility to assign a window to a buffer, not to a purpose.
+
+#+BEGIN_SRC 
+1. open a.py
+2. dedicate the buffer
+3. open c.py
+4. open it in the side window
+#+END_SRC
+
+These animations were the foundation of what purpose can offer you.
+But, we want to interact with other frames as well. 
+We want that everything with python shell files to be opened in the first frame.
+
+#+BEGIN_SRC 
+1. first frame with a.py and b.py, second frame with the shell
+2. assign to magit
+3. dont open in another frame
+4. it'll open in another frame
+#+END_SRC
+
+This went wrong. It's because we have to enable the builtin reusable-frames in the ~display-buffer-alist~.
+https://www.gnu.org/software/emacs/manual/html_node/elisp/Display-Action-Functions.html
 
 
-it attaches into an advice of opening into a buffer
-foundation for your emacs frame
-explain how window-purpose works
-give the link to internals
-such a nice wiki, it's worth a read
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'display-buffer-alist
+             `("\\*magit*"
+               nil
+               (reusable-frames . t)))
+#+END_SRC
 
-That was the foundation, but now let's make it into more interesting
+#+BEGIN_SRC emacs-lisp
+1. first frame with a.py and b.py, second frame with the shell
+2. assign to magit
+3. dont open in another frame
+4. it'll open in another frame
+#+END_SRC
 
-# if you're curious, the implementation of buffer dedication and window dedication is like this:
+If you're curious about more options and its internals, you could see the awesome [[https://github.com/bmag/emacs-purpose/wiki/][wiki]] of the project.
 
-* my daily workflow
-alt-tab sucks, you have to see it as an enemy
-enable to have multiple workspaces
-if you don't use a tiling window manager, you'll be tired to press alt-tab so many times
+* improving your workflow
+Now that we have a foundation about purpose, we can see it when a lot of frames is applied.
+When you use a conventional (floating) window manager, alt-tab is your only friend.
+You use it exclusively to change among windows.
+But, when you a lot of windows are involved, having a single keybinding starts to become _a cumbersome_.
 
-show the desired setup
-1st is primary coding
-2nd is second coding
-3rd is browser
-4th is terminal
-6th is notes
-7th is magit
-8th is compilation
-9th is conky to show the time, memory, network and other stats
+When you introduce a tiling window manager to your life, you realize that alt-tab was in fact your enemy the whole time.
+With a clean way to organize your windows, you can be really productive having a lot of GUI windows, which includes Emacs frames.
+
+I can't really say for other window managers, but I use i3wm and it separates the GUI windows in workspaces.
+You can have them as many as you want, but it's common to assign workspaces as numbers.
+
+Let me introduce all workspace responsabilities:
+- 1st: primary coding editor
+- 2nd: secondary coding editor
+- 3rd: browser
+- 4th: terminal
+- 6th: notes
+- 7th: magit
+- 8th: miscellaneous - compilation, elfeed, other stuff
+- 9th: dired
+
+We have a lot of Emacs frames here.
+Imagine using this setup with GNOME, in the worst case, you'd have to type ~alt-tab~ nine times.
 
 * open all frames automatically
-zezin-frames variable
-assign to workspaces
+To configure correctly all the Emacs frames when you start it would be very repetitive.
+We have to create a easy way to start and place all these frames in the correct frames.
 
-/usr/share/applications
+As an example that you could extend later, 
+let's first define the frames containing the title and the callback to be exectuded when it's first created.
 
-assign to multiple monitor as well (todo in emacs)
-assign to the workspaces in i3wm
+#+BEGIN_SRC emacs-lisp +n :exports result
+(setq zezin-frames
+      '(((title . "Emacs - Primary"))
+
+        ((title . "Emacs - Secondary"))
+
+        ((title . "Emacs - Notes") 
+         (start-fn . zezin-start-notes-frame))
+
+        ((title . "Emacs - Git") 
+         (start-fn . zezin-start-magit-frame))
+
+        ((title . "Emacs - Compilation") 
+         (start-fn . zezin-start-compilation-frame))))
+
+(defun zezin-add-reusable-buffers (buffer-regex)
+  (add-to-list 'display-buffer-alist
+               `(,buffer-regex
+                 nil
+                 (reusable-frames . t))))
+ 
+(defun zezin-frame-title (frame)
+  (cdr (assq 'title (frame-parameters frame))))
+
+(defun zezin-frame-exists? (title)
+  (member title
+          (-map
+           (lambda (frame) (zezin-frame-title frame))
+           (frame-list))))
+
+(defun zezin-make-new-frame (frame-config)
+  (let ((title (assoc 'title frame-config)))
+    (when (not (zezin-frame-exists? (cdr title)))
+      (make-frame `(,title)))))
+
+(defun zezin-start-frames ()
+  (interactive)
+  (-each zezin-frames 'zezin-make-new-frame)
+  ;; kill frame without a title
+)
+
+(defun zezin-find-start-fn (frame-title)
+  (cdr (assoc 'start-fn
+              (-first
+               (lambda (frame-config)
+                 (string= (cdr (assoc 'title frame-config)) frame-title))
+               zezin-frames))))
+
+(defun zezin-start-magit-frame (frame)
+  (switch-to-buffer (get-buffer-create "*magit: purpose"))
+  (purpose-toggle-window-purpose-dedicated))
+  
+(add-hook 'after-make-frame-functions
+          (lambda (frame)
+            (let* ((title (zezin-frame-title frame))
+                   (start-fn (zezin-find-start-fn title)))
+              (when start-fn
+                (select-frame frame)
+                (funcall start-fn frame)))))
+
+(use-package window-purpose
+  :config
+  (progn
+    (purpose-mode)
+    (purpose-x-magit-single-on)
+
+    (zezin-add-reusable-buffers "\\*magit*")
+    (zezin-add-purposes)
+
+    (purpose-compile-user-configuration)))
+#+END_SRC
+
+# With this configuration, we can 
+# To have an idea, check this configuration.
+
+We have an interactive function ~zezin-start-frames~, which will open all the frames if they don't exist.
+After that we have to open it with a certain way.
+_explain what it does_
+
+We now have this function, but how do we call it outside of Emacs.
+The answer is we create a .desktop application file to be called in a launcher or in a menu.
+Also, an Emacs daemon is required to be running when you call this action with a launcher.
+
+#+BEGIN_SRC conf
+# An emacs daemon is required to be opened
+# Save it in ~/.local/share/applications/emacssetup.desktop
+[Desktop Entry]
+Name=Emacs Setup
+GenericName=Text Editor
+Comment=Spawn specific Emacs instances
+# An emacs daemon is required to run this
+Exec=emacsclient -c -e "(zezin-start-frames)"
+Icon=emacs
+Type=Application
+Terminal=false
+Categories=Development;TextEditor;
+StartupWMClass=Emacs
+Keywords=Text;Editor;
+#+END_SRC
+
+Now we are opening all the frames specified in our list, but they are all located in the same workspace.
+Remember that we specified each frame with a title? Now, we use this information to position each frame in the desired workspace.
+
+#+BEGIN_SRC conf
+assign [title="Emacs - Primary"] 1
+assign [title="Emacs - Git"] 2
+#+END_SRC
+
+Now, after we call the ~Emacs Setup~ desktop entry, we can press ~Win+2~ and always find the Magit frame in this workspace.
+
+There's definitely a better way to do this within Emacs, but to solve this problem, I thought the code was concise enough to write.
 
 * conclusion
+maybe it's not so interesting to use this approach if you're not using a tiling window manager
+could be a productivity booster
+don't fight with the editor
 
-hope you like it
-i'm using it for a couple of months and i'm enjoying a lot because it does not mess up my window configuratio
-it's better for productivity
+i'm newbie
 
-i'm a newbie in emacs lisp, feel free to give me any advices in reddit
+# hope you like it
+# i'm using it for a couple of months and i'm enjoying a lot because it does not mess up my window configuratio
+# it's better for productivity
+# i'm a newbie in emacs lisp, feel free to give me any advices in reddit
