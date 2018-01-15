@@ -57,3 +57,4 @@ _posts
 .bundle_cache/
 .timestamps/
 /res/*
+vendor

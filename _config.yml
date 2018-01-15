@@ -20,7 +20,7 @@ paginate_path: /page:num/
 gems:
   - jekyll-paginate
   - jekyll-assets
-exclude: [syntax-extractor, org]
+exclude: [syntax-extractor, org, vendor]
 
 # Default values
 defaults:
