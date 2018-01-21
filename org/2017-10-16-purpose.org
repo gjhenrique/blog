@@ -20,8 +20,9 @@ they keep overwriting each other.
 This is a truly problem that a lot of Emacs users face: you struggle with the organization of the window layout.
 
 Whit this post, I hope to show how the awesome tool [[https://github.com/bmag/emacs-purpose][purpose]] can help you to overcome this difficulty. 
-The way is to have multiple responsibilities (git, code, shell, tests, notes) each one with their own GUI window.
-With the addition of a tiling window manager, you won't have the overhead of switching among them.
+The approach is to have multiple responsibilities (git, code, shell, tests, notes) each one with their own GUI window.
+Purpose will not let that those windows overstepping each other and,
+with the addition of a tiling window manager, you won't have the overhead of switching among them.
 
 * how purpose can help?
 Managing the window layout with purpose is easy but may take a little time to be tamed.
@@ -31,17 +32,18 @@ It provides us with two ways to deal with it:
 - you register a *single* buffer to a window *regardless* of the mode and that buffer won't *ever* leave that window. 
 
 I'll try to make these examples clearer with a few animations. 
-Let's get back with the example about our ruby file and the REPL shell from last section.
-To better represent the problem that purpose solves, the default behavior is showed first.
+Let's use the example about trying to manage regular ruby code and a [[https://github.com/pry/pry][pry]] REPL session.
+
+The default behavior is showed first to better represent the problem that purpose solves.
+
+[[./res/purpose/drawing-test.gif]]
 
 #+BEGIN_SRC
-gif with pry overriding the shell file 
+gif with pry overriding the ruby file 
 #+END_SRC
 
 Notice how Emacs doesn't really care about the meaning of a buffer and will overwrite it without any consideration.
-To give some context to those buffers, we have to declare our desired setup in its configuration
- # purpose simply doesn't know the "context" of the buffers as well.
-# To give some context to purpose, .
+To give some context to those buffers, we have to declare the desired behavior in the configuration:
 
 #+BEGIN_SRC emacs-lisp :exports result
 ;; ruby-mode buffers will have the ruby purpose
@@ -59,7 +61,7 @@ When opening a new buffer, purpose will try to reuse a window if they share the 
 
 #+BEGIN_SRC 
 1. two ruby files
-2. open ruby shell
+2. open ruby sell
 3. tries to open a python file in cursor with shell, it opens in other buffer
 4. go to the other 
 
@@ -124,6 +126,14 @@ If you're curious about more options and its internals, you could see the awesom
 
 * improving your workflow
 Now that we have a notion of how purpose works, we can extend it to bring multiple frames to the table.
+
+#+BEGIN_SRC 
+1. three frames
+2. one is code, two is magit, three is shell
+3. try to open shell
+4. try to open shell
+#+END_SRC
+
 Having multiple GUI windows is a disadvantage when you use a floating window manager, since ~alt-tab~ is your only friend.
 But, when a lot of windows are involved, having a single method to switch among windows becomes really cumbersome.
 

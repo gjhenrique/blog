@@ -252,3 +252,16 @@ footer {
   color: $main-color;
   font-size: 1.3em;
 }
+
+.figure {
+  // Image Caption
+  p:last-child {
+    text-align: center;
+    font-style: italic;
+    margin: auto;
+    width: 80%;
+    font-size: 0.95em;
+    margin-bottom: 1em;
+    margin-top: -1em;
+  }
+}
