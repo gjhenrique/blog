@@ -1,7 +1,7 @@
 #+BEGIN_EXPORT html 
 ---
 layout: post
-title: Giving (emacs-)purpose to i3wm (or any other tiling window manager)
+title: Giving (emacs-)purpose to i3wm
 comments: false
 categories:
   - programming
@@ -80,9 +80,8 @@ That went wrong because we have to add the corresponding regex in the [[https://
 If we don't do that, Purpose won't consider opening the buffer in another frame.
 
 #+BEGIN_SRC emacs-lisp :exports result
-;; TODO: Check if this works
 (add-to-list 'display-buffer-alist
-             `("\\*.rb"
+             `("\\.rb\\'"
                nil
                (reusable-frames . t)))
 #+END_SRC
@@ -132,7 +131,7 @@ We need an automatic mechanism to launch and position all these frames in each c
 ** Defining the frames
 I'll use only the Magit workspace, but it can be extended later easily with your preferences.
 This snippet basically creates all desired frames and configures them with Purpose.
-This is omitted for brevity but you can find the complete implementation _here_
+This is omitted for brevity but you can find the complete implementation [[https://github.com/gjhenrique/zezin.emacs/blob/master/modules/zezin-purpose.el][here]].
 
 #+BEGIN_SRC emacs-lisp :exports result
 (setq zezin-frames
