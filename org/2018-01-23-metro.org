@@ -1,0 +1,70 @@
+#+begin_EXPORT html 
+---
+layout: post
+title: Converting subway lines to git graph
+comments: false
+categories:
+  - programming
+tags:
+  - clojure
+  - subway
+---
+#+jND_EXPORT
+#+OPTIONS: ^:nil
+
+Always when studying a new technology, try to do a practical example
+In the case of clojure, it could be because of MetroGit
+I was thinking about something so silly but at the same time so ingenous could be a good example
+Dealing with git and graph algorithms could be a nice way to fit this new use case
+A question came to my mind: Why don't we have a generic input with subway lines and stations and in the end, 
+it would output the required git commands to build a tree
+
+Do you know the old saying that says destroy_hiroshima a good programmer would write destroy_city
+buid_subway_paris build_subway_city(city)
+
+* proposal
+We gotta go from this:
+Show the image of the subway from SP
+
+To this:
+Show the git command
+
+At first, it looks easy, but we can't bring any cycles, have a context of visited stations, and outputs the git commands
+
+always that we have a 
+
+* proposed algorithm
+now this is the place for the animations 
+
+look for the predecessors
+
+
+
+* nyc: the nemesis of the subways
+to see if the algorithm really works, i tried to test with the bigger subway system of the world
+a lot of cycles were introduced, so we always had to check this
+also I built a parser of the page and the page introduced a lot of inconsistencies
+
+check this link out and see for yourself. 
+
+* advantages of clojure
+the same code that is built to create the git commands is used to create these animations. it's amazing
+sorry about the cpu usage of these animations, i didn't have the time to optimize
+metro-seq is awesome
+
+
+Advantage of using something like clojure
+metro-seq example, employ purity so the algorithms flows nicely
+
+polimorphism is not restricted to object oriented languages.
+in clojure a functional language it is achieved with protocols
+show how map, count, etc. are all used
+
+currently, there are only _sao paulo_ and _new york city_ implemented, 
+open _an issue_ if you would like to include your city in the list 
+anyway, thanks for reading this and sorry about the cpu usage of these animations.
+
+#+BEGIN_EXPORT html 
+<h1>Hi</h1>
+#+END_EXPORT
+
