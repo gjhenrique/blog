@@ -101,7 +101,7 @@ Now that we have a notion of how Purpose works, we can extend it to bring multip
 This setup demands that you open a lot of GUI windows and this can be a disadvantage when you're using a floating window manager,
 because the single way to move among windows is with ~alt-tab.
 
-When you introduce a tiling window manager to your life, you realize that ~alt-tab~ was in fact your enemy the whole time.
+When you introduce a tiling window manager to your life, you realize that ~alt-tab~ was, in fact, your enemy the whole time.
 With a clean and flexible way to organize your windows, you can be really productive assigning each different GUI window to a new keybinding.
 
 I can't really say for other window managers, but [[http://i3wm.org/][i3wm]] separates the GUI windows in workspaces.
@@ -122,7 +122,7 @@ Let me suggest a possible setup with these workspaces:
 For each one of them, we dedicate the corresponding purpose to each frame.
 Every buffer that doesn't fit into any purpose will be opened inside the first frame since it's not dedicated to any purpose.
 
-I wish that by now you learned the principle and will be able to choose the setup that's most suitable to you.
+I wish that by now you learned the principle and will be able to choose the setup that's most suitable for you.
 
 * Open all frames automatically
 Opening all these Emacs frames and assign each one to the correct workspace is a manual and repetitive task.
@@ -172,7 +172,7 @@ This is omitted for brevity but you can find the complete implementation [[https
 ;; if there isn't, it creates a new one from zezin-frames elements
   (-each zezin-frames 'zezin-make-new-frame))
 
-;; hook that's executed everytime there's a new frame
+;; hook that's executed every time there's a new frame
 (add-hook 'after-make-frame-functions
           (lambda (frame)
             (let* ((title (zezin-frame-title frame))
