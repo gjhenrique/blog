@@ -1,16 +1,22 @@
-#+begin_EXPORT html 
+#+BEGIN_EXPORT html 
 ---
 layout: post
 title: Converting subway lines to git graph
 comments: false
+custom_js:
+  - ./res/metro/metro.js
+  - ./res/metro/custom.js
+  - ./res/metro/custom.js.map
 categories:
   - programming
 tags:
   - clojure
   - subway
+styles:
+  - "https://fonts.googleapis.com/css?family=Source+Code+Pro"
 ---
-#+jND_EXPORT
-#+OPTIONS: ^:nil
+#+END_EXPORT
+
 
 Always when studying a new technology, try to do a practical example
 In the case of clojure, it could be because of MetroGit
@@ -35,10 +41,13 @@ always that we have a
 
 * proposed algorithm
 now this is the place for the animations 
-
-look for the predecessors
-
-
+#+BEGIN_EXPORT html 
+<i id="metro-play-button" class="icon-play fa-play"></i>
+<div class="metro-animation">
+  <div id="graph-simple" class="metro-graph"></div>
+  <div id="commands-simple" class="metro-git-container"></div>
+</div>
+#+END_EXPORT
 
 * nyc: the nemesis of the subways
 to see if the algorithm really works, i tried to test with the bigger subway system of the world
@@ -63,8 +72,3 @@ show how map, count, etc. are all used
 currently, there are only _sao paulo_ and _new york city_ implemented, 
 open _an issue_ if you would like to include your city in the list 
 anyway, thanks for reading this and sorry about the cpu usage of these animations.
-
-#+BEGIN_EXPORT html 
-<h1>Hi</h1>
-#+END_EXPORT
-
