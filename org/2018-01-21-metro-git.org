@@ -1,7 +1,7 @@
 #+BEGIN_EXPORT html 
 ---
 layout: post
-title: Converting subway lines to git graph
+title: Converting metro lines to git graph using Clojure
 comments: false
 custom_js:
   - ./res/metro/metro.js
@@ -17,30 +17,274 @@ styles:
 ---
 #+END_EXPORT
 
+When I'm studying a new programming language or library, I always try to make a practical example to learn it.
+This projects can't be so big because they would eventually discourage me
+and not so small to only touch the surface of the tool.
 
-Always when studying a new technology, try to do a practical example
-In the case of clojure, it could be because of MetroGit
-I was thinking about something so silly but at the same time so ingenous could be a good example
-Dealing with git and graph algorithms could be a nice way to fit this new use case
-A question came to my mind: Why don't we have a generic input with subway lines and stations and in the end, 
-it would output the required git commands to build a tree
+I was trying to learn Clojure, had read some books and was looking for an interesting project to apply the knowledge.
+Then I remembered the project [[https://github.com/vbarbaresi/MetroGit%0A][MetroGit]] that consists of building a Git graph from the metro system of Paris.
+In my opinion, this project is so creative and simple that the original idea could be improved.
 
-Do you know the old saying that says destroy_hiroshima a good programmer would write destroy_city
-buid_subway_paris build_subway_city(city)
+So, the idea is to build the git graph through git operations dynamically.
+Provide the input with the metro system and the algorithm will generate all the necessary commands to build it.
 
-* proposal
-We gotta go from this:
-Show the image of the subway from SP
+It is based on the quote from [[https://en.wikiquote.org/wiki/Nathaniel_Borenstein][Nathaniel Borenstein]] (I originally saw it on [[https://blog.codinghorror.com/your-favorite-programming-quote/][Coding Horror]]).
 
-To this:
-Show the git command
+#+BEGIN_QUOTE 
+It should be noted that no ethically-trained software engineer would ever consent to write a *DestroyBaghdad* procedure. 
+Basic professional ethics would instead require him to write a *DestroyCity* procedure, to which Baghdad could be given as a parameter. 
+          -- Nathaniel Borenstein
+#+END_QUOTE
 
-At first, it looks easy, but we can't bring any cycles, have a context of visited stations, and outputs the git commands
+Only in this case, I ethically would write the *BuildMetroCity* procedure, not *BuildMetroParis*, passing the metro stations and connections as a parameter.
 
-always that we have a 
+* Main Idea
 
-* proposed algorithm
-now this is the place for the animations 
+In a nutshell, we gotta go from a metro stations and lines to a git graph.
+
+As an example, this part of [[https://pt.saopaulomap360.com/mapa-metro-sao-paulo][São Paulo]] metro system:
+[[./res/metro/metro-sp.png]]
+
+Will generate these shell commands:
+
+#+BEGIN_SRC shell-script :exports result
+# República
+git checkout --orphan "Red"
+git commit --allow-empty -m "República"
+git branch -f "Yellow" HEAD
+
+# Anhangabaú
+git commit --allow-empty -m "Anhangabaú"
+
+# Luz
+git checkout "Yellow"
+git commit --allow-empty -m "Luz"
+git branch -f "Blue" HEAD
+
+# Sao Bento
+git checkout "Blue"
+git commit --allow-empty -m "São Bento"
+
+# Sé
+git merge --strategy=ours --allow-unrelated-histories \
+--no-ff --commit -m "Sé" Red
+
+# Liberdade
+git commit --allow-empty -m "Liberdade"
+
+# Pedro II
+git checkout "Red"
+git commit --allow-empty -m "Pedro II"
+#+END_SRC
+
+Which produces the following git graph (~git log --graph --all --pretty=oneline~ command):
+
+[[./res/metro/git-result.png]]
+
+* Rationale
+
+To build the algorithm, we need to ask some core questions 
+that the algorithm will have to adhere.
+
+1. How to build the graph?
+Since a git graphs is a [[http://eagain.net/articles/git-for-computer-scientists/][Directed Acyclic Graph]], we need to (guess what?!) build a graph
+with directed edges without cycles. 
+But what's the best direction for the lines? 
+If we find any cycles, how we remove the minimum number of stations to become acyclic?
+
+2. How to traverse the graph?
+Can we traverse the graph without taking into account the other near stations?
+How to traverse the graph to visit all the stations?
+_Never visit the same station more than once._
+
+# Imagine if we did a simple traversed the graph without taking into account the other stations/commits. 
+# So we need to take in consideration the already "visited" stations to always finish with
+
+# Create a commit when you find a sole station and merge when we find a station when two or more lines meet.
+# But, it's not so simple because we have to decide how to traverse it.
+
+3. How to create commits, branches and merges?
+If we find a simple commit, can we simply commit it. 
+When it's a connection, do we simply generate a merge command?
+
+In the following sections, I'll show you
+
+* Building the graph
+The first step is to build a dag.
+Worry about cycles
+
+Vertex are the station and the connections are the edges
+
+** Dealing with the graph
+Now that the graph is ready, we could use the navigation algorithm of loom
+
+predecessors
+successors
+dfs, bfs and the important dag?
+
+namespace loom it means that i'm talking with the library
+To perform all graph related operations, we're using the [[https://github.com/aysylu/loom.git][loom]] library.
+After we're done we can call all the same operations
+
+The first detail to be defined is the input format that the subway map will be represented 
+It could be stored like this:
+_We could store it like this_:
+
+#+BEGIN_SRC json :exports result
+[
+  {
+    "name": "Red",
+    "stations": ["A", "C"]
+  },
+  {
+    "name": "Green",
+    "stations": ["B", "C"]
+  }
+]
+#+END_SRC
+
+** Without cycles
+The happy path is that new lines won't introduce any cycles.
+
+#+BEGIN_EXPORT html 
+<div class="metro-animation">
+  <div id="build-1" class="metro-graph"></div>
+</div>
+#+END_EXPORT
+
+Notice that, when two lines meet, it changes the vertex color.
+
+#+BEGIN_SRC clojure :exports result
+(defn build-subway-graph
+  [config]
+  (reduce
+    (fn [graph line]
+      (let [new-graph (loom/add-vertices graph (:stations line))]
+        (loom/add-attribute stations (:name line))))
+  
+    (loom/build-new-digraph)
+  
+    (json/read-json config))
+#+END_SRC
+If you don't understand Clojure, don't worry.
+We're simply declaring the function ~build-subway-graph~ which
+applies the anonymous function over each line metadata 
+using an empty graph as the input for the first step.
+For each line, the function will first create a new graph adding the stations and its connections
+and then assign an attribute to each vertex/station (That'll be important for the graph traversal).
+
+And since loom uses Clojure sets and maps under the hood to represent a graph,
+we don't need to worry about creating a new graph every time,
+since Clojure implements [[http://hypirion.com/musings/understanding-persistent-vector-pt-1][persistent data structures]].
+A new graph is being created at the same time but they share almost the same data structure
+
+** Reversing
+What if a new line introduces a cycle?
+Before we start to remove edges/connections, we could take a less damaging approach.
+
+Since every line runs in both directions, we can try to reverse the order of the stations and check if we still have cycles.
+
+_Add graph when the reversal_
+
+#+BEGIN_SRC clojure :exports result
+(defun add-stations
+  [graph stations]
+  (let [new-graph (loom/add-vertices graph (:stations line))]
+    (when loom/dag? new-graph
+      new-graph)))
+
+;; inside build-subway-graph function
+(or (add-stations graph (:stations line))
+    (add-stations graph (reverse (:stations line))))
+#+END_SRC
+
+The new method ~add-stations~ tries to create a new graph with the line stations. 
+If the new-graph doesn't have any cycles, _it's returned_ , otherwise it returns ~nil~.
+Then, we can call the ~or~ function to return the first real value.
+
+By the way, the method ~loom/dag?~ uses a topological sort, which takes ~O(E+V)~ to check if there's a cycle in the graph.
+
+** Removing connections/edges
+If there are still cycles after reversing, we need to remove *only* the edges that are introducing it in the first place.
+
+The algorithm is really simple and it's based on this _stackoverflow answer_.
+It incrementally create a graph with the new connection and check if the cycle exists.
+_If there's no cycle, it's safe to remove this connection_.
+
+In every connection,
+~O(E * (V + E))~
+It isn't a problem because the graph will few edges since each station (node) can go one step further.
+Didn't worry so much about complexity
+Albeit being simple, I tested with the New York City, which is the subway with the most stations
+and it removed only two connections
+
+These code samples are summarized here for _dunno_ reasons.
+But you can check the final graph construction algorithm _here_.
+
+* Traversal
+Just a notice with the animations
+
+If you notice any cpu spike, don't worry, I'm not using your browser to mine bitcoins.
+Simply pause the animations and everything will come back to normal.
+
+** Strategy
+What I liked about Clojure is that it forces you to think differently.
+_It simplifies your domain_
+simple data structures no class, objects
+Instead of assigning a variable
+immutable state
+
+
+#+BEGIN_SRC  clojure :exports result
+;; Using above function to build a loom graph
+(def graph (build-subway-graph config))
+
+;; We can store graph related data as attributes of the vertex
+(def state1 (traverse-subway-graph {:graph graph})
+;; {:current-node "A" :current-line "Red" :graph graph-1}
+
+(def state2 (traverse-subway-graph state1))
+;; {:current-node "B" :current-line "Blue" :graph graph-1}
+
+(def state3 (traverse-subway-graph state2))
+;; {:current-node "C" :current-line "Green" :graph graph-2}
+
+;; No more stations to process
+(def state4 (traverse-subway-graph state3))
+;; nil
+
+;; Passing state1 yields the same result as state2
+(def state4 (traverse-subway-graph state1))
+;; {:current-node "A" :current-line "Red" :graph graph-1}
+#+END_SRC
+
+The idea is to call this function until ~nil~ is returned we know for sure that the algorithm ended
+
+** Single stations
+#+BEGIN_SRC 
+Red - A B C
+#+END_SRC
+
+#+BEGIN_SRC clojure :exports result
+(defn traverse-subway-graph
+  [state]
+  (let [{:keys [graph current-node current-line]} state
+        predecessor 
+        (find-unvisited-predecessor graph current-node)]
+  (cond
+    (not (nil? predecessor)
+    (traverse-subway-graph 
+      (assoc state :current-node predecessor))
+  :else
+    (assoc state
+       :current-line (loom/attributes graph current-node :line)
+       :graph (loom/add-attribute graph 
+                                  current-node 
+                                  :visited true)
+#+END_SRC
+
+Notice that we always return a new state to the function
+
 #+BEGIN_EXPORT html 
 <i id="metro-play-button" class="icon-play fa-play"></i>
 <div class="metro-animation">
@@ -49,18 +293,54 @@ now this is the place for the animations
 </div>
 #+END_EXPORT
 
-* nyc: the nemesis of the subways
-to see if the algorithm really works, i tried to test with the bigger subway system of the world
-a lot of cycles were introduced, so we always had to check this
-also I built a parser of the page and the page introduced a lot of inconsistencies
+There's a problem with it so far. 
+The algorithm will run indefinitely because we're always returning
+We must supply a stop condition
+end variable
+stop condition
+But there's a problem here, we need to find a way to stop it, 
+so we need to add a function that finds any successors that were not visited
+~find-successors~ and empty?
 
-check this link out and see for yourself. 
+** Pending stations
+Imagine we have this setup
+Now there's a problem. What to choose when the connection has a fork
+When we have a fork, but there'll be no way to know when to come
+We need to add the pending-nodes attribute
 
-* advantages of clojure
+** Initial state
+
+#+BEGIN_SRC clojure :exports result
+(-> 
+  (initial-state)
+  (traverse-subway-graph))
+#+END_SRC
+
+Algorithm will decide how it should be stored
+We can use the 
+
+Check the _code_ of the traversal algorithm
+
+* Git commands
+Now we traverse the graph and for each step we generate the 
+The hardest part is gone
+
+We could use jgit for it
+
+We have to keep track of where we are using state
+
+Same strategy with traverse-subway-graph
+** Single commit
+
+** Merge stations
+
+** Git force with branch
+
+* Clojure Seq abstraction
+encapsulate the sequence
+
 the same code that is built to create the git commands is used to create these animations. it's amazing
-sorry about the cpu usage of these animations, i didn't have the time to optimize
 metro-seq is awesome
-
 
 Advantage of using something like clojure
 metro-seq example, employ purity so the algorithms flows nicely
@@ -69,6 +349,24 @@ polimorphism is not restricted to object oriented languages.
 in clojure a functional language it is achieved with protocols
 show how map, count, etc. are all used
 
+* That's it, folks
+Big thanks to washington project
+check the project in github
+
+the animations are written in clojurescript. the same algorithm that generated
+check this link out and see for yourself. 
+
+It's a combination of git, graph and clojure which means I found the perfect way to finally learn Clojure.
+
+sorry about the cpu usage of these animations, i didn't have the time to optimize
+
+to see if the algorithm really works, i tried to test with the bigger subway system of the world
+a lot of cycles were introduced, so we always had to check this
+also I built a parser of the page and the page introduced a lot of inconsistencies
+
+thanks to washington since I copied some of the git commands from there
+
+nyc subway is the big boss, since it's the larger
 currently, there are only _sao paulo_ and _new york city_ implemented, 
 open _an issue_ if you would like to include your city in the list 
 anyway, thanks for reading this and sorry about the cpu usage of these animations.

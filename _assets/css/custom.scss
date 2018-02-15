@@ -27,15 +27,15 @@
     display: none;
 }
 
+.icon-play {
+  position: relative;
+  z-index: 1
+}
+
 .metro-animation {
   margin-top: -20px;
   display: block;
   height: 300px;
-}
-
-.icon-play {
-  position: relative;
-  z-index: 1
 }
 
 // Metro style

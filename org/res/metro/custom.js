@@ -1,12 +1,25 @@
 document.addEventListener('DOMContentLoaded', function(){
-  var configSimple = [{name: "Red", stations: ["A", "B", "C"]},
-                      {name: "Blue", stations: ["D", "B", "E"]},
-                      {name: "Green", stations: ["F", "B", "G"]}];
+  // var building1 = [{name: "Red", stations: ["A", "C", "D"]},
+  //                  {name: "Green", stations: ["B", "C", "E"]}];
+
+  var building1 = [{name: "Red", stations: ["A", "B"]},
+                   {name: "Green", stations: ["C", "B"]}];
+
+  var building1Container = {
+    graph_container: "build-1",
+  };
+
+  metro.animations.build_animation(building1Container, building1, {git_container: false})
+
   var containers = {
     graph_container: "graph-simple",
     git_container: "commands-simple",
     timeout: 500
   };
+
+  var configSimple = [{name: "Red", stations: ["A", "B", "C"]},
+                      {name: "Blue", stations: ["D", "B", "E"]},
+                      {name: "Green", stations: ["F", "B", "G"]}];
 
   var state1 = metro.animations.build_animation(containers, configSimple)
   metro.animations.stop_animation(state1);
