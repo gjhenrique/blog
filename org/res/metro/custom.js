@@ -2,14 +2,14 @@ document.addEventListener('DOMContentLoaded', function(){
   // var building1 = [{name: "Red", stations: ["A", "C", "D"]},
   //                  {name: "Green", stations: ["B", "C", "E"]}];
 
-  var building1 = [{name: "Red", stations: ["A", "B"]},
-                   {name: "Green", stations: ["C", "B"]}];
+  var building1 = [{name: "Red", stations: ["A", "C"]},
+                   {name: "Blue", stations: ["B", "C", "A"]}];
 
   var building1Container = {
     graph_container: "build-1",
   };
 
-  metro.animations.build_animation(building1Container, building1, {git_container: false})
+  metro.animations.build_raw_animation(building1Container, building1, {git_container: false})
 
   var containers = {
     graph_container: "graph-simple",

@@ -28,7 +28,7 @@ In my opinion, this project is so creative and simple that the original idea cou
 So, the idea is to build the git graph through git operations dynamically.
 Provide the input with the metro system and the algorithm will generate all the necessary commands to build it.
 
-It is based on the quote from [[https://en.wikiquote.org/wiki/Nathaniel_Borenstein][Nathaniel Borenstein]] (I originally saw it on [[https://blog.codinghorror.com/your-favorite-programming-quote/][Coding Horror]]).
+It is based on the quote from [[https://en.wikiquote.org/wiki/Nathaniel_Borenstein][Nathaniel Borenstein]] (Originally seen it on [[https://blog.codinghorror.com/your-favorite-programming-quote/][Coding Horror]]).
 
 #+BEGIN_QUOTE 
 It should be noted that no ethically-trained software engineer would ever consent to write a *DestroyBaghdad* procedure. 
@@ -81,20 +81,18 @@ Which produces the following git graph (~git log --graph --all --pretty=oneline~
 
 [[./res/metro/git-result.png]]
 
-* Rationale
+* Questions
+To build the algorithm, we need to ask some questions
+that the algorithm will have to take into consideration.
 
-To build the algorithm, we need to ask some core questions 
-that the algorithm will have to adhere.
+**How to build the graph?**
+- Since a git graphs is a [[http://eagain.net/articles/git-for-computer-scientists/][Directed Acyclic Graph]], we need to (guess what?!) build a graph with directed edges without cycles. 
+- But can we pick any direction for the lines?
+- If we find any cycles, how do we remove the minimum number of stations to become acyclic?
 
-1. How to build the graph?
-Since a git graphs is a [[http://eagain.net/articles/git-for-computer-scientists/][Directed Acyclic Graph]], we need to (guess what?!) build a graph
-with directed edges without cycles. 
-But what's the best direction for the lines? 
-If we find any cycles, how we remove the minimum number of stations to become acyclic?
-
-2. How to traverse the graph?
-Can we traverse the graph without taking into account the other near stations?
-How to traverse the graph to visit all the stations?
+**How to traverse the graph?**
+- Can we traverse the graph without taking into account the other near stations?
+- How to traverse the graph to visit all the stations?
 _Never visit the same station more than once._
 
 # Imagine if we did a simple traversed the graph without taking into account the other stations/commits. 
@@ -103,20 +101,19 @@ _Never visit the same station more than once._
 # Create a commit when you find a sole station and merge when we find a station when two or more lines meet.
 # But, it's not so simple because we have to decide how to traverse it.
 
-3. How to create commits, branches and merges?
-If we find a simple commit, can we simply commit it. 
-When it's a connection, do we simply generate a merge command?
+**How to create the git commands?**
+- If we find a simple commit, can we simply commit it?
+- When it's a connection, do we simply generate a merge command?
 
-In the following sections, I'll show you
+In the following sections, all those answers will be answered
 
 * Building the graph
-The first step is to build a dag.
-Worry about cycles
+The first step of the process is to build a dag from the lines and stations.
 
-Vertex are the station and the connections are the edges
+_From the configuration to a loom graph_
+is that stations will be the graph vertex and the edges will be the connections.
 
-** Dealing with the graph
-Now that the graph is ready, we could use the navigation algorithm of loom
+# Now that the graph is ready, we could use the navigation algorithm of loom
 
 predecessors
 successors
@@ -126,31 +123,21 @@ namespace loom it means that i'm talking with the library
 To perform all graph related operations, we're using the [[https://github.com/aysylu/loom.git][loom]] library.
 After we're done we can call all the same operations
 
-The first detail to be defined is the input format that the subway map will be represented 
-It could be stored like this:
-_We could store it like this_:
+** Input data
+The first detail to be defined is the input data format that the subway map will be represented.
+This format doesn't matter too much and could be represented like this:
 
-#+BEGIN_SRC json :exports result
-[
-  {
-    "name": "Red",
-    "stations": ["A", "C"]
-  },
-  {
-    "name": "Green",
-    "stations": ["B", "C"]
-  }
-]
+#+BEGIN_SRC clojure :exports result
+[{:name "Red",
+  :stations ["A", "C"]},
+ {:name "Green",
+  :stations ["B", "C"]}]
 #+END_SRC
+
+The ~name~ key is the name of the line and the list of ~stations~ will contain the station names.
 
 ** Without cycles
 The happy path is that new lines won't introduce any cycles.
-
-#+BEGIN_EXPORT html 
-<div class="metro-animation">
-  <div id="build-1" class="metro-graph"></div>
-</div>
-#+END_EXPORT
 
 Notice that, when two lines meet, it changes the vertex color.
 
@@ -159,109 +146,176 @@ Notice that, when two lines meet, it changes the vertex color.
   [config]
   (reduce
     (fn [graph line]
-      (let [new-graph (loom/add-vertices graph (:stations line))]
-        (loom/add-attribute stations (:name line))))
-  
+      (let [new-graph (loom/add-nodes graph (:stations line))]
+        (loom/add-attribute new-graph (:stations stations) (:name line))))
     (loom/build-new-digraph)
-  
-    (json/read-json config))
+    config)
 #+END_SRC
-If you don't understand Clojure, don't worry.
-We're simply declaring the function ~build-subway-graph~ which
-applies the anonymous function over each line metadata 
-using an empty graph as the input for the first step.
-For each line, the function will first create a new graph adding the stations and its connections
-and then assign an attribute to each vertex/station (That'll be important for the graph traversal).
 
-And since loom uses Clojure sets and maps under the hood to represent a graph,
-we don't need to worry about creating a new graph every time,
-since Clojure implements [[http://hypirion.com/musings/understanding-persistent-vector-pt-1][persistent data structures]].
-A new graph is being created at the same time but they share almost the same data structure
+1. Start the reduce function with an empty loom graph and the subway map
+2. Iterate over each line and add to the stations to the vertex. 
+Also, add the name of line inside each station as an attribute.
 
-** Reversing
-What if a new line introduces a cycle?
+#+BEGIN_EXPORT html 
+<div class="metro-animation">
+  <div id="build-1" class="metro-graph"></div>
+</div>
+#+END_EXPORT
+
+This is enough to deal with subways that don't have cycles.
+
+** Reversing connections
+# What if a new station introduces a cycle?
+Now we have to worry about stations that introduce cycles
+
 Before we start to remove edges/connections, we could take a less damaging approach.
 
 Since every line runs in both directions, we can try to reverse the order of the stations and check if we still have cycles.
 
 _Add graph when the reversal_
 
-#+BEGIN_SRC clojure :exports result
-(defun add-stations
-  [graph stations]
-  (let [new-graph (loom/add-vertices graph (:stations line))]
-    (when loom/dag? new-graph
-      new-graph)))
+#+BEGIN_SRC diff :exports result
++(defun add-stations
++  [graph stations]
++  (let [new-graph (loom/add-nodes graph (:stations line))]
++    (when loom/dag? new-graph
++      new-graph)))
 
-;; inside build-subway-graph function
-(or (add-stations graph (:stations line))
-    (add-stations graph (reverse (:stations line))))
+  (reduce
+    (fn [graph line]
+-    (let [new-graph (graph/add-stations graph (:stations line))]
++    (let [new-graph (or (add-stations graph (:stations line))
++                        (add-stations graph (reverse (:stations line)))))
 #+END_SRC
 
-The new method ~add-stations~ tries to create a new graph with the line stations. 
-If the new-graph doesn't have any cycles, _it's returned_ , otherwise it returns ~nil~.
-Then, we can call the ~or~ function to return the first real value.
+The new method ~add-stations~ tries to create a new graph with the stations of each line. 
+If the new-graph introduces new cycles, a ~nil~ is returned.
 
-By the way, the method ~loom/dag?~ uses a topological sort, which takes ~O(E+V)~ to check if there's a cycle in the graph.
+By the way, the method ~loom/dag?~ uses a **topological sort**, which takes ~O(E+V)~ to check if there's a cycle in the graph.
 
 ** Removing connections/edges
-If there are still cycles after reversing, we need to remove *only* the edges that are introducing it in the first place.
+If after we reverse the station lines, we still have cycles, we gotta take the last resort,
+which is to remove the stations that are introducing the cycles.
+
+# If there are still cycles after reversing, we need to remove *only* the edges that are introducing it in the first place.
 
 The algorithm is really simple and it's based on this _stackoverflow answer_.
-It incrementally create a graph with the new connection and check if the cycle exists.
-_If there's no cycle, it's safe to remove this connection_.
+It iterates over each connection of a new station and tries to add it to the graph.
+If it introduces a new cycle, the connection is discarded and the source is linked to 
+_It incrementally creates a graph with the new station and checks if the cycle exists_.
 
-In every connection,
-~O(E * (V + E))~
-It isn't a problem because the graph will few edges since each station (node) can go one step further.
-Didn't worry so much about complexity
-Albeit being simple, I tested with the New York City, which is the subway with the most stations
-and it removed only two connections
+The code was kinda hard to understand and it's _here_ if you're more interested.
 
-These code samples are summarized here for _dunno_ reasons.
+# In every connection,
+# ~O(E * (V + E))~
+# It isn't a problem because the graph will few edges since each station (node) can go one step further.
+# Didn't worry so much about complexity
+# This algorithm behaved well in the New York City map, which is the subway with the most stations,
+# and it removed only two connections.
+
+# Albeit being simple, I tested with the New York City, 
+# and it removed only two connections
+
 But you can check the final graph construction algorithm _here_.
 
 * Traversal
-Just a notice with the animations
+Now that the loom graph is built, we need to iterate it in order to generate the git commands.
+We have several methods at our disposal, like [[http://aysy.lu/loom/loom.graph.html#var-predecessors][predecessors]] and [[http://aysy.lu/loom/loom.graph.html#var-successors][successors]].
 
-If you notice any cpu spike, don't worry, I'm not using your browser to mine bitcoins.
-Simply pause the animations and everything will come back to normal.
+_merge commands when two lines meet_
+_switch branch when one line finishes_
 
-** Strategy
-What I liked about Clojure is that it forces you to think differently.
-_It simplifies your domain_
-simple data structures no class, objects
-Instead of assigning a variable
-immutable state
+The requirements to go from the traversal to the git commands:
+- *All* the stations should be visited *only once*
+- In order to generate a merge command, we need to check if there are any predecessor that was not visited yet.
+- When we finish visiting a line, we need to check if there are other lines that were left behind and continue from there.
+  
+Don't worry too much about understanding these requirements because the next sections will cover it step by step.
 
+Just a quick notice about the animations.
+Don't worry if you notice any cpu spike, I'm not using your browser to mine bitcoins.
+Simply pause the animations after you visualize it and everything will come back to normal.
+
+** The Clojure way
+# How to approach this problem in the functional Clojure world?
+
+In the object-oriented world, we would have to encapsulate and hide our data structures and algorithms
+with classes and objects.
+Clojure advises you to embrace your data structures and there's no shame in making maps and lists first class citizens.
+Also, the state is immutable by default, which means you create a new state every time instead of modifying it.
+Because of this the use of recursion and other higher order functions, such as reduce and map, is not only encouraged but required.
+That's in my opinion is the greatest advantage of using clojure.
+
+The phrase from this [[http://lambdax.io/blog/posts/2016-04-18-state-management-in-clojure.html][post]] summarizes it well this concept.
+
+#+BEGIN_QUOTE 
+State refers to immutable data: a state is the value an identity refers to at a particular point in time. State never changes.
+#+END_QUOTE
+
+# # Since you can't mutate variables,
+# # Once you understand the identity and value concepts, your mind will blow.
+
+# # other mechanisms are needed to .
+# # It's pretty common .
+
+# encapsulated
+# A good thing about learning Clojure is that it forces you to think differently.
+# embrace your data structure, not hide it
+# concept of identity and value
+# All state is immutable by default
+# _It simplifies your domain_
+# simple data structures no class, objects
+# Instead of modifying your state, you create a new one
+# immutable state
+# http://blog.jayfields.com/2011/04/clojure-state-management.html
+# https://clojure.org/about/state
+# http://lambdax.io/blog/posts/2016-04-18-state-management-in-clojure.html
+
+With all those concepts laid out, how would we apprach the traversal of this particular graph?
+
+#+BEGIN_SRC 
+Without animation
+Red - A C
+Blue - B C
+#+END_SRC
+
+We could take the following approach:
 
 #+BEGIN_SRC  clojure :exports result
-;; Using above function to build a loom graph
+;; Using function to build the loom dag from the input data
 (def graph (build-subway-graph config))
 
 ;; We can store graph related data as attributes of the vertex
 (def state1 (traverse-subway-graph {:graph graph})
+;; The *identity* state1 stores the *value* at this time
 ;; {:current-node "A" :current-line "Red" :graph graph-1}
 
 (def state2 (traverse-subway-graph state1))
-;; {:current-node "B" :current-line "Blue" :graph graph-1}
+;; {:current-node "B" :current-line "Blue" :graph graph-2}
 
 (def state3 (traverse-subway-graph state2))
-;; {:current-node "C" :current-line "Green" :graph graph-2}
+;; {:current-node "C" :current-line ("Blue" "Red") :graph graph-3}
 
 ;; No more stations to process
 (def state4 (traverse-subway-graph state3))
 ;; nil
 
 ;; Passing state1 yields the same result as state2
-(def state4 (traverse-subway-graph state1))
+(def state5 (traverse-subway-graph state1))
+;; state5 has the same value of state2 but different identities
 ;; {:current-node "A" :current-line "Red" :graph graph-1}
 #+END_SRC
 
-The idea is to call this function until ~nil~ is returned we know for sure that the algorithm ended
+When ~nil~ is returned we know for sure that the traversal 
+is done and there are no more stations to visit.
+The next sections will handle the implementation of the ~traverse-subway-graph~
 
-** Single stations
-#+BEGIN_SRC 
+** Stations with only one line
+The most simple map _layout_ is when there's only one line.
+So let's approach it first and then extend it when the connections meet and go away.
+
+#+BEGIN_SRC
+Without animation
 Red - A B C
 #+END_SRC
 
@@ -283,15 +337,35 @@ Red - A B C
                                   :visited true)
 #+END_SRC
 
+#+BEGIN_SRC diff :exports result
+(defn traverse-subway-graph
+  [state]
+-  (let [{:keys [graph current-node current-line]} state
++  (let [{:keys [graph current-node current-line end]} state
+        predecessor 
+        (find-unvisited-predecessor graph current-node)]
++  (cond
++    (not (nil? predecessor)
+-    (traverse-subway-graph 
+      (assoc state :current-node predecessor))
+  :else
+    (assoc state
+       :current-line (loom/attributes graph current-node :line)
+       :graph (loom/add-attribute graph 
+                                  current-node 
+                                  :visited true)
+#+END_SRC
+
+
 Notice that we always return a new state to the function
 
-#+BEGIN_EXPORT html 
-<i id="metro-play-button" class="icon-play fa-play"></i>
-<div class="metro-animation">
-  <div id="graph-simple" class="metro-graph"></div>
-  <div id="commands-simple" class="metro-git-container"></div>
-</div>
-#+END_EXPORT
+# #+BEGIN_EXPORT html 
+# <i id="metro-play-button" class="icon-play fa-play"></i>
+# <div class="metro-animation">
+#   <div id="graph-simple" class="metro-graph"></div>
+#   <div id="commands-simple" class="metro-git-container"></div>
+# </div>
+# #+END_EXPORT
 
 There's a problem with it so far. 
 The algorithm will run indefinitely because we're always returning
@@ -336,7 +410,7 @@ Same strategy with traverse-subway-graph
 
 ** Git force with branch
 
-* Clojure Seq abstraction
+* Bonus: Clojure Seq abstraction
 encapsulate the sequence
 
 the same code that is built to create the git commands is used to create these animations. it's amazing
@@ -348,6 +422,11 @@ metro-seq example, employ purity so the algorithms flows nicely
 polimorphism is not restricted to object oriented languages.
 in clojure a functional language it is achieved with protocols
 show how map, count, etc. are all used
+
+_Should I put this here?_
+We don't need to worry about performance or memory footprint when creating a new graph every time
+because loom uses sets and maps under the hood and Clojure data structures are [[http://hypirion.com/musings/understanding-persistent-vector-pt-1][persistent]], i.e,
+_they share almost the same structure_.
 
 * That's it, folks
 Big thanks to washington project
