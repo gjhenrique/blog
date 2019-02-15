@@ -1,12 +1,11 @@
 #+BEGIN_EXPORT html 
 ---
 layout: post
-title: Converting metro lines to git graph using Clojure
+title: From generic subway map to git graph
 comments: false
 custom_js:
-  - ./res/metro/metro.js
+  - http://localhost:8080/prod/main.js
   - ./res/metro/custom.js
-  - ./res/metro/custom.js.map
 categories:
   - programming
 tags:
@@ -18,7 +17,7 @@ styles:
 #+END_EXPORT
 
 When I'm studying a new programming language or library, I always try to make a practical example to learn it.
-This projects can't be so big because they would eventually discourage me
+These projects can't be so big because they would eventually discourage me
 and not so small to only touch the surface of the tool.
 
 I was trying to learn Clojure, had read some books and was looking for an interesting project to apply the knowledge.
@@ -37,6 +36,8 @@ Basic professional ethics would instead require him to write a *DestroyCity* pro
 #+END_QUOTE
 
 Only in this case, I ethically would write the *BuildMetroCity* procedure, not *BuildMetroParis*, passing the metro stations and connections as a parameter.
+
+Lemme show you the journey of how to do this using Clojure
 
 * Main Idea
 
@@ -359,13 +360,13 @@ Red - A B C
 
 Notice that we always return a new state to the function
 
-# #+BEGIN_EXPORT html 
-# <i id="metro-play-button" class="icon-play fa-play"></i>
-# <div class="metro-animation">
-#   <div id="graph-simple" class="metro-graph"></div>
-#   <div id="commands-simple" class="metro-git-container"></div>
-# </div>
-# #+END_EXPORT
+#+BEGIN_EXPORT html
+<i id="metro-play-button" class="icon-play fa-play"></i>
+<div class="metro-animation">
+  <div id="graph-simple" class="metro-graph"></div>
+  <div id="commands-simple" class="metro-git-container"></div>
+</div>
+#+END_EXPORT
 
 There's a problem with it so far. 
 The algorithm will run indefinitely because we're always returning

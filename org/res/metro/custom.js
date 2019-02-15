@@ -14,7 +14,9 @@ document.addEventListener('DOMContentLoaded', function(){
   var containers = {
     graph_container: "graph-simple",
     git_container: "commands-simple",
-    timeout: 500
+    current_node: "C",
+    traversal_function: 5,
+    // timeout: 500
   };
 
   var configSimple = [{name: "Red", stations: ["A", "B", "C"]},
@@ -22,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function(){
                       {name: "Green", stations: ["F", "B", "G"]}];
 
   var state1 = metro.animations.build_animation(containers, configSimple)
-  metro.animations.stop_animation(state1);
 
   document.getElementById("metro-play-button").addEventListener("click", function(event) {
     var element = event.target;
