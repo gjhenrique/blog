@@ -1,7 +1,7 @@
 #+BEGIN_EXPORT html 
 ---
 layout: post
-title: From generic subway map to git graph
+title: Converting metro connections to git graph (Improve me)
 comments: false
 custom_js:
   - http://localhost:8080/prod/main.js
@@ -16,32 +16,34 @@ styles:
 ---
 #+END_EXPORT
 
-When I'm studying a new programming language or library, I always try to make a practical example to learn it.
-These projects can't be so big because they would eventually discourage me
-and not so small to only touch the surface of the tool.
+# When I'm studying a new programming language or library, I always try to make a practical example to learn it.
+# These projects can't be so big because they would eventually discourage me
+# and not so small to only touch the surface of the tool.
 
-I was trying to learn Clojure, had read some books and was looking for an interesting project to apply the knowledge.
-Then I remembered the project [[https://github.com/vbarbaresi/MetroGit%0A][MetroGit]] that consists of building a Git graph from the metro system of Paris.
-In my opinion, this project is so creative and simple that the original idea could be improved.
+A few years back, I was trying to learn Clojure, had read some books and was looking for an interesting project to apply the knowledge.
+Then I remembered the project [[https://github.com/vbarbaresi/MetroGit%0A][MetroGit]] which consists of building a Git graph from the metro system of Paris.
+In my opinion, this project is so creative and simple that the original idea could see some improvement.
 
-So, the idea is to build the git graph through git operations dynamically.
-Provide the input with the metro system and the algorithm will generate all the necessary commands to build it.
+So, the idea for this project is to build the git graph through shell commands with a *generic* input of lines and stations.
+The lines will be branches, commit for stations and connections will be merge commits.
 
-It is based on the quote from [[https://en.wikiquote.org/wiki/Nathaniel_Borenstein][Nathaniel Borenstein]] (Originally seen it on [[https://blog.codinghorror.com/your-favorite-programming-quote/][Coding Horror]]).
+# A single station
+# Provide the input with the metro connections and the algorithm will generate all the necessary commands to build it.
 
-#+BEGIN_QUOTE 
-It should be noted that no ethically-trained software engineer would ever consent to write a *DestroyBaghdad* procedure. 
-Basic professional ethics would instead require him to write a *DestroyCity* procedure, to which Baghdad could be given as a parameter. 
-          -- Nathaniel Borenstein
-#+END_QUOTE
+# It is based on the quote from [[https://en.wikiquote.org/wiki/Nathaniel_Borenstein][Nathaniel Borenstein]] (Originally seen it on [[https://blog.codinghorror.com/your-favorite-programming-quote/][Coding Horror]]).
 
-Only in this case, I ethically would write the *BuildMetroCity* procedure, not *BuildMetroParis*, passing the metro stations and connections as a parameter.
+# #+BEGIN_QUOTE 
+# It should be noted that no ethically-trained software engineer would ever consent to write a *DestroyBaghdad* procedure. 
+# Basic professional ethics would instead require him to write a *DestroyCity* procedure, to which Baghdad could be given as a parameter. 
+#           -- Nathaniel Borenstein
+# #+END_QUOTE
 
-Lemme show you the journey of how to do this using Clojure
+# Only in this case, I ethically would write the *BuildMetroCity* procedure, not *BuildMetroParis*, passing the metro stations and connections as a parameter.
 
-* Main Idea
+# Lemme show you the journey of how to do this using Clojure
 
-In a nutshell, we gotta go from a metro stations and lines to a git graph.
+* Illustration of the idea
+In a nutshell, we need to transform a bunch of unknown stations and connection to a git graph.
 
 As an example, this part of [[https://pt.saopaulomap360.com/mapa-metro-sao-paulo][São Paulo]] metro system:
 [[./res/metro/metro-sp.png]]
@@ -82,7 +84,10 @@ Which produces the following git graph (~git log --graph --all --pretty=oneline~
 
 [[./res/metro/git-result.png]]
 
-* Questions
+* Problems
+
+This idea might seem complicate at first
+
 To build the algorithm, we need to ask some questions
 that the algorithm will have to take into consideration.
 
