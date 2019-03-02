@@ -45,7 +45,7 @@ The lines will be branches, commit for stations and connections will be merge co
 * Illustration of the idea
 In a nutshell, we need to transform a bunch of unknown stations and connection to a git graph.
 
-As an example, this part of [[https://pt.saopaulomap360.com/mapa-metro-sao-paulo][São Paulo]] metro system:
+As an example, this piece of [[https://pt.saopaulomap360.com/mapa-metro-sao-paulo][São Paulo]] metro system:
 [[./res/metro/metro-sp.png]]
 
 Will generate these shell commands:
@@ -84,68 +84,73 @@ Which produces the following git graph (~git log --graph --all --pretty=oneline~
 
 [[./res/metro/git-result.png]]
 
-* Problems
+* Rationalization (Improve me)
+This idea might seem easy at first, but it brings some complications about how the rules of the algorithm.
 
-This idea might seem complicate at first
+1. A git graph is a [[http://eagain.net/articles/git-for-computer-scientists/][Directed *Acyclic* Graph]], so we can't have cycles in the connections.
+2. If there is a cycle, we need to remove the *minimum* number of stations.
+3. The traversal *should* visit all nodes (stations) *exactly* once
 
-To build the algorithm, we need to ask some questions
-that the algorithm will have to take into consideration.
+# To build the algorithm, we need to ask some questions
+# that the algorithm will have to take into consideration.
 
-**How to build the graph?**
-- Since a git graphs is a [[http://eagain.net/articles/git-for-computer-scientists/][Directed Acyclic Graph]], we need to (guess what?!) build a graph with directed edges without cycles. 
-- But can we pick any direction for the lines?
-- If we find any cycles, how do we remove the minimum number of stations to become acyclic?
+# **How to build the graph?**
+# - Since a git graphs is a   
+# - But can we pick any direction for the lines?
+# - If we find any cycles, how do we ?
 
-**How to traverse the graph?**
-- Can we traverse the graph without taking into account the other near stations?
-- How to traverse the graph to visit all the stations?
-_Never visit the same station more than once._
+# **How to traverse the graph?**
+# - Can we traverse the graph without taking into account the other near stations?
+# - How to traverse the graph to visit all the stations?
+# _Never visit the same station more than once._
 
-# Imagine if we did a simple traversed the graph without taking into account the other stations/commits. 
-# So we need to take in consideration the already "visited" stations to always finish with
+# # Imagine if we did a simple traversed the graph without taking into account the other stations/commits. 
+# # So we need to take in consideration the already "visited" stations to always finish with
 
-# Create a commit when you find a sole station and merge when we find a station when two or more lines meet.
-# But, it's not so simple because we have to decide how to traverse it.
+# # Create a commit when you find a sole station and merge when we find a station when two or more lines meet.
+# # But, it's not so simple because we have to decide how to traverse it.
 
-**How to create the git commands?**
-- If we find a simple commit, can we simply commit it?
-- When it's a connection, do we simply generate a merge command?
+# **How to create the git commands?**
+# - If we find a simple commit, can we simply commit it?
+# - When it's a connection, do we simply generate a merge command?
 
-In the following sections, all those answers will be answered
+# In the following sections, all those answers will be answered
 
-* Building the graph
-The first step of the process is to build a dag from the lines and stations.
+* Building the DAG without cycles
+Before starting the traversal, we need to build a DAG
 
-_From the configuration to a loom graph_
-is that stations will be the graph vertex and the edges will be the connections.
+# The first step of the process is to .
+
+# _From the configuration to a loom graph_
+# is that stations will be the graph vertex and the edges will be the connections.
 
 # Now that the graph is ready, we could use the navigation algorithm of loom
 
-predecessors
-successors
-dfs, bfs and the important dag?
+# predecessors
+# successors
+# dfs, bfs and the important dag?
 
-namespace loom it means that i'm talking with the library
-To perform all graph related operations, we're using the [[https://github.com/aysylu/loom.git][loom]] library.
-After we're done we can call all the same operations
+# namespace loom it means that i'm talking with the library
+# To perform all graph related operations, we're using the [[https://github.com/aysylu/loom.git][loom]] library.
+# After we're done we can call all the same operations
 
 ** Input data
-The first detail to be defined is the input data format that the subway map will be represented.
-This format doesn't matter too much and could be represented like this:
+Defining the input data is the least of our worries. It could be represented as ~json~ or ~xml~. 
+But, since we're using Clojure, let's represent as [[https://clojure.github.io/clojure/clojure.edn-api.html][Extensible Data Notation]] 
 
 #+BEGIN_SRC clojure :exports result
-[{:name "Red",
+[{:NAME "Red",
   :stations ["A", "C"]},
  {:name "Green",
   :stations ["B", "C"]}]
 #+END_SRC
 
-The ~name~ key is the name of the line and the list of ~stations~ will contain the station names.
+~name~ is the line and the ~stations~ will contain the station names. 
+Whenever there is a repeated name, we know there is a connection.
 
 ** Without cycles
-The happy path is that new lines won't introduce any cycles.
-
-Notice that, when two lines meet, it changes the vertex color.
+In an ideal world all the new lines wouldn't introduce any cycles.
+So, let's just 
 
 #+BEGIN_SRC clojure :exports result
 (defn build-subway-graph
@@ -168,7 +173,7 @@ Also, add the name of line inside each station as an attribute.
 </div>
 #+END_EXPORT
 
-This is enough to deal with subways that don't have cycles.
+# This is enough to deal with subways that don't have cycles.
 
 ** Reversing connections
 # What if a new station introduces a cycle?

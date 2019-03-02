@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', function(){
   // var building1 = [{name: "Red", stations: ["A", "C", "D"]},
   //                  {name: "Green", stations: ["B", "C", "E"]}];
 
-  var building1 = [{name: "Red", stations: ["A", "C"]},
-                   {name: "Blue", stations: ["B", "C", "A"]}];
+  var building1 = [{name: "Red", stations: ["A", "C", "E"]},
+                   {name: "Blue", stations: ["B", "C", "F"]}];
 
   var building1Container = {
     graph_container: "build-1",
