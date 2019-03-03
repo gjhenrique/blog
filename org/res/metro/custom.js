@@ -1,15 +1,26 @@
 document.addEventListener('DOMContentLoaded', function(){
-  // var building1 = [{name: "Red", stations: ["A", "C", "D"]},
-  //                  {name: "Green", stations: ["B", "C", "E"]}];
-
-  var building1 = [{name: "Red", stations: ["A", "C", "E"]},
+  var config1 = [{name: "Red", stations: ["A", "C", "E"]},
                    {name: "Blue", stations: ["B", "C", "F"]}];
 
-  var building1Container = {
+  var container1 = {
     graph_container: "build-1",
   };
+  metro.animations.build_raw_animation(container1, config1, {git_container: false})
 
-  metro.animations.build_raw_animation(building1Container, building1, {git_container: false})
+  var config2 = [{name: "Red", stations: ["B", "C", "D"]},
+                 {name: "Blue", stations: ["D", "B", "A"]}];
+
+  var container2 = {
+    graph_container: "build-2",
+  };
+  metro.animations.build_raw_animation(container2, config2, {git_container: false})
+
+  var config3 = [{name: "Red", stations: ["B", "C", "D"]},
+                 {name: "Blue", stations: ["A", "B", "D"]}];
+  var container3 = {
+    graph_container: "build-3",
+  };
+  metro.animations.build_raw_animation(container3, config3, {git_container: false})
 
   var containers = {
     graph_container: "graph-simple",

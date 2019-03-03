@@ -117,8 +117,11 @@ This idea might seem easy at first, but it brings some complications about how t
 # In the following sections, all those answers will be answered
 
 * Building the DAG without cycles
-Before starting the traversal, we need to build a DAG
+The first step is to build a directed graph without cycles, which means we'll need to identify cycles and potentially remove some connections.
+There is an awesome library called _loom_ which will support the boilerplate graph functions.
 
+# Before starting the traversal, we .
+# To achieve that, we need to find and support a foundation
 # The first step of the process is to .
 
 # _From the configuration to a loom graph_
@@ -136,86 +139,182 @@ Before starting the traversal, we need to build a DAG
 
 ** Input data
 Defining the input data is the least of our worries. It could be represented as ~json~ or ~xml~. 
-But, since we're using Clojure, let's represent as [[https://clojure.github.io/clojure/clojure.edn-api.html][Extensible Data Notation]] 
+But, since we're using Clojure, let's represent as [[https://clojure.github.io/clojure/clojure.edn-api.html][Extensible Data Notation]]. This way, it's not necessary to write extra code to transform data types.
 
 #+BEGIN_SRC clojure :exports result
-[{:NAME "Red",
-  :stations ["A", "C"]},
- {:name "Green",
-  :stations ["B", "C"]}]
+[{:name "Red", :stations ["A", "C"]},
+ {:name "Green", :stations ["B", "C"]}]
 #+END_SRC
 
-~name~ is the line and the ~stations~ will contain the station names. 
-Whenever there is a repeated name, we know there is a connection.
+~name~ is the name of the line and the ~stations~ will contain the station names. 
+
+** Interfaces
+#+BEGIN_SRC clojure :exports result
+=> (def subway-map
+  [{:name "Red", :stations ["A", "C", "D"]}, 
+   {:name "Blue", :stations ["B", "C", "E"]}])
+
+=> (def empty-g (loom.graph/digraph))
+
+=> (def g1 (loom.graph/add-nodes empty-g "A" "B" "C"))
+
+=> (def g2 (-> g1
+          (loom.attr/add-attr "A" :lines "Blue")
+          (loom.attr/add-attr "B" :lines "Blue")
+          (loom.attr/add-attr "B" :lines "Blue")))
+  
+=> (loom.graph/edges g2)
+;; (["C" "E"] ["C" "D"] ["B" "C"] ["A" "C"])
+
+=> (loom.graph/successors g2 "C")
+;; #{"E" "D"}
+
+=> (loom.attr/attr g2 "C" :lines)
+;; ["Red" "Blue"]
+
+=> (loom.alg/dag? g)
+;; true
+#+END_SRC
 
 ** Without cycles
-In an ideal world all the new lines wouldn't introduce any cycles.
-So, let's just 
+The subway engineers when planning to add new connections don't care if they'll introduce a cycle in their infrastructure (why would they, right?!)
+But, for simplicity, let's start with a graph without 
+
+# But, to start let's suppose that we don't have cycles. 
+# By the way, the _loom_ library was used to perform the graph boilerplate
 
 #+BEGIN_SRC clojure :exports result
-(defn build-subway-graph
-  [config]
+(defn- add-line-information
+  [graph stations line-name]
+  "Auxiliary function to add the line name to stations"
   (reduce
-    (fn [graph line]
-      (let [new-graph (loom/add-nodes graph (:stations line))]
-        (loom/add-attribute new-graph (:stations stations) (:name line))))
-    (loom/build-new-digraph)
-    config)
+   (fn [g station]
+     (->>
+      ;; To not override other lines
+      (conj (or (loom.attr/attr g station :lines) []) line-name)
+      ;; Add the attribute to the graph
+      (loom.attr/add-attr g station :lines)))
+   graph
+   stations))
+
+(defn build-with-cycles
+  [config]
+  "Build a graph without worrying about cycles"
+  (reduce
+   (fn [graph line]
+     ;; partition transforms [A B C] into (("C" "B") ("B" "A"))
+     (let [connections (partition 2 1 (:stations line))
+           ;; add these edges into the graph
+           new-graph (apply loom.graph/digraph graph connections)]
+       ;; add the line as attributes in the nodes, it works even with connections
+
+       (add-attribute new-graph (:stations line) (:name line))))
+   ;; Start with an empty digraph
+   (loom.graph/digraph)
+   config))
 #+END_SRC
 
-1. Start the reduce function with an empty loom graph and the subway map
-2. Iterate over each line and add to the stations to the vertex. 
-Also, add the name of line inside each station as an attribute.
+This piece of code yields the following graph:
+#+BEGIN_SRC clojure :exports result
+=> (def config [{:name "Red", :stations ["A", "C"]},
+                {:name "Blue", :stations ["B", "C"]}])
+=> (def g (build-with-cycles config))
 
+=> (loom.graph/edges g1)
+(["B" "C"] ["A" "C"])
+=> (loom.graph/nodes g1)
+#{"C" "B" "A"}
+=> (loom.attr/attr g1 "A" :lines)
+["Red"]
+=> (loom.attr/attr g1 "C" :lines)
+["Red" "Blue"]
+#+END_SRC
+
+The violet station is represented as a connection between red and blue.
 #+BEGIN_EXPORT html 
 <div class="metro-animation">
   <div id="build-1" class="metro-graph"></div>
 </div>
 #+END_EXPORT
 
-# This is enough to deal with subways that don't have cycles.
-
 ** Reversing connections
+# removing connections is the worst possible case
+
+# When we face a cycle, then the easiest way is to remove some.
+# But this might  
+
+# Back to the real world, we might have. s
+# And the easiest way to do it is simply to remove the connection.
+# But we don't wanna lose 
+
+# Since every line runs in both direction.
+
 # What if a new station introduces a cycle?
-Now we have to worry about stations that introduce cycles
+# Now we have to worry about stations that introduce cycles
 
-Before we start to remove edges/connections, we could take a less damaging approach.
+# Before we start to remove edges/connections, we could take a less damaging approach.
 
-Since every line runs in both directions, we can try to reverse the order of the stations and check if we still have cycles.
+# Since every line runs in both directions, we can try to reverse the order of the stations and check if we still have cycles.
 
-_Add graph when the reversal_
+# _Add graph when the reversal_
 
 #+BEGIN_SRC diff :exports result
-+(defun add-stations
-+  [graph stations]
-+  (let [new-graph (loom/add-nodes graph (:stations line))]
-+    (when loom/dag? new-graph
-+      new-graph)))
+- (let [connections (partition 2 1 (:stations line))
++ (let [connections (valid-connection graph line-config)
 
-  (reduce
-    (fn [graph line]
--    (let [new-graph (graph/add-stations graph (:stations line))]
-+    (let [new-graph (or (add-stations graph (:stations line))
-+                        (add-stations graph (reverse (:stations line)))))
 #+END_SRC
 
-The new method ~add-stations~ tries to create a new graph with the stations of each line. 
-If the new-graph introduces new cycles, a ~nil~ is returned.
+#+BEGIN_SRC clojure :exports result
+(defn- reverse-stations
+  [connections]
+  (map
+   (fn [info] [(second info) (first info)])
+   (reverse connections)))
+
+(defn- add-connections
+  [graph connections]
+  (let [new-graph (apply loom.graph/digraph graph connections)]
+    (when (loom.alg/dag? new-graph) connections)))
+
+(defn- valid-connection
+  [graph line-config]
+  (let [line-name (:name line-config)
+        connections (partition 2 1 (:stations line-config))]
+    (or (add-connections graph connections)
+        (add-connections graph (reverse-stations connections)))))
+#+END_SRC
 
 By the way, the method ~loom/dag?~ uses a **topological sort**, which takes ~O(E+V)~ to check if there's a cycle in the graph.
 
+#+BEGIN_SRC clojure :exports result
+(def config2 [{:name "Red" :stations ["B" "C" "D"]}
+              {:name "Blue" :stations ["A" "D" "B"]}]) 
+#+END_SRC
+
+#+BEGIN_EXPORT html 
+<div class="metro-animation">
+  <div id="build-2" class="metro-graph"></div>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html 
+<div class="metro-animation">
+  <div id="build-3" class="metro-graph"></div>
+</div>
+#+END_EXPORT
+
 ** Removing connections/edges
-If after we reverse the station lines, we still have cycles, we gotta take the last resort,
-which is to remove the stations that are introducing the cycles.
+If even after reversing the station lines, there are still cycles, the last resort is to remove the connections that introduce them.
 
-# If there are still cycles after reversing, we need to remove *only* the edges that are introducing it in the first place.
+The algorithm is not too complex and it's based on this [[https://stackoverflow.com/questions/20246417/how-to-detect-if-adding-an-edge-to-a-directed-graph-results-in-a-cycle][stackoverflow answer]].
+The idea is to check if a new connection will introduce a cycle. If it does, then that connection is dropped
 
-The algorithm is really simple and it's based on this _stackoverflow answer_.
-It iterates over each connection of a new station and tries to add it to the graph.
-If it introduces a new cycle, the connection is discarded and the source is linked to 
-_It incrementally creates a graph with the new station and checks if the cycle exists_.
+# It iterates over each connection of a new station and tries to add it to the graph.
 
-The code was kinda hard to understand and it's _here_ if you're more interested.
+# If it introduces a new cycle, the connection is discarded and the source is linked to
+# _It incrementally creates a graph with the new station and checks if the cycle exists_.
+
+# The code was kinda hard to understand and it's _here_ if you're more interested.
 
 # In every connection,
 # ~O(E * (V + E))~
@@ -227,41 +326,78 @@ The code was kinda hard to understand and it's _here_ if you're more interested.
 # Albeit being simple, I tested with the New York City, 
 # and it removed only two connections
 
-But you can check the final graph construction algorithm _here_.
+# But you can check the final graph construction algorithm _here_.
+
+# remove the minimum number of edges
+# If there are still cycles after reversing, we need to remove *only* the edges that are introducing it in the first place.
+# pragmmatic
+
+#+BEGIN_SRC diff :exports result
+(or (add-connections graph connections)
+-  (add-connections graph (reverse-stations connections)))))
++  (add-connections graph (reverse-stations connections))
++  (connections-without-cycle graph (:stations line-config) line-name))))
+
+#+END_SRC
+
+#+BEGIN_SRC clojure :exports result
+(defn- connections-without-cycle
+  [graph stations line-name]
+  (loop [g graph
+         final-stations [(first stations)]
+         iteration-stations (rest stations)]
+
+    (if (empty? iteration-stations)
+      (partition 2 1 final-stations)
+
+      (let [new-graph
+            (loom.graph/digraph g [(last final-stations)
+                                   (first iteration-stations)])]
+        (if (loom.alg/dag? new-graph)
+          (recur new-graph
+                 (conj final-stations (first iteration-stations))
+                 (rest iteration-stations))
+
+            (recur graph final-stations (rest iteration-stations)))))))
+            
+#+END_SRC
 
 * Traversal
-Now that the loom graph is built, we need to iterate it in order to generate the git commands.
-We have several methods at our disposal, like [[http://aysy.lu/loom/loom.graph.html#var-predecessors][predecessors]] and [[http://aysy.lu/loom/loom.graph.html#var-successors][successors]].
+We have built a good foundation to start the traversal algorithm. 
+We have a clear API which loom brings us and we know for a certain that we don't have cycles.
 
-_merge commands when two lines meet_
-_switch branch when one line finishes_
+# Now that the loom graph is built, we need to iterate it in order to generate the git commands.
+# We have several methods at our disposal, like [[http://aysy.lu/loom/loom.graph.html#var-predecessors][predecessors]] and [[http://aysy.lu/loom/loom.graph.html#var-successors][successors]].
 
-The requirements to go from the traversal to the git commands:
-- *All* the stations should be visited *only once*
-- In order to generate a merge command, we need to check if there are any predecessor that was not visited yet.
-- When we finish visiting a line, we need to check if there are other lines that were left behind and continue from there.
+# _merge commands when two lines meet_
+# _switch branch when one line finishes_
+
+# The requirements to go from the traversal to the git commands:
+# - *All* the stations should be visited *only once*
+# - In order to generate a merge command, we need to check if there are any predecessor that was not visited yet.
+# - When we finish visiting a line, we need to check if there are other lines that were left behind and continue from there.
   
-Don't worry too much about understanding these requirements because the next sections will cover it step by step.
+# Don't worry too much about understanding these requirements because the next sections will cover it step by step.
 
-Just a quick notice about the animations.
-Don't worry if you notice any cpu spike, I'm not using your browser to mine bitcoins.
-Simply pause the animations after you visualize it and everything will come back to normal.
+# Just a quick notice about the animations.
+# Don't worry if you notice any cpu spike, I'm not using your browser to mine bitcoins.
+# Simply pause the animations after you visualize it and everything will come back to normal.
 
-** The Clojure way
+** Laying out the API
 # How to approach this problem in the functional Clojure world?
 
-In the object-oriented world, we would have to encapsulate and hide our data structures and algorithms
-with classes and objects.
-Clojure advises you to embrace your data structures and there's no shame in making maps and lists first class citizens.
-Also, the state is immutable by default, which means you create a new state every time instead of modifying it.
-Because of this the use of recursion and other higher order functions, such as reduce and map, is not only encouraged but required.
-That's in my opinion is the greatest advantage of using clojure.
-
-The phrase from this [[http://lambdax.io/blog/posts/2016-04-18-state-management-in-clojure.html][post]] summarizes it well this concept.
-
-#+BEGIN_QUOTE 
-State refers to immutable data: a state is the value an identity refers to at a particular point in time. State never changes.
-#+END_QUOTE
+# In the object-oriented world, we would have to encapsulate and hide our data structures and algorithms
+# with classes and objects.
+# Clojure advises you to embrace your data structures and there's no shame in making maps and lists first class citizens.
+# Also, the state is immutable by default, which means you create a new state every time instead of modifying it.
+# Because of this the use of recursion and other higher order functions, such as reduce and map, is not only encouraged but required.
+# That's in my opinion is the greatest advantage of using clojure.
+# 
+# The phrase from this [[http://lambdax.io/blog/posts/2016-04-18-state-management-in-clojure.html][post]] summarizes it well this concept.
+# 
+# #+BEGIN_QUOTE 
+# State refers to immutable data: a state is the value an identity refers to at a particular point in time. State never changes.
+# #+END_QUOTE
 
 # # Since you can't mutate variables,
 # # Once you understand the identity and value concepts, your mind will blow.
@@ -282,23 +418,19 @@ State refers to immutable data: a state is the value an identity refers to at a 
 # https://clojure.org/about/state
 # http://lambdax.io/blog/posts/2016-04-18-state-management-in-clojure.html
 
-With all those concepts laid out, how would we apprach the traversal of this particular graph?
-
-#+BEGIN_SRC 
-Without animation
-Red - A C
-Blue - B C
-#+END_SRC
+# With all those concepts laid out, how would we apprach the traversal of this particular graph?
 
 We could take the following approach:
 
 #+BEGIN_SRC  clojure :exports result
+(def config [{:name "Red" :stations ["A" "C"]}
+             {:name "Blue" :stations ["B" "C"]}])
+             
 ;; Using function to build the loom dag from the input data
-(def graph (build-subway-graph config))
+(def graph (build-graph config))
 
 ;; We can store graph related data as attributes of the vertex
 (def state1 (traverse-subway-graph {:graph graph})
-;; The *identity* state1 stores the *value* at this time
 ;; {:current-node "A" :current-line "Red" :graph graph-1}
 
 (def state2 (traverse-subway-graph state1))
@@ -310,15 +442,10 @@ We could take the following approach:
 ;; No more stations to process
 (def state4 (traverse-subway-graph state3))
 ;; nil
-
-;; Passing state1 yields the same result as state2
-(def state5 (traverse-subway-graph state1))
-;; state5 has the same value of state2 but different identities
-;; {:current-node "A" :current-line "Red" :graph graph-1}
 #+END_SRC
 
-When ~nil~ is returned we know for sure that the traversal 
-is done and there are no more stations to visit.
+# When ~nil~ is returned we know for sure that the traversal 
+# is done and there are no more stations to visit.
 The next sections will handle the implementation of the ~traverse-subway-graph~
 
 ** Stations with only one line
