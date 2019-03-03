@@ -384,42 +384,6 @@ We have a clear API which loom brings us and we know for a certain that we don't
 # Simply pause the animations after you visualize it and everything will come back to normal.
 
 ** Laying out the API
-# How to approach this problem in the functional Clojure world?
-
-# In the object-oriented world, we would have to encapsulate and hide our data structures and algorithms
-# with classes and objects.
-# Clojure advises you to embrace your data structures and there's no shame in making maps and lists first class citizens.
-# Also, the state is immutable by default, which means you create a new state every time instead of modifying it.
-# Because of this the use of recursion and other higher order functions, such as reduce and map, is not only encouraged but required.
-# That's in my opinion is the greatest advantage of using clojure.
-# 
-# The phrase from this [[http://lambdax.io/blog/posts/2016-04-18-state-management-in-clojure.html][post]] summarizes it well this concept.
-# 
-# #+BEGIN_QUOTE 
-# State refers to immutable data: a state is the value an identity refers to at a particular point in time. State never changes.
-# #+END_QUOTE
-
-# # Since you can't mutate variables,
-# # Once you understand the identity and value concepts, your mind will blow.
-
-# # other mechanisms are needed to .
-# # It's pretty common .
-
-# encapsulated
-# A good thing about learning Clojure is that it forces you to think differently.
-# embrace your data structure, not hide it
-# concept of identity and value
-# All state is immutable by default
-# _It simplifies your domain_
-# simple data structures no class, objects
-# Instead of modifying your state, you create a new one
-# immutable state
-# http://blog.jayfields.com/2011/04/clojure-state-management.html
-# https://clojure.org/about/state
-# http://lambdax.io/blog/posts/2016-04-18-state-management-in-clojure.html
-
-# With all those concepts laid out, how would we apprach the traversal of this particular graph?
-
 We could take the following approach:
 
 #+BEGIN_SRC  clojure :exports result
