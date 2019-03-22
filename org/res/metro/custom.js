@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function(){
   };
 
   var config10 = [{name: "Green", stations: ["A", "B", "C"]},
-                  {name: "Blue", stations: ["D", "B", "E"]}];
+                  {name: "Red", stations: ["D", "B", "E"]}];
 
   var graph4 = metro.animations.build_animation(containers4, config10)
 
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function(){
   };
 
   var config11 = [{name: "Green", stations: ["A", "B", "C"]},
-                  {name: "Blue", stations: ["D", "B", "E"]}];
+                  {name: "Red", stations: ["D", "B", "E"]}];
 
   var graph5 = metro.animations.build_animation(containers5, config11)
 
