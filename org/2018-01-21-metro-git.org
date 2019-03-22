@@ -75,10 +75,14 @@ This idea brings some complications regarding the constraints of this algorithm.
 
 1. A git graph is a [[http://eagain.net/articles/git-for-computer-scientists/][Directed *Acyclic* Graph]], which means we can't have cycles in the connections.
 2. If there is a cycle, we need to remove the *minimum* number of stations.
-3. The traversal needs to take into account the correct order to build the correct git graph
+3. The traversal needs to take into account the correct visitation order to build the correct git commands
+
+_Improve me_
+The next steps will focus on the each step
 
 * Building the graph
 The first step is to build a directed graph without cycles, which means we'll need to identify cycles and potentially remove some connections.
+
 
 ** Input data
 Defining the input data is the least of our worries. It could be represented as ~json~ or ~xml~.
@@ -94,8 +98,6 @@ This way, it's not necessary to write extra code to transform data types.
 => (:stations (first config))
 ["A" "C"]
 #+END_SRC
-
-~name~ is the name of the line and the ~stations~ will contain the station names.
 
 ** Using loom
 For Clojure(script), there is an awesome library called [[https://github.com/aysylu/loom][loom]], which provides an exceptional API to work with graphs.
@@ -130,7 +132,8 @@ true
 ** Without cycles
 In the planning phase of the new stations,
 the subway engineers don't care if they'll introduce a cycle in their infrastructure (why would they, right?!)
-But, for now, let's not think about the cycles.
+
+But, to start, let's not think about the cycles yet.
 
 #+BEGIN_SRC clojure :exports result
 (defn- add-line-information
@@ -163,7 +166,7 @@ But, for now, let's not think about the cycles.
    config))
 #+END_SRC
 
-The following code produces the following result
+This code produces the following result:
 #+BEGIN_SRC clojure :exports result
 => (def config [{:name "Red", :stations ["A", "C"]},
                 {:name "Blue", :stations ["B", "C"]}])
@@ -179,7 +182,7 @@ The following code produces the following result
    ["Red" "Blue"]
 #+END_SRC
 
-This piece of code yields the following graph:
+And it yields the following graph:
 #+BEGIN_EXPORT html
 <div class="metro-animation">
   <div id="build-1" class="metro-graph"></div>
@@ -189,15 +192,16 @@ This piece of code yields the following graph:
 The violet station is represented as a connection between red and blue.
 
 ** Reversing connections
-Before start removing some connections, a less damaging approach could be used.
-There is an interesting heuristics that subway lines are bidirectional,
-so, when introducing a cycle, we could try to reverse the connections of the culprit line.
+Before start removing some connections, a less damaging approach is possible.
+There is an interesting heuristics that subway lines are bidirectional, which makes sense.
+Imagine going to work with a subway but having to return back with a car.
+
+Because of this, when introducing a cycle, we could try to reverse the connections of the culprit line.
 
 
 #+BEGIN_SRC diff :exports result
 - (let [connections (partition 2 1 (:stations line))
 + (let [connections (valid-connection graph line-config)
-
 #+END_SRC
 
 #+BEGIN_SRC clojure :exports result
@@ -299,7 +303,7 @@ true
 #+END_SRC
 
 The algorithm is costly ~O(E*(V+E))~ and could be improved, but our nodes and vertex are usually small.
-In the majority of cases, a station has only one connection, also, most of the stations won't introduce cycles.
+In the majority of cases, a station has only one connection _(WHAT?)_, also, most of the stations won't introduce cycles.
 
 Albeit simple, this algorithm behaved well in the New York subway system. It removed only 4 of 496 connections.
 
@@ -317,8 +321,8 @@ The ~D->A~ connection was removed.
 #+END_EXPORT
 
 * Traversal
-	
-Now that we have the graph builder in place. We can worry about the traversal algorithm.
+
+Now that we have the graph builder algorithm in place. We can worry about the traversal algorithm.
 
 The traversal algorithm should make the git graph construction possible and has the following characteristics:
 - All of the stations should be visited *only* once
@@ -327,10 +331,15 @@ The traversal algorithm should make the git graph construction possible and has 
 - After the last station of the line is reached, we need to check other non visited stations
 - When all of the stations are visited, then we reach the end of the traversal.
 
+It seems complicated, but we'll build each condition introducing each new constraint individually, so I hope it's easier to follow.
 
+<<<<<<< HEAD
 It seems complicated, but we'll build each condition step by step, so it'll be easy to swallow.
 
 ** In search of the correct API
+=======
+** Trying to find the best API
+>>>>>>> o espirro que precede o esporro
 The idea is to have a function that abstracts away all these logic requirements.
 
 Each call of the function will return the current state of the algorithm.
@@ -381,7 +390,7 @@ Let's start with the simplest case. A subway system with only one line.
 
 (defn traverse-subway-graph
   [state]
-  "Receiving a map as the values of each state. 
+  "Receiving a map as the values of each state.
    Does not worry with predecessors or successors"
   (let [{:keys [graph current-node current-line]} state]
       (assoc state
@@ -390,10 +399,10 @@ Let's start with the simplest case. A subway system with only one line.
 #+END_SRC
 
 #+BEGIN_SRC clojure :exports result
-(def config [{:name "Green" :stations ["A" "B" "C"]}]) 
+(def config [{:name "Green" :stations ["A" "B" "C"]}])
 (def g (build--graph config))
 
-=> (def state1 (traverse-subway-graph {:graph g :current-node "B"})) 
+=> (def state1 (traverse-subway-graph {:graph g :current-node "B"}))
 {:graph loom_graph, :current-node "B", :current-line ["Green"]}
 => (def state1 (traverse-subway-graph {:graph g :current-node "B"}))
 {:graph loom_graph, :current-node "B", :current-line ["Green"]}
@@ -413,14 +422,14 @@ The next case we should focus is to find the predecessors which weren't visited 
 (defn visited?
   [graph station]
   (loom.attr/attr graph station :visited))
-  
+
 (defn find-predecessor
   [graph station]
   "Finds the non visited predecessors of station"
   (first (filter
           (fn [p] (not (visited? graph p)))
           (loom.graph/predecessors graph station))))
-          
+
 (defn traverse-subway-graph
   [state]
   (let [{:keys [graph current-node current-line]} state
@@ -433,7 +442,7 @@ The next case we should focus is to find the predecessors which weren't visited 
       (assoc state
              :current-line (metro.graph/lines graph current-node)
              :graph (attr/add-attr graph current-node :visited true)))))
-             
+
 #+END_SRC
 
 #+BEGIN_EXPORT html
@@ -452,7 +461,7 @@ Now, it's time to add the condition that, if the current node is visited, it sho
   (filter
    (fn [s] (not (visited? graph s)))
           (loom.graph/successors graph node)))
-          
+
 (defn traverse-subway-graph
   [state]
   (let [{:keys [graph current-node current-line]} state
@@ -481,7 +490,7 @@ Now, it's time to add the condition that, if the current node is visited, it sho
 Cool. It worked for a single line for now, but we're not worried yet with connections.
 
 ** Multiple lines
-What if we execute the current state of the algorithm with multiple lines:
+Let's try to run the current state of the algorithm in a configuration with multiple lines
 
 #+BEGIN_EXPORT html
 <i id="alg-5-button" class="icon-play fa-play"></i>
@@ -491,9 +500,9 @@ What if we execute the current state of the algorithm with multiple lines:
 #+END_EXPORT
 
 When we introduce another line, a good point is that, for free, we're handling the case of non visited predecessors.
-But, after all the line is visited, the rest of the stations are not even considered.
+But, there is a problem that the remaining stations are not even considered in the algorithm when the station is finished.
 
-We need to add an auxiliary data structure which will hold the pending nodes (stations).
+We need to introduce an auxiliary data structure which will hold the nodes that are still waiting to be visited (pending nodes).
 
 #+BEGIN_SRC clojure :exports result
 (defn traverse-subway-graph
@@ -522,6 +531,8 @@ We need to add an auxiliary data structure which will hold the pending nodes (st
              :graph (attr/add-attr graph current-node :visited true)))))
 #+END_SRC
 
+With this result, notice how after green line finishes, we take the rest of blue line into account.
+
 #+BEGIN_EXPORT html
 <i id="alg-6-button" class="icon-play fa-play"></i>
 <div class="metro-animation">
@@ -530,6 +541,7 @@ We need to add an auxiliary data structure which will hold the pending nodes (st
 #+END_EXPORT
 
 ** Putting an end to the algorithm
+<<<<<<< HEAD
 Let's try to run the current code to verify how it's behaving.
 In practice, this would mean
 
@@ -549,6 +561,10 @@ In practice, this would mean
 ;; {:current-node "C" :current-line "Red" :graph graph-1}
 ;; Is this ever going to end?!
 #+END_EXPORT
+=======
+The algorithm still doesn't have a stop case. Which means
+If you try to run the algorithm in its current form, this means. We need to check the stop case of the
+>>>>>>> o espirro que precede o esporro
 
 As with all the recursive algorithms, it still doesn't have a stop case and it will run indefinitely.
 When the line doesn't have more stations or no more pending stations, we know it's time to finish the algorithm
@@ -569,7 +585,7 @@ When the line doesn't have more stations or no more pending stations, we know it
 #+END_EXPORT
 
 ** Improving the interface
-Although we have a functional code, 
+Although we have a functional code,
 the API of the function seems weird because the "clients" of this function would have to know the concept of ~state~, ~pending-nodes~ and ~graph~.
 
 The ideal case scenario is to encapsulate this logic into a facade function, with only the initial configuration as the input.
@@ -584,7 +600,7 @@ The ideal case scenario is to encapsulate this logic into a facade function, wit
   [graph]
   (let [node (first (graph/nodes graph))]
     {:pending-nodes () :current-node node :current-line (metro.graph/lines graph node)}))
-  
+
 (defun traverse-graph
   [config]
   (let [graph (build-subway-graph config)
