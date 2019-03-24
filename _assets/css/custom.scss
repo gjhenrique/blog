@@ -34,9 +34,10 @@
 
 .metro-animation {
   margin-top: -20px;
-  display: block;
+  display: flex;
   height: 300px;
 }
+
 
 // Metro style
 .metro-graph {
@@ -49,14 +50,16 @@
 }
 
 .metro-git-container {
-  display: inline-block;
   font-family: 'Source Code Pro', monospace;
   width: 45%;
   height: 100%;
   overflow: auto;
 
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
   span {
-    display: block
-    ;
+    display: inline-block;
   }
 }

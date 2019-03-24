@@ -156,4 +156,53 @@ document.addEventListener('DOMContentLoaded', function(){
       metro.animations.stop_animation(graph5);
     }
   });
+
+  var containers6 = {
+    graph_container: "alg-7",
+    git_container: "alg-7-git",
+    current_node: "B",
+    traversal_function: 10,
+  };
+  var config12 = [{name: "Green", stations: ["A", "B", "C"]}];
+
+  var graph6 = metro.animations.build_animation(containers6, config12)
+
+  document.getElementById("alg-7-button").addEventListener("click", function(event) {
+    var element = event.target;
+    if(element.classList.contains('fa-play')) {
+      element.classList.remove('fa-play');
+      element.classList.add('fa-pause');
+      metro.animations.start_animation(graph6);
+    } else {
+      element.classList.remove('fa-pause');
+      element.classList.add('fa-play');
+      metro.animations.stop_animation(graph6);
+    }
+  });
+
+  var containers7 = {
+    graph_container: "alg-8",
+    git_container: "alg-8-git",
+    current_node: "B",
+    traversal_function: 10,
+  };
+  var config13 = [{name: "Green", stations: ["A", "D", "E"]},
+                  {name: "Red", stations: ["B", "D", "F"]},
+                  {name: "Blue", stations: ["C", "D", "G"]}];
+
+  var graph7 = metro.animations.build_animation(containers7, config13)
+
+  document.getElementById("alg-8-button").addEventListener("click", function(event) {
+    var element = event.target;
+    if(element.classList.contains('fa-play')) {
+      element.classList.remove('fa-play');
+      element.classList.add('fa-pause');
+      metro.animations.start_animation(graph7);
+    } else {
+      element.classList.remove('fa-pause');
+      element.classList.add('fa-play');
+      metro.animations.stop_animation(graph7);
+    }
+  });
+
 }, false);
