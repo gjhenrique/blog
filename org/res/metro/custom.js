@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function(){
   );
 
   buildRawAnimation(
-    {graph_container: "build-2"},
+    {graph_container: "build-2", layout: "grid"},
     [{name: "Red", stations: ["B", "C", "D"]},
      {name: "Blue", stations: ["D", "B", "A"]}]
   );
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function(){
   );
 
   buildRawAnimation(
-    {graph_container: "build-4"},
+    {graph_container: "build-4", layout: "grid"},
     [{name: "Red", stations: ["A", "B", "C", "D", "A"]}]
   );
 
