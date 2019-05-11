@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function(){
     current_node: "B",
     traversal_function: 10,
   };
-  var config12 = [{name: "Green", stations: ["A", "B", "C"]}];
+  var config12 = [{name: "Blue", stations: ["A", "B", "C"]}];
 
   var graph6 = metro.animations.build_animation(containers6, config12)
 
@@ -182,13 +182,12 @@ document.addEventListener('DOMContentLoaded', function(){
 
   var containers7 = {
     graph_container: "alg-8",
-    git_container: "alg-8-git",
+    // git_container: "alg-8-git",
     current_node: "B",
     traversal_function: 10,
   };
-  var config13 = [{name: "Green", stations: ["A", "D", "E"]},
-                  {name: "Red", stations: ["B", "D", "F"]},
-                  {name: "Blue", stations: ["C", "D", "G"]}];
+  var config13 = [{name: "Blue", stations: ["A", "B"]},
+                  {name: "Red", stations: ["B", "C"]}];
 
   var graph7 = metro.animations.build_animation(containers7, config13)
 
@@ -205,4 +204,79 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   });
 
+  var containers8 = {
+    graph_container: "alg-9",
+    git_container: "alg-9-git",
+    current_node: "B",
+    traversal_function: 10,
+  };
+
+  var config14 = [{name: "Blue", stations: ["A", "B"]},
+                  {name: "Red", stations: ["C", "B"]}];
+
+  var graph8 = metro.animations.build_animation(containers8, config14)
+
+  document.getElementById("alg-9-button").addEventListener("click", function(event) {
+    var element = event.target;
+    if(element.classList.contains('fa-play')) {
+      element.classList.remove('fa-play');
+      element.classList.add('fa-pause');
+      metro.animations.start_animation(graph8);
+    } else {
+      element.classList.remove('fa-pause');
+      element.classList.add('fa-play');
+      metro.animations.stop_animation(graph8);
+    }
+  });
+
+  var containers9 = {
+    graph_container: "alg-10",
+    // git_container: "alg-10-git",
+    current_node: "B",
+    traversal_function: 10,
+  };
+
+  var config15 = [{name: "Blue", stations: ["A", "B", "D"]},
+                  {name: "Red", stations: ["C", "B", "D"]}];
+
+  var graph9 = metro.animations.build_animation(containers9, config15)
+
+  document.getElementById("alg-10-button").addEventListener("click", function(event) {
+    var element = event.target;
+    if(element.classList.contains('fa-play')) {
+      element.classList.remove('fa-play');
+      element.classList.add('fa-pause');
+      metro.animations.start_animation(graph9);
+    } else {
+      element.classList.remove('fa-pause');
+      element.classList.add('fa-play');
+      metro.animations.stop_animation(graph9);
+    }
+  });
+
+  var containers10 = {
+    graph_container: "alg-11",
+    git_container: "alg-11-git",
+    current_node: "B",
+    traversal_function: 10,
+  };
+
+  var config16 = [{name: "Green", stations: ["A", "D", "E"]},
+                  {name: "Red", stations: ["B", "D", "F", "G"]},
+                  {name: "Blue", stations: ["C", "D", "F", "H"]}];
+
+  var graph10 = metro.animations.build_animation(containers10, config16)
+
+  document.getElementById("alg-11-button").addEventListener("click", function(event) {
+    var element = event.target;
+    if(element.classList.contains('fa-play')) {
+      element.classList.remove('fa-play');
+      element.classList.add('fa-pause');
+      metro.animations.start_animation(graph10);
+    } else {
+      element.classList.remove('fa-pause');
+      element.classList.add('fa-play');
+      metro.animations.stop_animation(graph10);
+    }
+  });
 }, false);
