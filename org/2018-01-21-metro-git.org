@@ -305,8 +305,8 @@ If it does, then the destination station is skipped.
 #+END_SRC
 
 The algorithm is costly ~O(E*(V+E))~ and could be improved,
-but we're dealing, at worst case, with thousands of connections and stations, so it's a good price to pay.
-Also, albeit simple, this algorithm behaved well for example in the New York subway system. It removed only 4 of 496 connections.
+but we're dealing, at worst case, with thousands of connections and stations, so it's something we should not worry about.
+Also, albeit simple, this algorithm behaved well in the New York subway system. It removed only 4 of 496 connections.
 
 #+BEGIN_EXPORT html
 <div class="metro-animation">
@@ -564,7 +564,7 @@ All the recursive algorithms need a stop case, otherwise, they run indefinitely.
 For this case, when the line doesn't have more stations to visit or no more pending stations,
 we add the key ~end~ to that state. In the next iteration, ~nil~ is returned.
 
-#+BEGIN_EXPORT clojure exports: result
+#+BEGIN_SRC clojure :exports result
 (defn traverse-graph6
   [state]
   (let [{:keys [graph current-node current-line pending-nodes end]} state
@@ -608,7 +608,7 @@ we add the key ~end~ to that state. In the next iteration, ~nil~ is returned.
 ;; {:current-node "C" :current-line '("Red") :pending-nodes ()}
 (def state4 (traverse-subway-graph state3))
 ;; nil
-#+END_EXPORT
+#+END_SRC
 
 ** Tiny API improvement
 Instead of having to send the ~current-node~ and the graph every time, we can encapsulate that logic into its own function.
@@ -1044,9 +1044,11 @@ git log --oneline
 Phew. We finally finished the journey of mapping git commands of a subway system.
 I hope it was a pleasant experience and you learned something new.
 
+#+ATTR_HTML: :target _blank
 I wanna thank the creators of [[https://github.com/vbarbaresi/MetroGit][MetroGit]] (Paris) which I saw the original idea
 and [[https://github.com/bburky/git-dc-metro][git-dc-metro]] (Washington) which I took the inspiration of the format of the commands =P
 
+#+ATTR_HTML: :target _blank
 If you're curious, the code for the project [[https://github.com/gjhenrique/metro-clojure][metro-clojure]] is in github.
 In there, you'll find the complete code of the algorithm and the animations.
 If you want to, you can open an issue requesting a new city.
