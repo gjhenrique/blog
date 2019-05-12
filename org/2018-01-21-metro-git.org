@@ -18,12 +18,12 @@ styles:
 
 #+ATTR_HTML: :target _blank
 A few years ago, I was trying to learn Clojure, had read some books and was looking for an interesting project to apply the knowledge.
-Then I remembered of reading about the project [[https://github.com/vbarbaresi/MetroGit][MetroGit]] which consists of building a Git graph from the metro system of Paris.
-In my opinion, this project is so creative that the original idea could see some improvement.
+Then I remembered reading about the project [[https://github.com/vbarbaresi/MetroGit][MetroGit]] which consists of building a Git graph from the metro system of Paris.
+In my opinion, this project is so creative that the original idea could be improved.
 
 So, the idea for this project is to build the git graph through shell commands with a *generic* set of lines, stations and connections.
 The lines will be represented as branches, stations as commits and connections as merge commits connecting the branches.
-	
+
 * Illustration of the idea
 In a nutshell, we need to transform a bunch of dynamic stations and connection to a git graph.
 
@@ -136,7 +136,7 @@ true
 #+END_SRC
 
 ** Without cycles
-_Just to familiarize ourselves_, this section is gonna focus exclusively in connections without cycles.
+_Just to familiarize ourselves_, this section is gonna focus exclusively on connections without cycles.
 # In the planning phase of the new stations,
 # the subway engineers don't care if they'll introduce a cycle in their infrastructure (why would they, right?!)
 
@@ -193,7 +193,7 @@ The violet station is a connection between a red and blue station (red + blue = 
 ** Connections reversal
 Before removing some connections, a less damaging approach is possible.
 Subway lines are bidirectional, which makes sense because
-imagine going to work with a subway and not having a way to come back to your home in the end of the day.
+imagine going to work with a subway and not having a way to come back to your home at the end of the day.
 
 So, when introducing a cycle, we could try to reverse the connections of the line that introduced a new cycle.
 
@@ -327,15 +327,15 @@ We're only focusing on the traversal algorithm and not on the literal command ge
 
 Now, onto what matters, these are the requirements to go from a generic DAG to a git graph:
 - All of the stations should be *marked as visited only once* (no duplicated commits)
-- The station can only be marked as visited when it's the *first station* or all of 
-*their predecessors are already visited* (avoid marking a station as visited and other line has a connection to this station later)
+- The station can only be marked as visited when it's the *first station* or all of
+*their predecessors are already visited* (avoid marking a station as visited and another line has a connection to this station later)
 - After the station is marked as visited, *pick its successors* (continue with the next commits)
-- After the last station of the line is reached, check other *non visited stations* (evaluate the other stations on other branches)
+- After the last station of the line is reached, check other *unvisited stations* (evaluate the other stations on other branches)
 - When *all of the stations* are visited, we reach the end of the traversal
 
-Don't fell overwhelmed, it seems complicated, but each condition with a new constraint is gonna be introduced individually.
+Don't feel overwhelmed, it seems complicated, but each condition with a new constraint is gonna be introduced individually.
 
-** High-level overview of the API
+** A high-level overview of the API
 Ideally, we would have a function that abstracts away all these logic requirements.
 Each call of the function will return the visited station and its lines and, when ~nil~ is returned, we reach the end of the algorithm.
 
@@ -360,7 +360,7 @@ In a nutshell, here is the higher level view of this API:
 ;; nil
 #+END_SRC
 
-The next sections implements the ~traverse-subway-graph~ function.
+The next sections implement the ~traverse-subway-graph~ function.
 
 ** Single line with individual stations
 Let's start with the simplest case. A subway system with only one line and not worrying about successors and predecessors.
@@ -399,7 +399,7 @@ Let's start with the simplest case. A subway system with only one line and not w
 </div>
 #+END_EXPORT
 
-Not so great. It's just returning the same station every time, but we already have an idea how the _API should behave_.
+Not so great. It's just returning the same station every time, but we already have an idea of how the _API should behave_.
 
 ** Single line with predecessors
 The next case is to find the predecessors which weren't visited yet.
@@ -411,7 +411,7 @@ The next case is to find the predecessors which weren't visited yet.
 
 (defn find-predecessor
   [graph station]
-  "Finds the non visited predecessors of station"
+  "Finds the unvisited predecessors of a station"
   (first (filter
           (fn [p] (not (visited? graph p)))
           (loom.graph/predecessors graph station))))
@@ -502,7 +502,7 @@ Let's try to run the current state of the algorithm in a configuration with mult
 </div>
 #+END_EXPORT
 
-When we introduce another line, a good point is that, accidentally, we're handling the case of non visited predecessors.
+When we introduce another line, a good point is that, accidentally, we're handling the case of unvisited predecessors.
 But, there is still a problem that the remaining stations of other lines are not even considered in the algorithm when some line doesn't have more stations.
 
 To overcome this, we need to introduce a new data structure which will hold the nodes that are still waiting to be visited, the so-called pending nodes.
@@ -550,7 +550,7 @@ To overcome this, we need to introduce a new data structure which will hold the 
 ;; {:current-node "E", :pending-nodes (), :current-line ["Green"]}
 #+END_SRC
 
-With this result, notice how after green line finishes, we also take the other stations of red line into account.
+With this result, notice how after green line finishes, we also take the other stations of the red line into account.
 
 #+BEGIN_EXPORT html
 <i id="alg-6-button" class="icon-play fa-play"></i>
@@ -638,7 +638,7 @@ The rules of this algorithm with a station with a single line are:
 
 When a station has a connection:
 1. If, at least two branches (lines) are coming from a different commit (station), create a ~merge commit~
-with the name of the station and move the all of the other branches to this commit.
+with the name of the station and move all of the other branches to this commit.
 2. When all the branches are pointing to the same commit,
 we generate a normal commit and then move the other branches (~branch -f~) to point to this new commit.
 
@@ -693,11 +693,14 @@ Again, starting with the simplest case, which is a single line which yields only
 ;; ("git commit --allow-empty -m \"C\"")
 #+END_SRC
 
-#+ATTR_HTML: :target _blank
 We're changing the variable ~commands~ in two different places of the same function.
-The [[https://clojure.org/reference/atoms][atom]] construct was introduced to update a value in two different places of the same function,
+The
+@@html:<a href="https://clojure.org/reference/atoms" target="_blank">atom</a>@@
+construct was introduced to update a value in two different places of the same function,
 but it doesn't make our function less immutable or pure.
-This [[https://clojure.org/reference/transients][quote]] from Rich Hickey explains why this is not a problem.
+This
+@@html:<a href="https://clojure.org/reference/transients" target="_blank">quote</a>@@
+from Rich Hickey explains why this is not a problem.
 
 #+BEGIN_QUOTE
 #+BEGIN_EXPORT html
@@ -717,7 +720,7 @@ If a pure function mutates some local data in order to produce an immutable retu
 #+END_EXPORT
 
 ** Multiple branches/lines
-With a single connection, we generate only commits and a checkout to create the single branch in the beginning.
+With a single connection, we generate only commits and a checkout to create a single branch in the beginning.
 But, when dealing with multiple branches, we need to keep track of the existing state of our repository.
 
 *** Emulating a git repository
@@ -740,7 +743,7 @@ but our ~HEAD~ can point to a branch
 because our algorithm doesn't need this extra complexity.
 
 *** Finding the HEAD
-In the beginning of the algorithm, we need to decide if we can stick with the current ~HEAD~.
+At the beginning of the algorithm, we need to decide if we can stick with the current ~HEAD~.
 If the same ~HEAD~ is picked, we can save unnecessaries ~checkout~ commands.
 
 #+BEGIN_SRC clojure :exports result
@@ -813,7 +816,7 @@ That's why we get
 *** Finding companion branches
 When multiple branches are pointing to the same commit, we can't generate a merge commit
 because it's _not permitted by design_.
-If you try do so, git will raise the ~Already up to date~ message
+If you try to do so, git will raise the ~Already up to date~ message
 
 Luckily, the algorithm to identify these cases is really simple.
 
@@ -923,15 +926,15 @@ The implementation is mostly the same compared with single lines but adding new 
 * API improvements
 We all can agree on one thing here: the current way to generating these commands really sucks.
 You need to call a lot of boilerplate functions to get the job done.
-Also, a lot of internal information, like state of the algorithm and the git repository, about the algorithm is being exposed in those calls.
+Also, a lot of internal information, like the state of the algorithm and the git repository, about the algorithm is being exposed in those calls.
 The clients of this program are only interested in one thing: generate the git commands to a generic subway system.
 
 Fortunately, Clojure got our back.
 
 It's possible to produce our own custom collection-like by creating a new type using the ~deftype~ function that's gonna extend the ~ISeq~ interface.
 In exchange, we need to implement 4 functions:
-- *first*: The first element of the iteration when traversing the graph. If there is no more elements, it returns ~nil~.
-- *more* for Clojure or *rest* for Clojurescript: Returns the rest of the collection without the first element. Always returns a collection
+- *first*: The first element of the iteration when traversing the graph. If there are no more elements, it returns ~nil~.
+- *more* for Clojure or *rest* for Clojurescript: Returns the rest of the collection without the first element. Always returns a collection.
 - *next*: Returns the next element of the iteration. Same as rest, but returns ~nil~ when there are no more elements.
 - *seq*: Transforms the type in a sequence. In this case, our type is already a sequence, so we just return itself.
 
@@ -995,7 +998,7 @@ In exchange, we need to implement 4 functions:
 # Now we have a simple,
 
 We now have a simple and encapsulated way of executing the creation and traversal of the graph and generation of the commands.
-With this type we can reuse some ready-made functions, like ~filter~, ~map~ and ~reduce~
+With this type, we can reuse some ready-made functions, like ~filter~, ~map~ and ~reduce~
 
 # We can use [[https://clojure.org/reference/sequences#_the_seq_library%0A][several functions]]
 
@@ -1011,7 +1014,7 @@ With this type we can reuse some ready-made functions, like ~filter~, ~map~ and 
 
 ;; Stations that have more than 6 connections
 (map :station (filter #(> (count (:line %)) 6) nyc-seq))
-=> ("West 4 Street - Washington Square / 6 Avenue" 
+=> ("West 4 Street - Washington Square / 6 Avenue"
     "Atlantic Avenue / Barclays Center")
 
 ;; Number of merge commits
@@ -1044,12 +1047,17 @@ git log --oneline
 Phew. We finally finished the journey of mapping git commands of a subway system.
 I hope it was a pleasant experience and you learned something new.
 
-#+ATTR_HTML: :target _blank
-I wanna thank the creators of [[https://github.com/vbarbaresi/MetroGit][MetroGit]] (Paris) which I saw the original idea
-and [[https://github.com/bburky/git-dc-metro][git-dc-metro]] (Washington) which I took the inspiration of the format of the commands =P
+I wanna thank the creators of
+@@html:<a href="https://github.com/vbarbaresi/MetroGit" target="_blank">MetroGit</a>@@
+(Paris) which I saw the original idea
+and
+@@html:<a href="https://github.com/bburky/git-dc-metro" target="_blank">git-dc-metro</a>@@
+(Washington) which I took the inspiration of the format of the commands =P
 
 #+ATTR_HTML: :target _blank
-If you're curious, the code for the project [[https://github.com/gjhenrique/metro-clojure][metro-clojure]] is in github.
+If you're curious, the code for the project
+@@html:<a href="https://github.com/gjhenrique/metro-clojure" target="_blank">metro-clojure</a>@@
+ [[][] is in github.
 In there, you'll find the complete code of the algorithm and the animations.
 If you want to, you can open an issue requesting a new city.
 
