@@ -16,9 +16,10 @@ styles:
 ---
 #+END_EXPORT
 
-#+ATTR_HTML: :target _blank
 A few years ago, I was trying to learn Clojure, had read some books and was looking for an interesting project to apply the knowledge.
-Then I remembered reading about the project [[https://github.com/vbarbaresi/MetroGit][MetroGit]] which consists of building a Git graph from the metro system of Paris.
+Then I remembered reading about the project
+@@html:<a href="https://github.com/vbarbaresi/MetroGit" target="_blank">MetroGit</a>@@
+which consists of building a Git graph from the metro system of Paris.
 In my opinion, this project is so creative that the original idea could be improved.
 
 So, the idea for this project is to build the git graph through shell commands with a *generic* set of lines, stations and connections.
@@ -27,8 +28,8 @@ The lines will be represented as branches, stations as commits and connections a
 * Illustration of the idea
 In a nutshell, we need to transform a bunch of dynamic stations and connection to a git graph.
 
-#+ATTR_HTML: :target _blank
-As an example, running the algorithm with this piece of [[https://pt.saopaulomap360.com/mapa-metro-sao-paulo][São Paulo]]
+As an example, running the algorithm with this piece of
+@@html:<a href="https://pt.saopaulomap360.com/mapa-metro-sao-paulo" target="_blank">São Paulo</a>@@
 metro system would generate the following shell commands:
 [[./res/metro/metro-sp.png]]
 
@@ -81,16 +82,14 @@ is gonna be broken down into these sections:
 # 3. The traversal needs to take into account the correct visitation order to build the correct git commands
 
 * Build the DAG
-#+ATTR_HTML: :target _blank
-A git graph is a [[http://eagain.net/articles/git-for-computer-scientists/][Directed *Acyclic* Graph]], which means that we're gonna
+A git graph is a
+@@html:<a href="https://eagain.net/articles/git-for-computer-scientists/" target="_blank">Directed <b>Acyclic</b> Graphs</a>@@,
+which means that we're gonna
 build a graph with directions from stations and connections and remove the *minimum* number of cycles when needed.
 
 ** Input data format
-#+ATTR_HTML: :target _blank
-# Since Clojure is being used, let's represent this data in the [[https://clojure.github.io/clojure/clojure.edn-api.html][Extensible Data Notation (EDN)]].
-# This way, it's not necessary to write extra code to transform between data types.
+The data format is gonna be an array of lines and its stations.
 
-The data format is gonna be an array of lines that contains the stations.
 #+BEGIN_SRC clojure :exports result
 => (def config [{:name "Red", :stations ["A", "C"]},
                 {:name "Green", :stations ["B", "C"]}])
@@ -101,13 +100,12 @@ The data format is gonna be an array of lines that contains the stations.
 ["A" "C"]
 #+END_SRC
 
-By the way, some fictitious lines with colors and stations represented as letters.
+By the way, some fictitious lines are gonna be represented with colors and stations with letters.
 
 ** graph abstraction with loom library
-#+ATTR_HTML: :target _blank
-For Clojure(script), there is an awesome library called [[https://github.com/aysylu/loom][loom]], which provides an exceptional API to work with graphs.
-Here are some examples:
-# It's gonna be the foundation of the project
+For Clojure(script), there is an awesome library called
+@@html:<a href="https://github.com/aysylu/loom" target="_blank">loom</a>@@,
+which provides an exceptional API to work with graphs.
 
 #+BEGIN_SRC clojure :exports result
 ;; Create the graph with the connections
@@ -240,8 +238,9 @@ So, when introducing a cycle, we could try to reverse the connections of the lin
 ;; #{"C" "B"}
 #+END_SRC
 
-#+ATTR_HTML: :target _blank
-Keep in mind that the call to ~loom.graph/dag?~ does a [[https://en.wikipedia.org/wiki/Topological_sorting][Topological sorting]], which takes ~O(E+V)~.
+Keep in mind that the call to ~loom.graph/dag?~ does a
+@@html:<a href="https://en.wikipedia.org/wiki/Topological_sorting" target="_blank">Topological sorting</a>@@,
+which takes ~O(E+V)~.
 By the way, ~E~ (edges) are the stations and the ~V~ (vertex) are the connections between them.
 Therefore, this algorithm run in ~O(L*(E+V))~ where L is the number of lines,
 
@@ -1054,10 +1053,9 @@ and
 @@html:<a href="https://github.com/bburky/git-dc-metro" target="_blank">git-dc-metro</a>@@
 (Washington) which I took the inspiration of the format of the commands =P
 
-#+ATTR_HTML: :target _blank
 If you're curious, the code for the project
 @@html:<a href="https://github.com/gjhenrique/metro-clojure" target="_blank">metro-clojure</a>@@
- [[][] is in github.
+is in github.
 In there, you'll find the complete code of the algorithm and the animations.
 If you want to, you can open an issue requesting a new city.
 
