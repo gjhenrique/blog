@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', function(){
   buildAnimation(
     {
       graph_container: "alg-10",
+      git_container: "alg-10-git",
       current_node: "B",
       traversal_function: 10,
     },

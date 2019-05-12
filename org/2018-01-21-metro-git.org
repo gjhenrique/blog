@@ -4,7 +4,7 @@ layout: post
 title: Converting metro connections to git graph (Improve me)
 comments: false
 custom_js:
-  - http://localhost:8080/prod/main.js
+  - ./res/metro/metro.js
   - ./res/metro/custom.js
 categories:
   - programming
@@ -17,13 +17,13 @@ styles:
 #+END_EXPORT
 
 #+ATTR_HTML: :target _blank
-A few years back, I was trying to learn Clojure, had read some books and was looking for an interesting project to apply the knowledge.
-Then I remembered reading about the project [[https://github.com/vbarbaresi/MetroGit][MetroGit]] which consists of building a Git graph from the metro system of Paris.
+A few years ago, I was trying to learn Clojure, had read some books and was looking for an interesting project to apply the knowledge.
+Then I remembered of reading about the project [[https://github.com/vbarbaresi/MetroGit][MetroGit]] which consists of building a Git graph from the metro system of Paris.
 In my opinion, this project is so creative that the original idea could see some improvement.
 
 So, the idea for this project is to build the git graph through shell commands with a *generic* set of lines, stations and connections.
 The lines will be represented as branches, stations as commits and connections as merge commits connecting the branches.
-
+	
 * Illustration of the idea
 In a nutshell, we need to transform a bunch of dynamic stations and connection to a git graph.
 
@@ -71,7 +71,7 @@ _Improve me_
 # break down the components
 To make this process less overwhelming, the rest of the post
 is gonna be broken down into these sections:
-1. Build a Directed Acyclic Graph from the input data
+1. Build the graph from the input data
 2. Traverse the graph with the required constraints
 3. Generate the git commands while traversing the graph
 4. Improve the api with some Clojure magic
@@ -327,14 +327,13 @@ We're only focusing on the traversal algorithm and not on the literal command ge
 
 Now, onto what matters, these are the requirements to go from a generic DAG to a git graph:
 - All of the stations should be *marked as visited only once* (no duplicated commits)
-- The station can only be marked as visited when it's the *first station* or all of *their predecessors are already visited*
-(avoid marking a station as visited and other line has a connection to this station later)
+- The station can only be marked as visited when it's the *first station* or all of 
+*their predecessors are already visited* (avoid marking a station as visited and other line has a connection to this station later)
 - After the station is marked as visited, *pick its successors* (continue with the next commits)
 - After the last station of the line is reached, check other *non visited stations* (evaluate the other stations on other branches)
 - When *all of the stations* are visited, we reach the end of the traversal
 
-Don't worry, it seems complicated, but each condition with a new constraint is gonna be introduced individually,
-so it's gonna be easier to reason about all of this.
+Don't fell overwhelmed, it seems complicated, but each condition with a new constraint is gonna be introduced individually.
 
 ** High-level overview of the API
 Ideally, we would have a function that abstracts away all these logic requirements.
@@ -400,7 +399,7 @@ Let's start with the simplest case. A subway system with only one line and not w
 </div>
 #+END_EXPORT
 
-Not so great. It's just returning the same station every time, but we already have an idea how the API should behave.
+Not so great. It's just returning the same station every time, but we already have an idea how the _API should behave_.
 
 ** Single line with predecessors
 The next case is to find the predecessors which weren't visited yet.
@@ -711,7 +710,7 @@ If a pure function mutates some local data in order to produce an immutable retu
 
 #+BEGIN_EXPORT html
 <i id="alg-7-button" class="icon-play fa-play"></i>
-<div class="metro-animation">
+<div class="metro-animation-git">
   <div id="alg-7" class="metro-graph"></div>
   <div id="alg-7-git" class="metro-git-container"></div>
 </div>
@@ -768,7 +767,7 @@ If the same ~HEAD~ is picked, we can save unnecessaries ~checkout~ commands.
 
 #+BEGIN_EXPORT html
 <i id="alg-8-button" class="icon-play fa-play"></i>
-<div class="metro-animation">
+<div class="metro-animation-git">
   <div id="alg-8" class="metro-graph"></div>
   <div id="alg-8-git" class="metro-git-container"></div>
 </div>
@@ -804,7 +803,7 @@ That's why we get
 
 #+BEGIN_EXPORT html
 <i id="alg-9-button" class="icon-play fa-play"></i>
-<div class="metro-animation">
+<div class="metro-animation-git">
   <div id="alg-9" class="metro-graph"></div>
   <div id="alg-9-git" class="metro-git-container"></div>
 </div>
@@ -813,7 +812,7 @@ That's why we get
 
 *** Finding companion branches
 When multiple branches are pointing to the same commit, we can't generate a merge commit
-because it's not permitted by design.
+because it's _not permitted by design_.
 If you try do so, git will raise the ~Already up to date~ message
 
 Luckily, the algorithm to identify these cases is really simple.
@@ -833,7 +832,7 @@ Luckily, the algorithm to identify these cases is really simple.
 
 #+BEGIN_EXPORT html
 <i id="alg-10-button" class="icon-play fa-play"></i>
-<div class="metro-animation">
+<div class="metro-animation-git">
   <div id="alg-10" class="metro-graph"></div>
   <div id="alg-10-git" class="metro-git-container"></div>
 </div>
@@ -915,7 +914,7 @@ The implementation is mostly the same compared with single lines but adding new 
 
 #+BEGIN_EXPORT html
 <i id="alg-11-button" class="icon-play fa-play"></i>
-<div class="metro-animation">
+<div class="metro-animation-git">
   <div id="alg-11" class="metro-graph"></div>
   <div id="alg-11-git" class="metro-git-container"></div>
 </div>
@@ -929,7 +928,7 @@ The clients of this program are only interested in one thing: generate the git c
 
 Fortunately, Clojure got our back.
 
-It's possible to produce our own custom collection-like by creating a new class using the ~deftype~ function that's gonna extend the ~ISeq~ interface.
+It's possible to produce our own custom collection-like by creating a new type using the ~deftype~ function that's gonna extend the ~ISeq~ interface.
 In exchange, we need to implement 4 functions:
 - *first*: The first element of the iteration when traversing the graph. If there is no more elements, it returns ~nil~.
 - *more* for Clojure or *rest* for Clojurescript: Returns the rest of the collection without the first element. Always returns a collection
@@ -1005,21 +1004,22 @@ With this type we can reuse some ready-made functions, like ~filter~, ~map~ and 
 (def nyc-config (load-from-file "nyc.txt"))
 (def nyc-seq (metro-git-seq nyc-config))
 
-;; how many stations are in New York City
+;; lines of  New York City
 (sort (set (flatten (map :line nyc-seq))))
 => ("1" "2" "3" "4" "5" "6" "7" "A" "B" "C" "D"
     "E" "F" "G" "J" "L" "M" "N" "Q" "R" "W" "Z")
 
 ;; Stations that have more than 6 connections
 (map :station (filter #(> (count (:line %)) 6) nyc-seq))
-=> ("West 4 Street - Washington Square / 6 Avenue" "Atlantic Avenue / Barclays Center")
+=> ("West 4 Street - Washington Square / 6 Avenue" 
+    "Atlantic Avenue / Barclays Center")
 
 ;; Number of merge commits
 (count (filter #(str/starts-with? % "git merge") (mapcat :commands nyc-seq)))
 => 62
 #+END_SRC
 
-And maybe, the most important part is creating a new file with the git commands.
+But, the most important part is creating a new file with the git commands.
 
 #+BEGIN_SRC clojure exports result
 ;; Write the git commands to a file
@@ -1047,8 +1047,8 @@ I hope it was a pleasant experience and you learned something new.
 I wanna thank the creators of [[https://github.com/vbarbaresi/MetroGit][MetroGit]] (Paris) which I saw the original idea
 and [[https://github.com/bburky/git-dc-metro][git-dc-metro]] (Washington) which I took the inspiration of the format of the commands =P
 
-Check and star the project [[https://github.com/gjhenrique/metro-clojure][metro-clojure]] in github.
+If you're curious, the code for the project [[https://github.com/gjhenrique/metro-clojure][metro-clojure]] is in github.
 In there, you'll find the complete code of the algorithm and the animations.
-If you want, open an issue requesting a new city.
+If you want to, you can open an issue requesting a new city.
 
 Also, sorry for the CPU usage of the animations. ;)
