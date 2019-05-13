@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function(){
   buildAnimation(
     {
       graph_container: "alg-8",
+      git_container: "alg-8-git",
       current_node: "B",
       traversal_function: 10,
     },
