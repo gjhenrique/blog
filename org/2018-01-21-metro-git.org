@@ -16,20 +16,19 @@ styles:
 ---
 #+END_EXPORT
 
-A few years ago, I was trying to learn Clojure, had read some books and was looking
+A few years ago, I was learning Clojure, had read some books and was looking
 for an interesting project to practice the learnings.
 Then I remembered reading about the project
 @@html:<a href="https://github.com/vbarbaresi/MetroGit" target="_blank">MetroGit</a>@@
 which consists of building a Git graph from the metro system of Paris.
-In my opinion, this project is so creative that the original idea could be improved.
+In my opinion, this project is so creative that the original scope could be extended.
 
-So, the idea for this project is to *generate* the necessary git commands
+So, the idea of this project is to *generate* the necessary git commands
 to build the git graph with a *generic* set of lines, stations and connections.
 The branches are represented as lines, commits are stations and merge commits are stations that connect lines.
 
 * Illustration of the idea
 In a nutshell, we need to transform a bunch of stations, lines and connections to a git graph.
-
 As an example, running the algorithm with this piece of
 @@html:<a href="https://pt.saopaulomap360.com/mapa-metro-sao-paulo" target="_blank">São Paulo</a>@@
 metro system would generate the following shell commands:
@@ -69,22 +68,21 @@ Which produces the following git graph from ~git log --graph --all --pretty=onel
 
 [[./res/metro/git-result.png]]
 
-# Instead of doing all at once
-The next sections are gonna focus on the journey of achieving this world changing functionality.
-So, the post is gonna be broken into the following sections:
-1. Build the graph from the input data
+The next sections are gonna focus on the journey of achieving this and
+the following sections are :
+1. Build an acyclic graph from the input data
 2. Traverse the built graph with the required constraints
-3. Generate the git commands when traversing the graph
-4. Transform our traversal into the Clojure ~seq~ abstraction
+3. Generate the git commands while traversing the graph
+4. Improve the API with the Clojure ~seq~ abstraction
 
 * Build the acyclic graph
 A git graph is a
 @@html:<a href="https://eagain.net/articles/git-for-computer-scientists/" target="_blank">Directed <b>Acyclic</b> Graphs</a>@@,
 which means that first we need to
-build a graph with directions from stations and connections and remove the *minimum* number of cycles whenever needed.
+build a graph with directions from stations and connections and remove the *minimum* number of cycles if needed.
 
 ** Input data format
-The data format is gonna be an array of lines and its stations. Simple as that.
+The data format is gonna be simply an array of lines and its stations.
 
 #+BEGIN_SRC clojure :exports result
 => (def config [{:name "Red", :stations ["A", "C"]},
@@ -101,8 +99,8 @@ By the way, to avoid mental overhead, the fictitious lines are gonna be represen
 ** Loom, our fellow graph library
 For Clojure(script), there is an awesome library called
 @@html:<a href="https://github.com/aysylu/loom" target="_blank">loom</a>@@,
-which provides the foundation of creating and manipulating graphs.
-Take a look of some functions we're gonna use in the future.
+which provides code for creating and manipulating graphs.
+Take a look at the examples of some functions we're gonna use in the future.
 
 #+BEGIN_SRC clojure :exports result
 ;; Create the graph with the connections
@@ -130,11 +128,11 @@ Take a look of some functions we're gonna use in the future.
 true
 #+END_SRC
 
-** Graph Without cycles
-First of all, let's deal with the easiest type of metro map, the one without cycles.
+** Graph without cycles
+First of all, let's deal with the easiest type of metro configuration, the one without cycles.
 
-The required code doesn't do much. We're receiving an input data and creating a new loom graph from it
-storing the line as attributes of each station/node.
+This code doesn't do much. We receive an input data, create a new loom graph
+from the connections and store the line as attributes of each station/node.
 
 #+BEGIN_SRC clojure :exports result
 (defn- add-line-information
@@ -185,14 +183,15 @@ It yields the following graph:
 
 The violet station is a connection between a red and blue station.
 
-** Reversing connections as an alternative
-Before start removing connections, we could take a less damaging approach.
-As we all know subway lines are bidirectional, which makes sense because
-imagine taking the metro to go work and having to take a Uber to come back to your home at the end of the day.
+** Reverse connections as an alternative
+Before start removing connections for ciclic graphs, we could try to approach the problem with a less damaging mindset.
+As we all know metro lines are bidirectional, which makes sense because
+imagine going to work by metro in the morning and having to take a Uber to come back to your home at the end of the day.
 
 So, after adding a new line and checking if it introduces a cycle,
-we could try to reverse the connections.
+we could try to reverse the connections and check if it worked.
 
+_TODO_ Add reverse-stations
 #+BEGIN_SRC clojure :exports result
 (defn- connections-without-cycle
   "Check if adding the connections to a graph introduces cycle
@@ -233,9 +232,11 @@ we could try to reverse the connections.
 ;; #{"C" "B"}
 #+END_SRC
 
-Keep in mind that the call to ~loom.graph/dag?~ does a
-@@html:<a href="https://en.wikipedia.org/wiki/Topological_sorting" target="_blank">Topological sorting</a>@@,
-which takes ~O(E+V)~.
+Keep in mind that the call to ~loom.graph/dag?~ represents the most expensive operation of the algorithm.
+It does a
+@@html:<a href="https://en.wikipedia.org/wiki/Topological_sorting" target="_blank">Topological sorting</a>@@
+to tell if the graph is a dag or not.
+It takes ~O(E+V)~, where
 By the way, ~E~ (edges) are the stations and ~V~ (vertex) are the connections among them.
 Therefore, this algorithm run in ~O(Line*(Stations+Connections))~.
 
@@ -253,11 +254,11 @@ Notice that now the ~B~ station connects to the ~D~ station, not ~A~ anymore.
 </div>
 #+END_EXPORT
 
-** Removing connections/edges
-If, even after reversing the station lines, there are still cycles, the last resort is to remove the connections that introduced a cycle.
+** Remove connections/edges
+If, even after reversing the station lines, there are still cycles, the last resort is to remove the connection that introduced a cycle.
 
-The idea is to check if there is a cycle for every addition of a origin station and destination station.
-If there is, then the destination station is skipped and the station after the destination is connected with the origin station.
+The idea is to check if there is a cycle in every addition of a connection.
+If there is, then the destination station is skipped and the station after the destination is connected, if possible, with the origin station.
 
 #+BEGIN_SRC clojure :exports result
 (defn- connections-removing-cycles
@@ -284,7 +285,7 @@ If there is, then the destination station is skipped and the station after the d
 
 #+END_SRC
 
-Notice how the removal of the cycles runs after trying to revert the connections.
+Notice how the removal of the cycle is executed only after trying to revert the connections.
 
 #+BEGIN_SRC diff :exports result
 ;; in valid-connection function
@@ -307,7 +308,7 @@ Notice how the removal of the cycles runs after trying to revert the connections
 ;; true
 #+END_SRC
 
-The algorithm is costly ~O(E*(V+E))~ or ~O(Connections*(Stations+Connection))~ and could be improved,
+The algorithm is costly ~O(E*(V+E))~ or ~O(Connections*(Stations+Connection))~ and it's not ideal,
 but we're dealing, at worst case, with thousands of connections and stations, so it's something we should not worry about.
 For example, this algorithm removed only 4 of 496 connections in the huge New York subway system.
 
@@ -317,7 +318,7 @@ For example, this algorithm removed only 4 of 496 connections in the huge New Yo
 </div>
 #+END_EXPORT
 
-After running the algorithm, the ~D->A~ connection is removed.
+After running the algorithm, ~D->A~ connection is removed.
 #+BEGIN_EXPORT html
 <div class="metro-animation">
   <div id="build-5" class="metro-graph"></div>
@@ -325,29 +326,29 @@ After running the algorithm, the ~D->A~ connection is removed.
 #+END_EXPORT
 
 We build the algorithm to build a DAG removing the miminum number of connections.
-Now we can focus on the traversal of this graph.
+Now it's time to focus on the traversal of this graph.
 
 * Traversal
 # After building the DAG, it's time to focus on the traversal that's gonna generate the git commands correctly.
 This section focus only on the traversal algorithm and not the command generation.
-It's wise to decouple these two components, otherwise the algorithm gets complex really fast.
+It's wise to decouple these two components, otherwise the algorithm gets too messy.
 
-Now, back to business, these are the requirements to perform this traversal appropriately:
+Now, back to business, these are the requirements to perform this traversal without interfering with the construction of the graph:
 - All of the stations should be *marked as visited only once* (no duplicated commits)
-- The station can only be marked as visited when it's the *first station* or all of
-*their predecessors are already visited* (avoid marking a station as visited and another line has a connection to this station later)
+- The station can only be marked as visited when it's the *first station* or all of *their predecessors are already visited* (once you issue a commit, all of the predecessors should be commited before)
 - After the station is marked as visited, *pick its successors* (continue with the next commits)
-- After the last station of the line is reached, check other *unvisited stations* (evaluate the other stations on other branches)
+- After the last station of a certain line is reached, check other *unvisited stations* (evaluate the other stations on other branches)
 - When *all of the stations* are visited, we reach the end of the traversal
 
 Don't feel overwhelmed by all of this, it seems complicated, but these constraints are gonna be introduced gradually.
 
-** Black box
-Instead of having an ~Iterator~ or similar,
-the API I thought is a function call that receives
-a state of current visited station and lines and a graph and
-returns a new state with the visited station and the updated loom graph.
+** API of the algorithm
+Instead of having an ~Iterator~ or something similar,
+the designed API is a function call that receives
+a state of current visited station and lines and a graph.
+After the processing logic, a new state is returned with the new visited station and the updated loom graph.
 When ~nil~ is returned, we reach the end of the algorithm.
+This approach is similar to a reducer in the redux universe.
 
 #+BEGIN_SRC  clojure :exports result
 (def config [{:name "Red" :stations ["A" "C"]}
@@ -372,7 +373,7 @@ When ~nil~ is returned, we reach the end of the algorithm.
 The next sections implement the ~traverse-graph~ function.
 
 ** Single line with individual stations
-Always starting with the simplest case: A subway system with only one line.
+Always the simplest case first: a subway configuration with only one line.
 
 #+BEGIN_EXPORT html
 <div class="metro-animation">
@@ -413,11 +414,12 @@ Always starting with the simplest case: A subway system with only one line.
 </div>
 #+END_EXPORT
 
-Not so great. It's just returning the same station every time, but we already have an idea of the parameters and return of the function.
+Not so great yet.
+It's just returning the same station every time, but we already have an idea of the shape of the function.
 
 ** Single line with predecessors
 The next case is to find the unvisited predecessors.
-To do so, we recursively try to find a station which doesn't have a unvisited predecessor yet.
+To do so, we recursively try to find a station which doesn't have an unvisited predecessor yet.
 
 #+BEGIN_SRC clojure :exports result
 (defn- visited?
@@ -460,11 +462,12 @@ To do so, we recursively try to find a station which doesn't have a unvisited pr
 </div>
 #+END_EXPORT
 
-We're having progress. The algorithm now is at least returning to the initial station
+We're having progress. The algorithm now is at least returning to the initial station.
 
 ** Single line with successors
 Now, it's time to add the condition that, if the current station was already visited, the successors are picked.
 
+_TODO Implement the correct code_
 #+BEGIN_SRC clojure :exports result
 (defn- visited?
   [graph station]
@@ -508,7 +511,7 @@ Now, it's time to add the condition that, if the current station was already vis
 </div>
 #+END_EXPORT
 
-Cool. It worked for a single line, but the algorithm is still not taking into connections and multiple lines.
+Cool. It worked for a single line, but the algorithm is still not taking into account connections and multiple lines.
 
 ** Multiple lines
 Just out of curiosity, let's try to run the current state of the algorithm in a configuration with multiple lines
@@ -521,8 +524,9 @@ Just out of curiosity, let's try to run the current state of the algorithm in a 
 #+END_EXPORT
 
 # When we introduce another line, a good point is that, accidentally, we're handling the case of unvisited predecessors.
-There is still a problem that the stations of other lines are not even considered when a line visits all stations.
-To solve this, we need to introduce a new data structure which holds the stations that are still waiting to be visited, the so-called pending nodes.
+There is still a problem that the stations of other lines are not even considered when a line finishes to visit all stations.
+To solve this, we need to introduce a new data structure which holds the stations that are still waiting to be visited,
+the so-called pending nodes.
 
 #+BEGIN_SRC clojure :exports result
 (defn traverse-graph-with-pending-stations
@@ -580,8 +584,8 @@ With this result, notice how after green line finishes, we also take the other s
 ** Everything comes to an end
 All the recursive algorithms need a stop case, otherwise, they run indefinitely.
 
-For this case, when the line doesn't have more stations to visit or no more pending stations,
-we add a new key ~end~ to the returned state. In the next iteration, ~nil~ is returned.
+For this case, when the line doesn't have more stations to visit and no more pending stations,
+we add a new key ~end~ to the returned state. In the next iteration, ~nil~ is returned if this key is present.
 
 #+BEGIN_SRC clojure :exports result
 (defn traverse-graph
@@ -629,9 +633,9 @@ we add a new key ~end~ to the returned state. In the next iteration, ~nil~ is re
 ;; nil
 #+END_SRC
 
-** Helper function to bootstrap the traversal
-One disadvantage of this approach is that the initial state should contain a current-node, including .
-To alleviate this, we can encapsulate this logic into its own function.
+** Helper function to hide some details
+One disadvantage of this approach is that the initial state should contain boilerplate data such as ~pending-nodes~, ~current-node~, etc.
+To alleviate this problem for now, we can encapsulate this logic into its own bootstrap function.
 
 #+BEGIN_SRC clojure :exports result
 (defn initial-state
@@ -649,22 +653,21 @@ To alleviate this, we can encapsulate this logic into its own function.
 #+END_SRC
 
 * Generate git commands
-The last piece of the puzzle is to create *one or more git commands* for each new iteration of the traversal.
+One last piece of the puzzle is to create *one or more git commands* for each new iteration of the traversal.
 
-For each iterated station, the algorithm needs to perform two tasks:
-- Switch to or create a branch if needed
-- Generate the (merge) commit and, if necessary, move the other branchs to the new commit.
+For each iterated station, essentially, the algorithm needs to perform two tasks in this order:
+1. Switch (move the ~HEAD~) to a branch/line or create a branch/line and then move the ~HEAD~ to it.
+2. Generate a (simple/merge) commit with the station name and, when dealing with multiple branches, move the other branchs to this new commit.
 
-In the switching branch logic:
-1. When ~HEAD~ is pointing to some line of the iterated lines, don't do anything.
-2. When ~HEAD~ is not pointing to some line but a line already exists, do a ~checkout~ if the line exists or a ~checkout --orphan~ if it doesn't exist.
+In the switching branch phase:
+- When ~HEAD~ is ponting to some of the input branches, don't issue any command.
+- When ~HEAD~ is not pointing to some of input branches, but some line already exists, issue a ~checkout~ command.
+- When ~HEAD~ is not pointing to some of input branches, and all of the branches don't exist, create a ~checkout --orphan~ command.
 
-In the command generation:
-1. If there is a single line, create a simple ~commit~.
-2. If at least two lines (branches) are coming from different stations (commits), create a ~merge commit~
-with the name of the station and move all of the other branches to the new commit.
-3. When all the lines (branches) are coming to the same station (commit),
-generate a simple ~commit~ and then move the other branches (~branch -f~) to point to this new commit.
+In the command generation phase:
+- If it's a single line, create a simple ~commit~.
+- If, at least two lines (branches) are coming from different stations (commits), create a ~merge commit~ and move the remaining branches (~branch -f~) to this new commit.
+- When all the lines (branches) are coming from the same station (commit), generate a simple ~commit~ and then move the other branches (~branch -f~) to the new commit.
 
 ** Single line/branch
 Again, starting with the simplest case, which is a single line which yields only ~checkout~ and ~commit~ commands.
@@ -715,8 +718,8 @@ and it's totally decoupled from the traversal algorithm.
 We're changing the variable ~commands~ in two different places of the same function.
 The
 @@html:<a href="https://clojure.org/reference/atoms" target="_blank">atom</a>@@
-construct was introduced to update a value in two different places of the same function,
-but it doesn't make our function less immutable or pure.
+construct was used to update a value in two different places of the same function,
+but it doesn't make our function less immutable or pure *to the outside world*.
 This
 @@html:<a href="https://clojure.org/reference/transients" target="_blank">quote</a>@@
 from Rich Hickey explains why this is not a problem.
@@ -738,14 +741,13 @@ If a pure function mutates some local data in order to produce an immutable retu
 </div>
 #+END_EXPORT
 
-** Multiple branches/lines
+** Emulating a git repository
 When dealing with multiple branches,
-we need to keep track of where ~HEAD~ is pointing and the commits that the branches are pointing to.
+we need to keep track of where ~HEAD~ is pointing and the last commit that the branches are pointing to.
 
-*** Emulating a git repository
-Instead of using a real life git repository to keep track of the existing branches and commits,
+Instead of using a real life git repository to have this logic of handling with existing branches and commits,
 we can represent it as a plain old Clojure(script) map.
-Each new command can update this map with the current state of branches and the commit of each branch.
+Each new iteration can update this map with the current state of branches and commits.
 Basically, our "fake" repo can be represented as:
 
 #+BEGIN_SRC clojure :exports result
@@ -753,11 +755,15 @@ Basically, our "fake" repo can be represented as:
 (def head :Red)
 #+END_SRC
 
-A quick remark is that ~HEAD~ points to a commit in a real git repo,
-but our ~HEAD~ points to a branch
-because only the branch is necessary to check if we need to issue a ~checkout~ command or not.
+A quick remark is that our ~HEAD~ points to a branch, instead of a ~commit~ like the original git repository.
+It's done like this because it's with the branch we need to check if an additional ~checkout~ command is necessary.
+Besides we store only the last commit of the branch to decide if we need to generate a merge or a simple commit.
 
-*** Picking the HEAD
+# A quick remark is that ~HEAD~ points to a commit in the original git repository,
+# but our ~HEAD~ points to a branch
+# because only the branch is necessary to check if we need to issue a ~checkout~ command or not.
+
+** Picking the HEAD
 At the beginning of the algorithm, we need to decide if it's possible to stick with the current ~HEAD~.
 If the same ~HEAD~ is picked, we can save unnecessaries ~checkout~ commands.
 
@@ -791,8 +797,8 @@ If the same ~HEAD~ is picked, we can save unnecessaries ~checkout~ commands.
 </div>
 #+END_EXPORT
 
-*** Merge branches
-When the iterated station has multiple branches and they're coming to different commits, we generate a merge commit.
+** Merge branches
+When the iterated station has multiple branches and they're coming from different commits, we generate a merge commit.
 
 #+BEGIN_SRC clojure :exports result
 (defn find-merge-branches
@@ -826,12 +832,12 @@ When the iterated station has multiple branches and they're coming to different 
 </div>
 #+END_EXPORT
 
-*** Companion branches
+** Companion branches
 When multiple branches are coming from the same commit, we can't generate a merge commit
-because these branches are not divergent.
+because these branches are not divergent and can't be...merged.
 If you try to do this, git will raise the ~Already up to date~ message.
 
-To identify these cases, we can check if the evaluated lines are not from inside the merging branches.
+To identify these cases, we can check if the evaluated lines are simply not inside the merging branches set.
 
 #+BEGIN_SRC clojure :exports result
 (defn find-companion-branches
@@ -854,7 +860,7 @@ To identify these cases, we can check if the evaluated lines are not from inside
 </div>
 #+END_EXPORT
 
-*** Fitting the pieces together
+** Fitting the pieces together
 Now that all of the pieces were introduced, we can fill the gaps and assemble the rest of the implementation.
 
 #+BEGIN_SRC clojure :exports result
@@ -935,10 +941,10 @@ Now that all of the pieces were introduced, we can fill the gaps and assemble th
 #+END_EXPORT
 
 * seq abstraction to the rescue
-One part we call all agree on: the current API to generate these commands really sucks.
-You need to call a lot of boilerplate functions to get the job done.
-Also, a lot of internal information, like the state of the algorithm and the git repository, about the algorithm is being exposed in those calls.
-The clients of this program are only interested in one thing: generate the git commands to a metro configuration.
+One part we call all agree o is that the current API to generate these commands really sucks.
+The user needs to call a lot of boilerplate functions to get the job done.
+Also, a lot of internal information, like the state of the traversal algorithm and the git repository, is being exposed in those calls.
+The clients of this program are only interested in one thing: generate the git commands from a metro configuration.
 
 Fortunately, Clojure got our back.
 
@@ -1006,8 +1012,8 @@ In exchange, Clojure only asks us to implement 4 functions:
 (:station (second (metro-git-seq config)))
 #+END_SRC
 
-We now have a simple and encapsulated way of executing the creation and traversal of the graph and generation of the commands.
-With this new type, we can reuse some ready-made functions that we all learned to love.
+We now have a straightforward and encapsulated way of creating and traversing and generating the git commands.
+With this new type, we can reuse some ready-made functions that we all learned to love from Clojure.
 
 #+BEGIN_SRC clojure exports result
 ;; load-from-file simply transforms the text file into a EDN
@@ -1031,17 +1037,14 @@ With this new type, we can reuse some ready-made functions that we all learned t
 
 But, the most important part is creating a new file with the git commands.
 
+_Test this please_
 #+BEGIN_SRC clojure exports result
 ;; Write the git commands to a file
 (spit "nyc.sh" (str/join "\n" (mapcat :commands nyc-seq)))
-#+END_SRC
-
-#+BEGIN_SRC shell exports result
-mkdir nyc_repo && cd nyc_repo
-git init
-sh ../nyc.sh
-
-git log --oneline
+(sh "mkdir nyc_repo")
+(sh "git" "init" :dir "nyc_repo")
+(sh "../nyc.sh" :dir "nyc_repo")
+(println(sh git log --oneline
 # 670b346 (HEAD -> M) Forest Avenue / 67 Avenue
 # eb8a8e4 Hewes Street / Broadway
 # 6a97c04 Lorimer Street / Broadway
@@ -1051,21 +1054,22 @@ git log --oneline
 #+END_SRC
 
 * That's it, folks
-Phew. We reached the end of the journey of mapping git commands of a subway system.
+Phew. We reached the end of the journey of mapping git commands from a metro system.
 I hope it was a pleasant experience and you learned something new.
 
 I wanna thank the creators of
 @@html:<a href="https://github.com/vbarbaresi/MetroGit" target="_blank">MetroGit</a>@@
-(Paris) which I got the original idea
+(Paris) where I got the original idea
 and
 @@html:<a href="https://github.com/bburky/git-dc-metro" target="_blank">git-dc-metro</a>@@
-(Washington) which I took the inspiration of the format of the commands =P
+(Washington) where I took the inspiration of the format of the commands =P
 
 If you're curious, the code for the project
 @@html:<a href="https://github.com/gjhenrique/metro-clojure" target="_blank">metro-clojure</a>@@
 is in github.
 If you want to, you can open an issue requesting a new city.
-Another great thing about Clojure(script) is that the animations of this post
+
+Another great thing about Clojure(script) is that the animations demonstrating the traversal and creation
 uses the same code but transpiled to JS.
 
 Also, sorry for the CPU usage of the animations. ;)
