@@ -1,7 +1,7 @@
 #+BEGIN_EXPORT html
 ---
 layout: post
-title: Converting metro connections to git graph (Improve me)
+title: From metro connections to a git graph
 comments: false
 custom_js:
   - ./res/metro/metro.js
@@ -133,8 +133,8 @@ First of all, let's deal with the easiest type of metro configuration, the one w
 This code doesn't do much. We receive an input data, create a new loom graph
 from the connections and store the line as attributes of each station/node.
 
-_The code was introduced, but it's not necessary for the fully understanding_
-_It's possible to only look at the examples in the final of the functions and look at the algorithm_
+# _The code was introduced, but it's not necessary for the fully understanding_
+# _It's possible to only look at the examples in the final of the functions and look at the algorithm_
 
 #+BEGIN_SRC clojure :exports result
 (defn- add-line-information
@@ -244,7 +244,7 @@ Keep in mind that the call to ~loom.graph/dag?~ represents the most expensive op
 It does a
 @@html:<a href="https://en.wikipedia.org/wiki/Topological_sorting" target="_blank">Topological sorting</a>@@
 to tell if the graph is a DAG or not.
-It takes ~O(E+V)~, 
+It takes ~O(E+V)~,
 where ~E~ (edges) are the stations and ~V~ (vertex) are the connections among them.
 Therefore, this algorithm run in ~O(Line*(Stations+Connections))~.
 
@@ -408,7 +408,7 @@ Always the simplest case first: a subway configuration with only one line.
              :current-line (lines graph current-node)
              ;; Store the visited as atttribute of the station
              :graph (loom.attr/add-attr graph current-node :visited true))))
-             
+
 (def config [{:name "Green" :stations ["A" "B" "C"]}])
 (def g (build-graph config))
 
@@ -485,7 +485,7 @@ Now, it's time to add the condition that, if the current station was already vis
   [graph node]
   (filter
    (fn [s] (not (visited? graph s)))
-          (loom.graph/successors graph node))) 
+          (loom.graph/successors graph node)))
 
 (defn traverse-graph-with-successors
   "Continue the traversal when there are unvisited succcessors"
@@ -508,8 +508,8 @@ Now, it's time to add the condition that, if the current station was already vis
       :else
       (assoc state
              :current-line (lines graph current-node)
-             :graph (loom.attr/add-attr graph current-node :visited true))))) 
-             
+             :graph (loom.attr/add-attr graph current-node :visited true)))))
+
 => (def config [{:name "Green" :stations ["A" "B" "C"]}])
 => (def g (build-graph config))
 => (def state1 (traverse-graph-with-successors {:graph g :current-node "B"}))
@@ -647,7 +647,7 @@ we add a new key ~end~ to the returned state. In the next iteration, ~nil~ is re
              :pending-nodes (remove #{current-node} pending-nodes)
              :current-line (metro.graph/lines graph current-node)
              :graph (loom.attr/add-attr graph current-node :visited true)))))
-             
+
 
 => (def config [{:name "Red" :stations ["A" "B" "C"]}])
 => (def graph (build-graph config))
@@ -676,10 +676,10 @@ To alleviate this problem, we can encapsulate this logic into its own bootstrap 
      :current-node station
      :current-line (lines graph station)}))
 
-=> (def config [{:name "Red" :stations ["A" "B" "C"]}]) 
-=> (def graph (build-graph config)) 
-=> (def state1 (initial-state g)) 
-=> (:current-node state1) 
+=> (def config [{:name "Red" :stations ["A" "B" "C"]}])
+=> (def graph (build-graph config))
+=> (def state1 (initial-state g))
+=> (:current-node state1)
 ;; "C"
 #+END_SRC
 
@@ -897,7 +897,6 @@ To identify these cases, we can check if the iterated lines are simply not insid
 ** Fitting the pieces together
 Now that all of the small pieces were introduced, we can fill the gaps and assemble all the pieces into the final implementation.
 
-_Review this code_
 #+BEGIN_SRC clojure :exports result
 (defn git-force-branch
   [branches]
@@ -940,31 +939,32 @@ _Review this code_
             :head new-head
             :repo (update-repo repo branches commit-name)))))
 
-(def config
-  [{:name "Green" :stations ["A", "D", "E"]},
-   {:name "Red" :stations ["B", "D", "F", "G"]},
-   {:name "Blue" :stations ["C", "D", "F", "H"]}])
-(def g (build-graph config))
+=> (def config
+     [{:name "Green" :stations ["A", "D", "E"]},
+      {:name "Red" :stations ["B", "D", "F", "G"]},
+      {:name "Blue" :stations ["C", "D", "F", "H"]}])
 
-(def alg-state1 (traverse-graph (initial-state g)))
-(def git-state1 (create-git-commands (:current-node alg-state1) (:current-line alg-state1)))
+=> (def g (build-graph config))
 
-(def alg-state2 (traverse-graph alg-state1))
-(def git-state2 (create-git-commands git-state1 (:current-node alg-state2) (:current-line alg-state2)))
+=> (def alg-state1 (traverse-graph (initial-state g)))
+=> (def git-state1 (create-git-commands (:current-node alg-state1) (:current-line alg-state1)))
 
-(def alg-state3 (traverse-graph alg-state2))
-(def git-state3 (create-git-commands git-state2 (:current-node alg-state3) (:current-line alg-state3)))
+=> (def alg-state2 (traverse-graph alg-state1))
+=> (def git-state2 (create-git-commands git-state1 (:current-node alg-state2) (:current-line alg-state2)))
 
-(def alg-state4 (traverse-graph alg-state3))
-(def git-state4 (create-git-commands git-state3 (:current-node alg-state4) (:current-line alg-state4)))
-(:commands git-state4)
-=> ("git merge --strategy=ours --allow-unrelated-histories --no-ff --commit -m \"D\" Red Blue"
-    "git branch -f \"Red\" HEAD"
-    "git branch -f \"Blue\" HEAD")
-(:head git-state4)
-=> "Green"
-(:repo git-state4)
-=> {"Blue" "D", "Red" "D", "Green" "D"}
+=> (def alg-state3 (traverse-graph alg-state2))
+=> (def git-state3 (create-git-commands git-state2 (:current-node alg-state3) (:current-line alg-state3)))
+
+=> (def alg-state4 (traverse-graph alg-state3))
+=> (def git-state4 (create-git-commands git-state3 (:current-node alg-state4) (:current-line alg-state4)))
+=> (:commands git-state4)
+;; ("git merge --strategy=ours --allow-unrelated-histories --no-ff --commit -m \"D\" Red Blue"
+;;  "git branch -f \"Red\" HEAD"
+;;  "git branch -f \"Blue\" HEAD")
+=> (:head git-state4)
+;; "Green"
+=> (:repo git-state4)
+;; {"Blue" "D", "Red" "D", "Green" "D"}
 #+END_SRC
 
 #+BEGIN_EXPORT html
@@ -983,26 +983,44 @@ The clients of this program are only interested in one thing: generate the git c
 
 Fortunately, Clojure gets our back.
 
-It's possible to produce our own custom collection-like by creating a new type using the ~deftype~ function that implements the methods from the 
-~ISeq~ Java interface (in Clojurescript, we override the methods from multiple protocols).
-In exchange, Clojure only asks us to implement 4 functions:
+It's possible to produce our own custom collection-like by creating a new type using the ~deftype~ function that implements the methods from the
+~ISeq~ interface in Cloujure or we override from protocols ~ISeq~, ~INext~ and ~ISeqable~ in Clojurescript.
+
+In exchange, Clojure(script) only asks us to implement 4 functions:
 - *first*: The first element of the iteration when traversing the graph. If there are no more elements, it returns ~nil~.
 - *more* for Clojure or *rest* for Clojurescript: Returns the rest of the collection without the first element. Returns an empty collection with no more elements.
 - *next*: Returns the next element of the iteration. Same as rest, but returns ~nil~ when there are no more elements.
 - *seq*: Transforms this type in a sequence. In this case, the instance of our type is already a sequence, so it just returns itself.
 
 #+BEGIN_SRC clojure exports result
+;;
 (declare seq-first seq-rest seq-next)
 
-(deftype MetroGraph [algorithm-state git-state]
-  clojure.lang.ISeq
-  (first [self] (seq-first algorithm-state git-state))
+;; Same implementation for Clojure and Clojurescript
+#?(:clj
+   (deftype MetroGraph [algorithm-state git-state traversal-algorithm]
+     clojure.lang.ISeq
+     (first [self] (seq-first algorithm-state git-state))
 
-  (more [self] (seq-rest self))
+     (more [self] (seq-rest self))
 
-  (next [self] (seq-next algorithm-state git-state))
 
-  (seq [self] self))
+     (next [self] (seq-next algorithm-state git-state traversal-algorithm))
+
+     (seq [self] self)))
+
+#?(:cljs
+   (deftype MetroGraph [algorithm-state git-state traversal-algorithm]
+     ISeq
+     (-first [self] (seq-first algorithm-state git-state))
+
+     (-rest [self] (seq-rest self))
+
+     INext
+     (-next [self] (seq-next algorithm-state git-state traversal-algorithm))
+
+     ISeqable
+     (-seq [self] self)))
 
 (defn seq-first
   [algorithm-state git-state]
@@ -1045,48 +1063,55 @@ But, the most important part is that we can reuse a lot of ready-made functions 
 
 #+BEGIN_SRC clojure exports result
 ;; load-from-file simply transforms the text file into a EDN
-(def nyc-config (load-from-file "nyc.txt"))
+=> (def nyc-config (load-from-file "nyc.txt"))
+=> (def nyc-seq (metro-git-seq nyc-config))
 
-(:commands (first (metro-git-seq config)))
-(:line (last (metro-git-seq config)))
-(:station (second (metro-git-seq config)))
+=> (:commands (first nyc-seq))
+;; ("git checkout --orphan \"C\""
+;;  "git commit --allow-empty -m \"Washington Heights - 168 Street / Broadway\"")
 
-(def nyc-seq (metro-git-seq nyc-config))
+=> (:line (last nyc-seq))
+;; ["M"]
+=> (:station (second nyc-seq))
+;; "163 Street - Amsterdam Avenue Saint Nicholas Avenue"
 
 ;; lines of  New York City
-(sort (set (flatten (map :line nyc-seq))))
-=> ("1" "2" "3" "4" "5" "6" "7" "A" "B" "C" "D"
-    "E" "F" "G" "J" "L" "M" "N" "Q" "R" "W" "Z")
+=> (sort (set (flatten (map :line nyc-seq))))
+;; ("1" "2" "3" "4" "5" "6" "7" "A" "B" "C" "D"
+;;  "E" "F" "G" "J" "L" "M" "N" "Q" "R" "W" "Z")
 
 ;; Stations that have more than 6 connections
-(map :station (filter #(> (count (:line %)) 6) nyc-seq))
-=> ("West 4 Street - Washington Square / 6 Avenue"
-    "Atlantic Avenue / Barclays Center")
+=> (map :station (filter #(> (count (:line %)) 6) nyc-seq))
+;; ("West 4 Street - Washington Square / 6 Avenue"
+;;  "Atlantic Avenue / Barclays Center")
 
 ;; Number of merge commits
-(count (filter #(str/starts-with? % "git merge") (mapcat :commands nyc-seq)))
-=> 62
+=> (count (filter #(str/starts-with? % "git merge") (mapcat :commands nyc-seq)))
+;; 62
 #+END_SRC
 
 But, the most important part is creating a new file with the git commands.
 
-_Test this please_
 #+BEGIN_SRC clojure exports result
 ;; Write the git commands to a file
-(spit "nyc.sh" (str/join "\n" (mapcat :commands nyc-seq)))
-(sh "mkdir nyc_repo")
-(sh "git" "init" :dir "nyc_repo")
-(sh "../nyc.sh" :dir "nyc_repo")
-(println(sh git log --oneline
-# 670b346 (HEAD -> M) Forest Avenue / 67 Avenue
-# eb8a8e4 Hewes Street / Broadway
-# 6a97c04 Lorimer Street / Broadway
-# cfddc65 Flushing Avenue / Broadway
-# c503053 Kosciuszko Street / Broadway
-# 1cb5df7 Halsey Street / Broadway
+=> (use '[clojure.java.shell :only [sh]])
+=>
+=> (spit "nyc.sh" (str/join "\n" (mapcat :commands nyc-seq)))
+=> (sh "mkdir" "nyc_repo")
+=> (sh "mv" "nyc.sh" "nyc_repo")
+=> (sh "git" "init" :dir "nyc_repo")
+=> (sh "sh" "nyc.sh" :dir "nyc_repo")
+=> (sh "sh" "nyc.sh" :dir "nyc_repo")
+=> (println (:out (sh "git" "log" "--oneline")))
+;; # 670b346 (HEAD -> M) Forest Avenue / 67 Avenue
+;; # eb8a8e4 Hewes Street / Broadway
+;; # 6a97c04 Lorimer Street / Broadway
+;; # cfddc65 Flushing Avenue / Broadway
+;; # c503053 Kosciuszko Street / Broadway
+;; # 1cb5df7 Halsey Street / Broadway
 #+END_SRC
 
-* That's it, folks
+* That's all Folks
 We reached the end of the journey of mapping git commands from a metro system.
 I hope it was a pleasant experience and you learned something new just as I did.
 
