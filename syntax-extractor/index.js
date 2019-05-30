@@ -8,12 +8,12 @@ var postsPath  = __dirname + '/../_posts';
 var syntaxOrgFile  = __dirname + '/' + process.argv.slice(2)[0] + '.css';
 var syntaxFinalFile = __dirname + '/../_assets/css/syntax.scss';
 
-function getSrcClasses(file) {
+function getSrcClasses(file, classes) {
   fs.readFile(file, 'utf-8', function(err, contents) {
     var $ = cheerio.load(contents);
-    var classes = new Set();
+    // var classes = new Set();
     $('.org-src-container').each(function(index, element) {
-      var set = addClassesToSet(element, classes);
+      addClassesToSet(element, classes);
     });
     searchClasses(classes);
   });
@@ -49,8 +49,10 @@ function addClassesToSet(element, set) {
   return set;
 }
 
+const classes = new Set();
+
 fs.readdir(postsPath, function(err, files) {
   files
     .filter(function(file) { return file.substr(-5) === '.html'; })
-    .map(function(file) { getSrcClasses(postsPath + '/' + file); });
+    .map(function(file) { getSrcClasses(postsPath + '/' + file, classes); });
 });

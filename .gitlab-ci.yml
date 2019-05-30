@@ -8,8 +8,7 @@ org-generation:
     name: iquiw/alpine-emacs
   before_script:
     - apk update
-    - apk add graphviz
-    - apk add ttf-freefont
+    - apk add graphviz ttf-freefont
     # If cache succeeded, copy to emacs home
     - if [ -d elpa ]; then cp -rf elpa /root/.emacs.d; fi
   cache:
