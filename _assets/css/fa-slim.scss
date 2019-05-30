@@ -24,9 +24,18 @@ i {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.fa-play:before {
+  content: "\f04b";
+}
+
+.fa-pause:before {
+  content: "\f04c";
+}
+
 .fa-github:before {
   content: "\f09b";
 }
+
 .fa-gitlab:before {
   content: "\f296";
 }
