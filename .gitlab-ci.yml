@@ -54,7 +54,7 @@ pages:
     - apk add build-base
     - bundle install --path .bundle_cache/
   script:
-    - JEKYLL_ENV=production jekyll build -d public
+    - JEKYLL_ENV=production bundle exec jekyll build -d public
   artifacts:
     paths:
       - public
