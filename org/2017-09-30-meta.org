@@ -140,7 +140,7 @@ class Axe:
 
 #+END_SRC
 
-By the way, these colors are from the [[https://github.com/emacsfodder/emacs-theme-darktooth][darktooth theme]],
+By the way, these colors are from the [[https://github.com/belak/base16-emacs][base16 theme]],
 but you're free to use any available theme.
 
 * Hosting with Gitlab Pages
@@ -213,7 +213,7 @@ Lastly, we specify that this job will be in the ~build-org~ stage group, which m
 css-theme:
   image: node:6.11.3-alpine
   script:
-    - node syntax-extractor/index.js darktooth _assets/css/syntax.scss
+    - node syntax-extractor/index.js base16-default-oceanic _assets/css/syntax.scss
   artifacts:
     paths:
       - _assets/css/syntax.scss

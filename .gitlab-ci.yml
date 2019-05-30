@@ -37,7 +37,7 @@ css-theme:
     - npm config set cache $(pwd)/.npm_cache
     - cd syntax-extractor && npm install && cd ..
   script:
-    - node syntax-extractor/index.js darktooth
+    - node syntax-extractor/index.js base16-default-oceanic
   artifacts:
     paths:
       - _assets/css/syntax.scss

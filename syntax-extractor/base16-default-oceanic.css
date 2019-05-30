@@ -3340,3 +3340,8 @@ a {
 a:hover {
   text-decoration: underline;
 }
+.org-shinning {
+  /* shinning-face */
+  color: #ff0000;
+  background-color: #ffffff;
+}

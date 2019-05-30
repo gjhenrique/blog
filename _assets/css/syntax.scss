@@ -8,6 +8,11 @@
   color: #FE8019;
 }
 
+.org-bold {
+  /* bold */
+  font-weight: bold;
+}
+
 .org-comment {
   /* font-lock-comment-face */
   color: #7C6F64;
@@ -26,6 +31,11 @@
 .org-css-selector {
   /* css-selector */
   color: #A89984;
+}
+
+.org-doc {
+  /* font-lock-doc-face */
+  color: #a7adba;
 }
 
 .org-doc {
@@ -78,10 +88,14 @@
   color: #c594c5;
 }
 
-.org-shinning {
-  /* shinning-face */
-  color: #ff0000;
-  background-color: #ffffff;
+.org-rainbow-delimiters-depth-8 {
+  /* rainbow-delimiters-depth-8-face */
+  color: #65737e;
+}
+
+.org-sh-escaped-newline {
+  /* sh-escaped-newline */
+  color: #99c794;
 }
 
 .org-string {
@@ -92,4 +106,10 @@
 .org-variable-name {
   /* font-lock-variable-name-face */
   color: #83A598;
+}
+
+.org-shinning {
+  /* shinning-face */
+  color: #ff0000;
+  background-color: #ffffff;
 }
