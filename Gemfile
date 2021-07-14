@@ -9,5 +9,3 @@ group :jekyll_plugins do
   # https://github.com/envygeeks/jekyll-assets/issues/622
   gem "sprockets", "~> 3.7"
 end
-
-gem "pry-byebug"
