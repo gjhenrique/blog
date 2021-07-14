@@ -9,7 +9,6 @@ author:
   url: "https://gjhenrique.com"
 
 # Build settings
-baseurl: / # Change this to your relative path (ex: /blog/), or leave just a /
 github: https://github.com/gjhenrique
 gitlab: https://gitlab.com/gjhenrique
 markdown: kramdown
@@ -18,10 +17,14 @@ destination: ./_site
 permalink: /:title.html
 paginate: 8
 paginate_path: /page:num/
-gems:
+plugins:
   - jekyll-paginate
   - jekyll-assets
 exclude: [syntax-extractor, org, vendor]
+
+assets:
+  compression: true
+  gzip: true
 
 # Default values
 defaults:

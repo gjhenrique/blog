@@ -4,6 +4,7 @@ _site
 _public
 .asset-cache
 public
+.jekyll-cache/
 
 ### Emacs ###
 # -*- mode: gitignore; -*-
