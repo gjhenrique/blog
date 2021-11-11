@@ -214,6 +214,3 @@ I tried to present here a different way to position your buffers with Emacs.
 I'm using it for a few months and it's been great so far.
 Also, if you think having multiple frames is troublesome, give at least Purpose a try. 
 It's really worth it.
-
-Thanks for reading.
-
