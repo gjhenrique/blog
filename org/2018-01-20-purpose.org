@@ -137,8 +137,7 @@ This is omitted for brevity but you can find the complete implementation [[https
 (setq zezin-frames
          ;; title of GUI window
       '(((title . "Emacs - Primary"))
-
-        ((title . "Emacs - Git") 
+        ((title . "Emacs - Git")
          ;; function that will be executed when this frame starts
          (start-fn . zezin-start-magit-frame))))
 

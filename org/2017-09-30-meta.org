@@ -146,7 +146,7 @@ but you're free to use any available theme.
 * Hosting with Gitlab Pages
 #+BEGIN_QUOTE 
 You can host your blog here with any static website generator that you want as long as it is +black+ Jekyll
-          -- Github
+          -- Github Pages
 #+END_QUOTE
 
 After the html files are ready with your juicy content, you need a place to host it.
@@ -156,7 +156,7 @@ however, a major drawback is that you can only use Jekyll and, to make it worse,
 This is where[[https://pages.gitlab.io/][ Gitlab Pages]] really shines.
 Because of its unique way to tie the blog generation with their continuous integration process (Gitlab CI),
 you have the flexibility and freedom to choose any library or framework that you desire to host your blog.
-It's possible to build your site with [[https://gohugo.io/tutorials/hosting-on-gitlab/][Hugo]], [[https://lisplover.gitlab.io/blog/2016/04/23/How-to-Setup-Hexo-Blog-on-GitLab/][hexo]],[[https://gitlab.com/pages/middleman][ middleman]] or ~__________~.
+It's possible to build your site with [[https://gohugo.io/tutorials/hosting-on-gitlab/][Hugo]], [[https://lisplover.gitlab.io/blog/2016/04/23/How-to-Setup-Hexo-Blog-on-GitLab/][hexo]],[[https://gitlab.com/pages/middleman][ middleman]] or _insert your prefered static site generator_.
 
 Fundamentally, [[https://about.gitlab.com/gitlab-ci/][Gitlab CI]] uses the file [[https://docs.gitlab.com/ce/ci/yaml/][.gitlab-ci.yml]] to configure the tasks of the project.
 With it, you choose the docker images in which your job will run, install the packages required for the blog generation

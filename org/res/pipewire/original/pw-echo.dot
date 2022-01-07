@@ -1,0 +1,109 @@
+digraph pipewire {
+fontsize = 18;
+rankdir = "LR";
+splines = ortho;
+link_155 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_155 [label="link_id: 155\loutput_node_id: 34\linput_node_id: 99\loutput_port_id: 62\linput_port_id: 93\lstate: active\l"];
+port_62 -> link_155 -> port_93;
+link_92 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_92 [label="link_id: 92\loutput_node_id: 34\linput_node_id: 99\loutput_port_id: 61\linput_port_id: 100\lstate: active\l"];
+port_61 -> link_92 -> port_100;
+link_96 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_96 [label="link_id: 96\loutput_node_id: 91\linput_node_id: 35\loutput_port_id: 98\linput_port_id: 65\lstate: active\l"];
+port_98 -> link_96 -> port_65;
+link_101 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_101 [label="link_id: 101\loutput_node_id: 91\linput_node_id: 35\loutput_port_id: 97\linput_port_id: 63\lstate: active\l"];
+port_97 -> link_101 -> port_63;
+subgraph cluster_node_99 {
+bgcolor=palegreen;
+label="node_id: 99\lname: Pixel 3 - Output - Headset Audio Gateway\lmedia_class: Stream/Input/Audio\l"
+port_94 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_94 [label="port_id: 94\lname: monitor_FR\ldirection: output\l"];
+port_93 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_93 [label="port_id: 93\lname: input_FR\ldirection: input\l"];
+port_90 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_90 [label="port_id: 90\lname: monitor_FL\ldirection: output\l"];
+port_100 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_100 [label="port_id: 100\lname: input_FL\ldirection: input\l"];
+}
+subgraph cluster_node_91 {
+bgcolor=palegreen;
+label="node_id: 91\lname: Pixel 3 - Input - Headset Audio Gateway\lmedia_class: Stream/Output/Audio\l"
+port_98 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_98 [label="port_id: 98\lname: output_FR\ldirection: output\l"];
+port_97 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_97 [label="port_id: 97\lname: output_FL\ldirection: output\l"];
+}
+link_102 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_102 [label="link_id: 102\loutput_node_id: 36\linput_node_id: 56\loutput_port_id: 68\linput_port_id: 77\lstate: active\l"];
+port_68 -> link_102 -> port_77;
+link_87 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_87 [label="link_id: 87\loutput_node_id: 36\linput_node_id: 56\loutput_port_id: 67\linput_port_id: 75\lstate: active\l"];
+port_67 -> link_87 -> port_75;
+link_80 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_80 [label="link_id: 80\loutput_node_id: 55\linput_node_id: 33\loutput_port_id: 74\linput_port_id: 58\lstate: active\l"];
+port_74 -> link_80 -> port_58;
+link_79 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_79 [label="link_id: 79\loutput_node_id: 55\linput_node_id: 33\loutput_port_id: 73\linput_port_id: 60\lstate: active\l"];
+port_73 -> link_79 -> port_60;
+subgraph cluster_node_56 {
+bgcolor=palegreen;
+label="node_id: 56\lname: Speakers - Output - ALSA\lmedia_class: Audio/Sink\l"
+port_78 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_78 [label="port_id: 78\lname: monitor_FR\ldirection: output\l"];
+port_77 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_77 [label="port_id: 77\lname: playback_FR\ldirection: input\l"];
+port_76 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_76 [label="port_id: 76\lname: monitor_FL\ldirection: output\l"];
+port_75 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_75 [label="port_id: 75\lname: playback_FL\ldirection: input\l"];
+}
+subgraph cluster_node_55 {
+bgcolor=palegreen;
+label="node_id: 55\lname: Yeti Blue Nano - Input - ALSA\lmedia_class: Audio/Source\l"
+port_74 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_74 [label="port_id: 74\lname: capture_FR\ldirection: output\l"];
+port_73 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_73 [label="port_id: 73\lname: capture_FL\ldirection: output\l"];
+}
+subgraph cluster_node_36 {
+bgcolor=palegreen;
+label="node_id: 36\lname: echo-cancel-playback\lmedia_class: Stream/Output/Audio\l"
+port_68 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_68 [label="port_id: 68\lname: output_FR\ldirection: output\l"];
+port_67 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_67 [label="port_id: 67\lname: output_FL\ldirection: output\l"];
+}
+subgraph cluster_node_35 {
+bgcolor=palegreen;
+label="node_id: 35\lname: echo-cancel-sink\lmedia_class: Audio/Sink\l"
+port_66 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_66 [label="port_id: 66\lname: monitor_FR\ldirection: output\l"];
+port_65 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_65 [label="port_id: 65\lname: playback_FR\ldirection: input\l"];
+port_64 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_64 [label="port_id: 64\lname: monitor_FL\ldirection: output\l"];
+port_63 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_63 [label="port_id: 63\lname: playback_FL\ldirection: input\l"];
+}
+subgraph cluster_node_34 {
+bgcolor=palegreen;
+label="node_id: 34\lname: echo-cancel-source\lmedia_class: Audio/Source\l"
+port_62 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_62 [label="port_id: 62\lname: capture_FR\ldirection: output\l"];
+port_61 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_61 [label="port_id: 61\lname: capture_FL\ldirection: output\l"];
+}
+subgraph cluster_node_33 {
+bgcolor=palegreen;
+label="node_id: 33\lname: echo-cancel-capture\lmedia_class: Stream/Input/Audio\l"
+port_57 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_57 [label="port_id: 57\lname: monitor_FR\ldirection: output\l"];
+port_58 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_58 [label="port_id: 58\lname: input_FR\ldirection: input\l"];
+port_59 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_59 [label="port_id: 59\lname: monitor_FL\ldirection: output\l"];
+port_60 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_60 [label="port_id: 60\lname: input_FL\ldirection: input\l"];
+}
+}

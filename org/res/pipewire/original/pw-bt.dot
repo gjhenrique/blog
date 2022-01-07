@@ -1,0 +1,57 @@
+digraph pipewire {
+fontsize=18;
+rankdir = "LR";
+splines = ortho;
+link_79 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_79 [label="link_id: 79\loutput_node_id: 49\linput_node_id: 69\loutput_port_id: 56\linput_port_id: 76\lstate: active\l"];
+port_56 -> link_79 -> port_76;
+link_78 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_78 [label="link_id: 78\loutput_node_id: 49\linput_node_id: 69\loutput_port_id: 55\linput_port_id: 74\lstate: active\l"];
+port_55 -> link_78 -> port_74;
+link_73 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_73 [label="link_id: 73\loutput_node_id: 68\linput_node_id: 62\loutput_port_id: 71\linput_port_id: 65\lstate: active\l"];
+port_71 -> link_73 -> port_65;
+link_72 [shape=box fontsize=18 style=filled fillcolor=lightblue];
+link_72 [label="link_id: 72\loutput_node_id: 68\linput_node_id: 62\loutput_port_id: 70\linput_port_id: 63\lstate: active\l"];
+port_70 -> link_72 -> port_63;
+subgraph cluster_node_69 {
+bgcolor=palegreen;
+label="node_id: 69\lname: Pixel 3 - Output - Headset Audio Gateway\lmedia_class: Stream/Input/Audio\l"
+port_77 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_77 [label="port_id: 77\lname: monitor_FR\ldirection: output\l"];
+port_76 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_76 [label="port_id: 76\lname: input_FR\ldirection: input\l"];
+port_75 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_75 [label="port_id: 75\lname: monitor_FL\ldirection: output\l"];
+port_74 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_74 [label="port_id: 74\lname: input_FL\ldirection: input\l"];
+}
+subgraph cluster_node_68 {
+bgcolor=palegreen;
+label="node_id: 68\lname: Pixel 3 - Input - Headset Audio Gateway\lmedia_class: Stream/Output/Audio\l"
+port_71 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_71 [label="port_id: 71\lname: output_FR\ldirection: output\l"];
+port_70 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_70 [label="port_id: 70\lname: output_FL\ldirection: output\l"];
+}
+subgraph cluster_node_62 {
+bgcolor=palegreen;
+label="node_id: 62\lname: Bose QC 35 ii Headphones - Output - A2DP Sink\lmedia_class: Audio/Sink\l"
+port_66 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_66 [label="port_id: 66\lname: monitor_FR\ldirection: output\l"];
+port_65 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_65 [label="port_id: 65\lname: playback_FR\ldirection: input\l"];
+port_64 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_64 [label="port_id: 64\lname: monitor_FL\ldirection: output\l"];
+port_63 [shape=box fontsize=18 style=filled fillcolor=lightslateblue];
+port_63 [label="port_id: 63\lname: playback_FL\ldirection: input\l"];
+}
+subgraph cluster_node_49 {
+bgcolor=palegreen;
+label="node_id: 49\lname: Yeti Blue Nano - Input - ALSA\lmedia_class: Audio/Source\l"
+port_56 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_56 [label="port_id: 56\lname: capture_FR\ldirection: output\l"];
+port_55 [shape=box fontsize=18 style=filled fillcolor=lightcoral];
+port_55 [label="port_id: 55\lname: capture_FL\ldirection: output\l"];
+}
+}
