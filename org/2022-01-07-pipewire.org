@@ -30,7 +30,7 @@ So, this post is about my experience of making these Whatsapp calls work on a Li
 Honestly, this doesn't bother me that much, but I'm using it as an excuse to learn more about these technologies.
 It's one of the cases where the journey is the reward, not the destination.
 
-#+CAPTION: Bose QC 35 ii, Pixel 3 and Blue Yeti Nano will be my companions in this adventure. Honourable mention goes to the Bluetooth controller Intel AX200. Unfortunately, I was lazy to unplug it from the motherboard.
+#+CAPTION: Bose QC 35 ii, Pixel 3 and Blue Yeti Nano will be my companions in this adventure. Honourable mention goes to the Bluetooth controller Intel AX200. Unfortunately, I was lazy to unplug it from the motherboard to include it in the photo.
 [[./res/pipewire/devices.jpg]]
 
 * Yet another Audio recap
@@ -39,17 +39,17 @@ Humans then need to develop creative abstractions to provide meaning to these nu
 One byte may represent a character inside an ASCII table.
 Three bytes may represent a colour in the RGB colour model.
 It's no different for digital audio.
-It's possible to convert the analogue signal into binary data using PCM (Pulse-code modulation).
+It's possible to convert the analogue signal into binary data using a process called PCM (Pulse-code modulation).
 The quality of the audio depends on some characteristics of these numbers, which can be:
-- Sample rate: Amount of samples of the signal per second. The higher, the better the sound quality will appear when played.
+- Sample rate: Amount of samples of the incoming signal per second. The higher, the better the sound quality will appear when played.
   A typical sample rate is 44.1 kHz (44100 numbers per second) for high-quality audio, but telephony generally systems use 8 kHz, and a skype call uses 16 kHz to save space.
   The sample rate is one of the biggest reasons listening to Spotify sounds better than hearing your grandmother on the telephone.
 - Mono or Stereo: A channel is a stream of recorded sound. Mono audio has a single track, and stereo has two.
   Having an additional channel produces a more immersive experience for listeners.
-  You can be sure that this is stereo audio when you listen to a guitar in your right ear only and the bass in your left ear with a headset.
+  You can be sure that this is stereo audio when you listen to a guitar in your right ear only and the bass in your left ear with a headphone.
 - Bit depth: Number of bits of each sample. The higher, the better sounding it will be. Generally, digital audio has 16 bits (values that range from -32,768 to +32,767) or 24 bits.
 
-To grasp how computers could use PCM data, let's see a commented ruby program that produces a one-second white noise sound, famous for soothing babies (and some adults).
+To grasp how computers could manipulate PCM data, let's see a commented ruby program that produces a one-second white noise sound, famous for soothing babies (and some adults).
 
 #+begin_src ruby
 SAMPLE_RATE = 44_100
@@ -109,7 +109,7 @@ The device acting as the handset is the HFP Hands-Free and the one receiving the
 In our case, Pixel 3 will be the HFP Hands-Free, and the computer will be the HFP Audio Gateway.
 But, using HFP for audio is not always the best option because its quality is sub-par. For example, it only supports mono audio and a sample rate of 16k Hz.
 
-Based on these features, A2DP was the profile used between the computer and the headset (Bose QC35 ii) and HFP was used between the computer and the smartphone (Pixel 3).
+Based on these characteristics, A2DP was the profile used between the computer and the headset (Bose QC35 ii) and HFP was used between the computer and the smartphone (Pixel 3).
 
 ** Codecs to the rescue
 Bluetooth is unsuitable for transmitting heavy PCM data because a channel can't stream the necessary throughput.
@@ -135,7 +135,7 @@ The CVSD codec supports only audio at 8 kHz and the mSBC (wideband speech) at 16
 
 SIG only mandates devices to support the poorer CVSD, not mSBC.
 That's why the Bose headphone only supports CVSD, and the Linux computer needs to be the bridge between the smartphone and the headphone.
-If supported, I could simply pick up the call via the headphone connected to the smartphone directly.
+If mSBC codec was supported, I could simply pick up the call via the headphone connected to the smartphone directly.
 
 Using CVSD is a no-no because the audio is terrible for the caller and me, especially considering I talk with older relatives.
 Therefore, mSBC codec is the way to go.
@@ -226,8 +226,7 @@ It schedules, resamples and routes this data flow through all of these interconn
 These nodes can have configurable and dynamic buffers holding audio data. Bigger buffers yield more latency to stream through all connected nodes but consume less processing power.
 
 As a practical example, here are the nodes involved in the Whatsapp call:
-- the source node receives PCM data from the microphone when I speak something
-The sink node managing the HFP connection wakes up, receives this PCM data, and encodes the audio with the mSBC codec. Then, it writes this data to a socket. The caller can hear me.
+- the source node receives PCM data from the microphone when I speak something. The sink node managing the HFP connection wakes up, gets this PCM data, and encodes the audio with the mSBC codec. Then, it writes this data to a socket. The caller can hear me.
 - another source node receives mSBC data from the socket and decodes it back to PCM data. This audio contains the caller's voice.
 - the sink node from the A2DP connection linked to the headphone encodes the audio with AAC codec and writes it to the socket
 
@@ -237,19 +236,19 @@ The sink node managing the HFP connection wakes up, receives this PCM data, and 
 
 To juggle all of these pieces, PipeWire ships with some programs.
 - The daemon (~pipewire-core~) is responsible for holding the properties of the registered nodes and other objects. In addition, it exposes events and the current state of the processing graph. For example, The cli [[https://gitlab.freedesktop.org/pipewire/pipewire/-/blob/master/src/tools/pw-mon.c][pw-mon]] connects to the daemon through a socket exposed by PipeWire and monitors all the nodes and other entities creation and updates.
-- The session manager (~pipewire-media-session~) performs device discovery, policy logic for sandboxed applications, and the node's configuration. It doesn't hold any state of the objects, which is the responsibility of the daemon. The PipeWire session manager is a PoC, and [[https://gitlab.freedesktop.org/pipewire/wireplumber][WirePlumber]] will replace it eventually. This module even lived in a directory called ~examples~ in PipeWire source code, but now it's a separate repo included as a git submodule in the main codebase.
+- The session manager (~pipewire-media-session~) performs device discovery, policy logic for sandboxed applications, and the node's configuration. It doesn't hold any state of the objects, which is the responsibility of the daemon. The PipeWire session manager is a Proof of Concept, and [[https://gitlab.freedesktop.org/pipewire/wireplumber][WirePlumber]] will replace it eventually. This module even lived in a directory called ~examples~ in PipeWire source code, but now it's a separate repo included as a git submodule in the main codebase.
 - ~pipewire-pulse~ server translates clients that use Pulseaudio API to its own API. Because of this, apps like Spotify, Chrome, Zoom, Firefox don't need to rewrite their application to use the new PipeWire API.
 
 ** Bluetooth on PipeWire
 The Bluetooth foundation on Linux is inside a project called BlueZ.
 BlueZ comprises a kernel subsystem that implements the Host Layer - L2CAP logic, socket infrastructure and assembling/disassembling HCI packets.
-Its userspace companion is in a daemon called ~bluetoothd~, which exposes its interface to other apps using some [[https://github.com/bluez/bluez/tree/5.62/doc][D-Bus APIs]].
-Some command-line tools like ~bluetoothctl~ and ~btmon~ are also available to introspect and configure the Bluetooth setup in Linux.
+Its userspace counterpart is in a daemon called ~bluetoothd~, which exposes its interface to other apps using some [[https://github.com/bluez/bluez/tree/5.62/doc][D-Bus APIs]].
+Some command-line tools like ~bluetoothctl~ and ~btmon~ are also available to introspect and configure Bluetooth in Linux.
 # https://github.com/bluez/bluez/tree/d7c2a4cee7ad4d46f9ab4da9f7d8558a29d0b1ad/doc
 
 PipeWire is one of the consumers of these D-Bus APIs provided by ~bluetoothd~.
 To implement the A2DP profile, the session manager needs to send some D-Bus method calls and listen to some signals from the [[https://github.com/bluez/bluez/blob/5.62/doc/media-api.txt][Media API]] section.
-As an example:
+One of these interactions are:
 - It needs to register itself as a media endpoint to receive updates on the connections. It calls the ~RegisterApplication~ method on ~org.bluez.Media1~ interface.
 - After the device is paired, PipeWire calls the method ~SetConfiguration~ on ~org.bluez.MediaEndpoint1~, to set the agreed codec between the host and the device.
 - When PipeWire requests that the node start playing some audio, it will send the method ~Acquire~ to the ~MediaTransport~, which returns a file descriptor.
@@ -275,7 +274,7 @@ A port is attached to a node and a direction (input for sink devices or output f
 #+end_src
 
 So, when playing music through a speaker, PipeWire creates a Spotify node with two ports because the sound is stereo and two links connected to the two ports of the speaker node.
-When ~pipewire-pulse~ streams data from the Spotify process, PipeWire manages the data flow through these objects until audio is played on the speaker.
+When ~pipewire-pulse~ streams data from the Spotify process, PipeWire manages the data flow through these components until audio is played on the speaker.
 
 The PipeWire graph of the Whatsapp call setup is represented by:
 
@@ -292,8 +291,8 @@ But, these tests proved to be a nuisance because when I needed to restart PipeWi
 I needed to leave the meeting and join again.
 
 Looking into how to speed up the feedback look, I found the project [[https://github.com/aahlenst/android-audiorecord-sample][android-audiorecord-sample]].
-This project opens an HFP call and provides some on/off knobs to save the incoming voice from the caller into a file, but the idea is to stream back the audio receiving back to the sender, so I can hear in real-time how my voice looks like.
-After changing the Java code and fixing some permission logic and SDK version issue, I had a working app.
+This project opens an HFP call and provides some on/off knobs to save the incoming voice from the caller into a file, but the idea was to stream back the audio receiving back to the sender, so I can hear in real-time how my voice looks like.
+I had a working app after changing the Java code and fixing some permission logic and SDK version issue.
 After some refactorings, I managed to stream the received audio from the HFP link back to the computer.
 
 #+CAPTION: I can click on the ~BLUETOOTH~ and the ~START~ button and hear me talking on the headphone through an HFP connection.
@@ -465,14 +464,14 @@ failure:
 A new ~sk_buff~ is allocated and connected to the socket only if ~sk_wmem_alloc~ field is smaller than ~sk_sndbuf~ field.
 When a new buffer arrives into the kernel, the ~sk_wmem_alloc~ increases its size.
 
-By default, the socket sets the ~sk_sndbuf~ value from ~/proc/sys/net/core/wmem_default~ (value 212992 by default in my machine).
+By default, the socket sets the ~sk_sndbuf~ value from ~/proc/sys/net/core/wmem_default~ (212992 by default in my machine).
 But, Pipewire sets this socket property to a lower value with a ~setsockopt~ call passing the ~SO_SNDBUF~ parameter.
 PipeWire multiplies the write MTU of the device by two. As an example, the Bose headphone has an MTU of 875.
 
 Naive me thought: "It's such a low value. I will increase the size of the buffer. That will solve it."
 So, instead of multiplying by two, I changed the [[https://gitlab.freedesktop.org/pipewire/pipewire/-/blob/0.3.40/spa/plugins/bluez5/a2dp-sink.c#L68][PipeWire code]] to multiply by 5 to check what happened.
 However, it only made matters worse because when the ~EAGAIN~ error happened, the audio didn't catch up, and I could only hear silence after the first hiccup. Then some audio after some seconds and then silence again.
-I couldn't find the reasoning for setting a low buffer on the PipeWire codebase, but I could trace back why the two-factor is there from a Pulseaudio commit and the [[https://bugs.freedesktop.org/show_bug.cgi?id=58746][forum discussion]].
+I couldn't find the reasoning for setting a low buffer on the PipeWire codebase. Still, I could trace back why the two-factor multiplication is there from a Pulseaudio commit and the [[https://bugs.freedesktop.org/show_bug.cgi?id=58746][forum discussion]].
 
 Pulseaudio/PipeWire decreases the buffer size to avoid lags after "temporary connection drops".
 Logically, the error is one layer below, and I needed to check why the buffers were not emptied on time.
@@ -521,10 +520,10 @@ Looking at logs from different functions simultaneously proved to be hard to fol
 Besides, it was difficult to extract historical data to compare when everything was fine and days when nothing worked.
 One thing led to another, and I created [[https://github.com/gjhenrique/bluetooth_exporter][bluetooth_exporter]] as a tool to help me solve this issue.
 
-~bluetooth_exporter~ exports Prometheus data from what's happening on the Bluetooth layer in the kernel.
+This tool exports Prometheus data from what's happening on the Bluetooth layer in the kernel.
 The repo also includes a docker-compose with Prometheus and Grafana setup for easy integration.
 Besides other metrics, I could see:
-- The number of write syscalls from Bluetooth and its return codes
+- The number of write syscalls from Bluetooth sockets and their return codes
 - The time an HCI packet takes to pass through the USB layer
 - The interval that an ACL packet takes to be acknowledged
 
@@ -538,7 +537,7 @@ Before jumping to conclusions, we need to understand some of the layers an ACL p
    The returned value signals the total packets that the controller can process concurrently.
    The kernel stores the ACL field in a field called ~acl_cnt~.
    In the case of my controller (AX200), the value is 4 slots for ACL and 6 slots for SCO.
-2. Whenever an ACL packet is enqueued, the kernel decreases the ~acl_cnt~ by 1. This represents that the controller is "busy" with that ongoing packet. In addition, when the ACL packet is scheduled, the higher level ~sk_wmem_alloc~ from the socket is decreased to accept a new buffer from userspace.
+2. Whenever an ACL packet is enqueued, the kernel decreases the ~acl_cnt~ by 1. This represents that the controller is "busy" with that outgoing packet. In addition, when the ACL packet is scheduled, the ~sk_buff~ is destroyed and, consequently, the higher level ~sk_wmem_alloc~ decreased to accept a new buffer from userspace.
 3. If a new packet arrives and the value of ~acl_cnt~ is 0, no new packet is sent to the controller.
 4. Whenever an ACL packet is processed by the sink device (Bose headset), the controller sends a ~HCI_Number_Of_Completed_Packets~ event. Then, the ~acl_cnt~ is incremented, and the kernel can now send new ACL packets to the controller.
 
@@ -573,16 +572,16 @@ Or another option is that it's simply a specific bug in the controller or the he
 
 
 *** Possible solutions
-To validate my hunch that the controller cannot keep up with the incoming eSCO and ACL traffic.
 A possible workaround would be to try to have a less reliable call.
+I found an interesting quote from the specification searching how to achieve that.
 
-I found an interesting quote from the Bluetooth core specification.
 #+BEGIN_QUOTE
 eSCO traffic should be given priority over ACL traffic in the retransmission window.
-#+END_QUOTE
-Bluetooth Core Specification Version 5.3 | Vol 2, Part B. Section 8.6.3
 
-eSCO achieves a more reliable connection by reserving additional slots for retransmission if needed.
+          -- Bluetooth Core Specification Version 5.3 | Vol 2, Part B. Section 8.6.3
+#+END_QUOTE
+
+eSCO achieves a more reliable connection than SCO by reserving additional slots for retransmission if needed.
 This field is called ~Retransmission_Effort~.
 Also, there is a configured value called ~Maximum Latency~, which is the time in milliseconds it waits before giving up on the packet counting also the retransmission.
 Maybe I could tweak these two settings to use fewer slots and leave more ACL slots for the headphone communication.
@@ -663,7 +662,7 @@ One of them communicates with the HFP/eSCO Pixel 3, and the other takes care of 
 
 ** Calls through the speaker
 Sometimes I use the speakers and not the headphone.
-However, it's a bad idea for the callers because of the echo.
+However, placing calls with it is a bad idea because of the echo.
 
 Luckily, PipeWire ships with a module called ~echo-cancel~.
 It uses the project [[https://www.freedesktop.org/software/pulseaudio/webrtc-audio-processing/][webrtc-audio-processing]], created initially for Pulseaudio, to have the echo cancellation logic of WebRTC from Chromiums codebase into a standalone library.
@@ -682,7 +681,7 @@ context.modules = [
 #+end_src
 
 
-#+CAPTION: Mandatory ~pw-dot~ image taken from this setup
+#+CAPTION: Mandatory ~pw-dot~ image from this setup
 [[./res/pipewire/pw-echo.svg]]
 
 # Another interesting component is _Noisetorch_.
