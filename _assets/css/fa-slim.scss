@@ -8,7 +8,7 @@
   font-style: normal;
 }
 
-#icons i {
+#icons i, i.icon-play, i.icon-pause {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'fa_slim' !important;
   speak: none;
