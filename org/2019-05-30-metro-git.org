@@ -972,7 +972,7 @@ Now that all of the small pieces were introduced, we can fill the gaps and assem
 </div>
 #+END_EXPORT
 
-* Improving the API with ~seq~ abstraction
+* Improving the API with the ~seq~ abstraction
 One fact we can all agree on is that the current API to generate these commands really sucks.
 The client needs to call a lot of boilerplate functions to get the job done.
 Also, a lot of internal information, like the state of the traversal algorithm and the git repository, is being exposed in those calls.
