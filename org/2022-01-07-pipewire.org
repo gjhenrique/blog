@@ -636,9 +636,9 @@ After that happened, I simply gave up.
 
 [[./res/pipewire/table-flip.png]]
 
-I'm simply not knowledgeable enough to proceed, and I don't even know if there is a bug with the controller or even in the Android Bluetooth stack.
-It's better to buy a new 15 euro Bluetooth USB stick.
-One of them communicates with the HFP/eSCO Pixel 3, and the other takes care of the A2DP/L2CAP Bose headphone.
+I don't know if there is a bug with the closed-source controller, which would require me to buy a physical Bluetooth packet sniffer or even in the Android Bluetooth stack, which uses Bluedroid instead of BlueZ.
+It's better to just buy a new 15 euro Bluetooth USB stick.
+One communicates with the HFP/eSCO Pixel 3, and the other takes care of the A2DP/L2CAP Bose headphone.
 
 
 # If we follow the theory that the adapter is not handling SCO for connection and L2CAP, then a straightforward workaround is to buy another 15 euro Bluetooth.
