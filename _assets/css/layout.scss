@@ -265,4 +265,9 @@ footer {
     margin-bottom: 1em;
     margin-top: -1em;
   }
+
+  // Undo the first rule when there are no captions
+  p:first-child {
+    width: 100%;
+  }
 }
