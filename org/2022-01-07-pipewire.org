@@ -39,6 +39,7 @@ Humans then need to develop creative abstractions to provide meaning to these nu
 One byte may represent a character inside an ASCII table.
 Three bytes may represent a colour in the RGB colour model.
 It's no different for digital audio.
+
 It's possible to convert the analogue signal into binary data using a process called PCM (Pulse-code modulation).
 The quality of the audio depends on some characteristics of these numbers, which can be:
 - Sample rate: Amount of samples of the incoming signal per second. The higher, the better the sound quality will appear when played.
@@ -49,7 +50,7 @@ The quality of the audio depends on some characteristics of these numbers, which
   You can be sure that this is stereo audio when you listen to a guitar in your right ear only and the bass in your left ear with a headphone.
 - Bit depth: Number of bits of each sample. The higher, the better sounding it will be. Generally, digital audio has 16 bits (values that range from -32,768 to +32,767) or 24 bits.
 
-To grasp how computers could manipulate PCM data, let's see a commented ruby program that produces a one-second white noise sound, famous for soothing babies (and some adults).
+To grasp how computers manipulates PCM data, let's see a commented ruby program that produces a one-second white noise sound, famous for soothing babies (and some adults).
 
 #+begin_src ruby
 SAMPLE_RATE = 44_100
@@ -72,12 +73,12 @@ File.open("/tmp/noise.raw", "wb") { |f| f.write(binary_samples) }
 puts `ffplay -f s16le -ar 44100 -ac 1 /tmp/noise.raw`
 #+end_src
 
-One downside of PCM data is that it's costly to transmit and store. For example, a song with 3 minutes could use at least 31 megabytes (180 seconds * 44100 sample rate * 2 channels * 16-bit depth / 8 bits).
+One downside of PCM data is that it's costly to transmit and store. For example, a song with 3 minutes uses at least 31 megabytes (180 seconds * 44100 sample rate * 2 channels * 16-bit depth / 8 bits).
 That's when codecs (Coder/Decoder) enter the stage.
-They use mathematical algorithms to represent PCM data with fidelity but use way fewer data.
+They use mathematical algorithms to represent PCM data with fidelity but generate way fewer data in return.
 
-Interestingly, this compression also happens in other domains.
-JPEG or PNG for image files and gzip for files, for example, can significantly decrease the size of this data.
+Interestingly, other domains also applies this compression.
+JPEG or PNG for image files and gzip for files, for example, decreases significantly the size of this data.
 Again, humans create algorithms in computers to solve an issue.
 
 * Bluetooth
@@ -87,7 +88,7 @@ I think everyone ever faced an issue with pairing a device at least once.
 
 Understanding the Bluetooth stack and how it transfers audio might be a little bit overwhelming with lots of abbreviations, but fear not, we'll get there.
 
-/Low-Energy Bluetooth is a different beast, and it's out-of-scope of this tutorial. Only Classic or BR/EDR is used for the communication/
+/Low-Energy Bluetooth is a different beast, and it's out-of-scope of this tutorial. This post only discusses Classic or BR/EDR /
 
 ** Profiles, profiles, profiles
 With a headphone, it's possible to listen to high-quality audio, but also talk and listen to phone calls, and pause the music you're listening with its buttons.
@@ -106,7 +107,7 @@ However, A2DP has a drawback. It only allows unidirectional audio, and placing p
 For a device to act as a cell phone, it needs to implement either the Headset or the newer Hands-Free profiles (HSP or HFP).
 Both have the same core features, but HFP supports some additional features, such as the last number redial.
 The device acting as the handset is the HFP Hands-Free and the one receiving the audio is the HFP Audio Gateway.
-In our case, Pixel 3 will be the HFP Hands-Free, and the computer will be the HFP Audio Gateway.
+In our case, Pixel 3 will act as the HFP Hands-Free, and the computer plays the HFP Audio Gateway role.
 But, using HFP for audio is not always the best option because its quality is sub-par. For example, it only supports mono audio and a sample rate of 16k Hz.
 
 Based on these characteristics, A2DP was the profile used between the computer and the headset (Bose QC35 ii) and HFP was used between the computer and the smartphone (Pixel 3).
@@ -175,9 +176,9 @@ Three types of links can be established, ACL (Asynchronous Connection-Oriented),
 
 SCO links reserves a certain amount of slots to guarantee a constant transmission rate.
 Besides having the same reserved slots, the newer eSCO links support a retransmission window to offer more reliability to the connection.
-Practically, SCO and eSCO are used for bidirectional audio a.k.a, phone calls.
+Practically, bidirectional audio a.k.a, phone calls uses SCO and eSCO.
 
-The ACL links use the remaining slots not used by SCO/eSCO and leave the most complex part of multiplexing and order to a protocol in an above layer called L2CAP.
+The ACL links use the remaining slots not used by SCO/eSCO and leave the most complex part of multiplexing and ordering to a protocol in an above layer called L2CAP.
 But we'll get there eventually.
 ACL is used basically for everything else that's not a voice call, like listening to music, moving the mouse or even doing the handshake of the SCO/eSCO link.
 
@@ -191,7 +192,7 @@ Other protocols, such as RFCOMM (used as a replacement for serial cables) and SD
 
 # Page 1014
 
-In Linux, the kernel implements the host layer and sockets interface with userspace.
+In Linux, the kernel implements the host layer and the userspace communicates with it via sockets.
 
 *** HCI - A protocol to glue them all
 Be it with L2CAP and ACL or directly sending or receiving voice packets through SCO/eSCO, the host layer needs a way to communicate with the Bluetooth controller.
@@ -200,7 +201,7 @@ To allow both pieces to talk to each other, SIG created the HCI (Host Controller
 One of the ways that the Linux kernel implements the HCI layer is through the [[https://www.kernel.org/doc/html/v4.15/driver-api/usb/index.html][Linux USB API]].
 The kernel encapsulates the incoming ACL/SCO packets into HCI packets and then to USB packets.
 The controller receives these USB packets and assembles them into ACL/SCO packets.
-The opposite flow is performed when the controller acts as the sender.
+As a sender, the controller performs the opposite flow.
 Even when using a Bluetooth keyboard or mouse in Linux, you're somehow using USB to make it work. How wild is that?
 (This might not be the case when the controller uses UART or RS232 for the HCI transport).
 
@@ -219,7 +220,7 @@ After briefly touching the Bluetooth stack, the following diagram exposes all th
 * PipeWire
 PipeWire is an application responsible for routing multimedia data between applications and devices.
 Before PipeWire, the only two alternatives for audio manipulation on Linux were Jack for professional audio and Pulseaudio for consumer audio.
-The goal is to cover these two use cases and become the de-facto Linux sound server.
+Now the goal is to cover these two use cases and become the de-facto Linux sound server.
 
 Like Jack, PipeWire builds a graph of connected devices and applications.
 It schedules, resamples and routes this data flow through all of these interconnected nodes in the graph.
@@ -240,9 +241,9 @@ To juggle all of these pieces, PipeWire ships with some programs.
 - ~pipewire-pulse~ server translates clients that use Pulseaudio API to its own API. Because of this, apps like Spotify, Chrome, Zoom, Firefox don't need to rewrite their application to use the new PipeWire API.
 
 ** Bluetooth on PipeWire
-The Bluetooth foundation on Linux is inside a project called BlueZ.
+The BlueZ project implement Bluetooth on Linux desktop.
 BlueZ comprises a kernel subsystem that implements the Host Layer - L2CAP logic, socket infrastructure and assembling/disassembling HCI packets.
-Its userspace counterpart is in a daemon called ~bluetoothd~, which exposes its interface to other apps using some [[https://github.com/bluez/bluez/tree/5.62/doc][D-Bus APIs]].
+Its userspace counterpart is in a daemon called ~bluetoothd~, which exposes its interface to other apps using [[https://github.com/bluez/bluez/tree/5.62/doc][D-Bus APIs]].
 Some command-line tools like ~bluetoothctl~ and ~btmon~ are also available to introspect and configure Bluetooth in Linux.
 # https://github.com/bluez/bluez/tree/d7c2a4cee7ad4d46f9ab4da9f7d8558a29d0b1ad/doc
 
@@ -250,7 +251,7 @@ PipeWire is one of the consumers of these D-Bus APIs provided by ~bluetoothd~.
 To implement the A2DP profile, the session manager needs to send some D-Bus method calls and listen to some signals from the [[https://github.com/bluez/bluez/blob/5.62/doc/media-api.txt][Media API]] section.
 One of these interactions are:
 - It needs to register itself as a media endpoint to receive updates on the connections. It calls the ~RegisterApplication~ method on ~org.bluez.Media1~ interface.
-- After the device is paired, PipeWire calls the method ~SetConfiguration~ on ~org.bluez.MediaEndpoint1~, to set the agreed codec between the host and the device.
+- After the computer pairs the device, PipeWire calls the method ~SetConfiguration~ on ~org.bluez.MediaEndpoint1~, to set the agreed codec between the host and the device.
 - When PipeWire requests that the node start playing some audio, it will send the method ~Acquire~ to the ~MediaTransport~, which returns a file descriptor.
 With this file descriptor, Pipewire can write the audio to the socket interfacing with the kernel directly (the encoding is happening on the PipeWire side).
 Under the hood, BlueZ opens a socket with ~socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)~, but applications using the API don't need to care about this complexity.
@@ -276,7 +277,7 @@ A port is attached to a node and a direction (input for sink devices or output f
 So, when playing music through a speaker, PipeWire creates a Spotify node with two ports because the sound is stereo and two links connected to the two ports of the speaker node.
 When ~pipewire-pulse~ streams data from the Spotify process, PipeWire manages the data flow through these components until audio is played on the speaker.
 
-The PipeWire graph of the Whatsapp call setup is represented by:
+To sum it up, here is the PipeWire graph of the Whatsapp call setup:
 
 #+CAPTION: Image from ~pw-dot~ command-line tool. Even though node 68 has two ports, the sound won't have a stereo-like quality because HFP only supports mono audio.
 [[./res/pipewire/pw-bt.svg]]
@@ -330,13 +331,13 @@ rules = [
     }
 #+end_src
 
-In the future, ~pipewire-media-session~ will be replaced by ~WirePlumber~, and these configurations will be done via a Lua script.
+In the future, ~Wireplumber~ will replace ~pipewire-media-session~, and these configurations will be done via a Lua script.
 The migration will be smooth when that happens because the code that handles these keys and values are inside a [[https://docs.pipewire.org/page_spa_plugins.html][SPA]] (Simple Plugin API) plugin (living in ~libspa-bluez5.so~) used by both session managers.
 
 Additionally, in the middle of 2021, after I started the experiments, PipeWire added the concept of a "quirks" database, which enables and disables mSBC support automatically based on a list of devices or kernel versions.
-Maybe the ~bluez5.enable-msbc~ is outdated, but it doesn't hurt to force it just to be sure.
+Maybe the ~bluez5.enable-msbc~ option is outdated, but it doesn't hurt to force it just to be sure.
 
-After PipeWire used mSBC and even auto-connected, I would be happy to start using it. However, I found some issues.
+After PipeWire used mSBC and even auto-connected, I would be happy to start using it. However, I found more issues.
 
 ** I can't hear what other people are saying
 The first issue I encountered was that the volume from the caller was ultralow, almost inaudible.
@@ -374,7 +375,7 @@ To really fix it, I needed to find out where the volume was being decreased: Is 
 # To check if the issue was with receiving or sending this audio data, I set up a TCP server on my machine and modified the Android application to stream the received PCM data to the server.
 # The received audio there was basically the same as the one sent from Pipewire. Hence, Android modified the volume when sending back the audio, not when receiving it.
 
-After googling about it, I found [[https://www.reddit.com/r/GooglePixel/comments/8hbcuu/the_100_solution_to_bluetooth_volume_issues/][a Reddit thread]] that mentions that the ~Absolute Bluetooth Volume~ should be toggled off.
+After googling about it, I found [[https://www.reddit.com/r/GooglePixel/comments/8hbcuu/the_100_solution_to_bluetooth_volume_issues/][a Reddit thread]] that mentions that users should toggle off the ~Absolute Bluetooth Volume~ option.
 With this feature, Android is the owner of the volume control on the other end and assumes that the sink will adjust it accordingly. Spoiler alert: PipeWire didn't modify it.
 After disabling it, the volume is compatible with the computer's volume.
 
@@ -513,7 +514,7 @@ Looking at logs wasn't helping me much, and I needed a new approach.
 That's when I stumbled upon eBPF (Extended Berkeley Packet Filter).
 eBPF is a recent technology that allows extending the kernel without recompilation or adding new modules.
 It supports many features, one of which is to plug some hooks into functions and log their parameters.
-This allowed me to get my feet wet started with [[https://github.com/iovisor/bcc/blob/v0.23.0/tools/stackcount.py][stackcount]] that checks the number of invocations of a function and a rudimentary stack trace.
+This allowed me to get my feet wet starting with [[https://github.com/iovisor/bcc/blob/v0.23.0/tools/stackcount.py][stackcount]] that checks the number of invocations of a function and a rudimentary stack trace.
 Then I started creating my own scripts to log some interesting functions.
 
 Looking at logs from different functions simultaneously proved to be hard to follow.
