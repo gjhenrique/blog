@@ -1,3 +1,4 @@
+#+OPTIONS: ^:{}
 #+BEGIN_EXPORT html
 ---
 layout: post
@@ -25,7 +26,7 @@ Instead of using docker and avoiding the container inside the container rabbit h
 I had some experience with Libvirt and QEMU/KVM, but wasn't in the mood to configure my cluster in XML.
 
 I could use vagrant with libvirt plugin to generate the XML for me but decided to go with [[https://github.com/dmacvicar/terraform-provider-libvirt][terraform-provider-libvirt]] instead. Mainly as an excuse to mess around with Terraform.
-You can see the result of the experiments in this post in [[https://github.com/gjhenrique/k8s-experiments][this repo]].
+You can see the result of the experiments in [[https://github.com/gjhenrique/k8s-experiments][this repo]].
 
 # But there are too many layers to debug
 # libvirt with qemu/KVM fits this nicely in a linux environment
@@ -49,7 +50,7 @@ I looked at the logs and assumed the OS was terminating the etcd process for som
 Luckily, searching on the Internet, I found the [[https://discuss.kubernetes.io/t/why-does-etcd-fail-with-debian-bullseye-kernel/19696/6][first clue]]:
 
 #+BEGIN_QUOTE
-> What helped me was to add ~systemd.unified_cgroup_hierarchy=0~ to my ~GRUB_CMDLINE_LINUX_DEFAULT~ in the grub file (/etc/default/grub for Debian)
+> What helped me was to add systemd.unified_cgroup_hierarchy=0 to my GRUB_CMDLINE_LINUX_DEFAULT in the grub file (/etc/default/grub for Debian)
 #+END_QUOTE
 
 I added this option, and it worked!
@@ -98,7 +99,7 @@ If you have an hour to spare, do watch this talk from [[https://www.youtube.com/
 
 * What's that systemd config doing under the hood?
 
-Coming back to the original issue, the fix with ~systemd.unified_cgroup_hierarchy~. If you're curious, [[https://github.com/systemd/systemd/blob/551dd873b0bdfb9e7e47431b2933c8b910228f0c/src/core/mount-setup.c#L64][the code]] in systemd related to the option given in that thread is surprisingly easy to follow.
+Coming back to the original issue and the fix with ~systemd.unified_cgroup_hierarchy~. If you're curious, [[https://github.com/systemd/systemd/blob/551dd873b0bdfb9e7e47431b2933c8b910228f0c/src/core/mount-setup.c#L64][the code]] in systemd related to the option given in that thread is surprisingly easy to follow.
 
 This option impacts the return of ~cg_is_unified_wanted~ and ~cg_is_legacy_wanted~ functions.
 Based on both results, systemd will mount the entries of the ~mount_table~ variable with the option from cgroups v1 or v2.
@@ -144,7 +145,7 @@ I don't need to fiddle with kernel arguments, and I can use the more recent cgro
 * What's this config doing under the hood?
 
 kubelet doesn't create the container processes or set up the cgroups for the pods.
-It communicates with containerd via the [[https://kubernetes.io/docs/concepts/architecture/cri/][CRI (Container Runtime Interface)]]. ~containerd~ in turn delegates the heavy lifting of creating the container cgroups to ~runc~ via the ~systemd-cgroup~ option.
+It communicates with containerd via the [[https://kubernetes.io/docs/concepts/architecture/cri/][CRI (Container Runtime Interface)]] specification. ~containerd~ in turn delegates the heavy lifting of creating the container cgroups to ~runc~ via the ~systemd-cgroup~ option.
 ~runc~, based on this option, sends a message to ~systemd~ through D-Bus.
 # https://github.com/containerd/containerd/blob/79fcc38b1117814fee65fb287b7b5069325d4e92/runtime/v1/shim/client/client.go#L204
 
@@ -156,7 +157,7 @@ It communicates with containerd via the [[https://kubernetes.io/docs/concepts/ar
 * Okay, but who's killing your pods?
 What's a good detective story without revealing the real author of the crimes? We need to trace where the pods termination happens to have some closure.
 
-Turning on the kubelet log level visibility to ~DEBUG~ and looking at the order of the events, I saw that it's indeed the kubelet that's the culprit and it's telling containerd to kill the pod.
+Turning on the kubelet log level visibility to ~DEBUG~ and looking at the order of the events, I realised that it's indeed the kubelet that's the culprit, and it's telling containerd to kill the pod.
 
 # kubelet expected a cgroup in a folder and had in another format because containerd tried to create it without systemd.
 
@@ -164,7 +165,7 @@ Turning on the kubelet log level visibility to ~DEBUG~ and looking at the order 
 
 ** Where?
 It all starts on the ~Start~ method (Ha!).
-Something somewhere sends a value into the channel to keep pod in sync with the desired state.
+Something somewhere sends a value into the channel to conciliate the actual state of the pod with the desired state.
 I left out the code that sends this value because it's irrelevant to our investigation.
 
 #+begin_src go
@@ -257,11 +258,11 @@ Putting a log with the error there surprised me with the following message:
 ~cgroup [\"kubepods\" \"besteffort\" \"pod7149273f-1369-42ff-ae1f-79b1529bba7b\"] has some missing controllers: cpuset~
 
 Okay. kubelet identifies the cgroup as missing because it's missing a controller.
-Who's removing the ~cpuset~ controller?
+Who's removing the ~cpuset~ controller then?
 
 
 ** Kubernetes QoS
-Let's digress a bit. Kubernetes assigns a pod in one of the three [[https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/][Qualify of Service (QoS)]]. It sets different CPU scheduling and decides who will die first in case of memory pressure. The three types are:
+Let's digress a bit. Kubernetes assigns a pod in one of the three [[https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/][Qualify of Service (QoS)]] classes. It sets different CPU scheduling and decides who will die first in case of memory pressure. The three types are:
 
 - *Guaranteed*: Pods that are strict about their CPU and memory limit and requests
 - *Burstable*: Pods that are less strict but still define at least one limit or request in one of its containers
@@ -273,12 +274,11 @@ Let's digress a bit. Kubernetes assigns a pod in one of the three [[https://kube
 # - ~kubepods-burstable-<pod_id>.slice~ and ~kubepods-besteffort.slice~: cgroup for a specific pod inside the QoS cgroup
 # - ~cri-containerd:<container_id>~: container cgroup inside the pod cgroup
 
-kubelet uses the ~cpu.weight~ property to allocate CPU time for the given processes based on their QoS.
-This calculation happens every minute, and in the end, it will send a D-Bus message with the ~CPUWeight~ property to the *QoS cgroup*.
+kubelet uses the ~cpu.weight~ file to allocate CPU time for the given processes based on their QoS.
+This calculation happens every minute, and in the end, it will send a D-Bus message to systemd with the ~CPUWeight~ property to the *QoS cgroup*.
 kubelet sets the minimum share of one to the BestEffort cgroup and calculates the BestEffort shares based on the existing requests of active pods.
 As a good citizen, kubernetes rewards the pod with more CPU time.
 So, always specify a limit and request in your pod definition.
-
 
 # For example, in my control plane, it tries to set CPUWeight of 1 to BestEffort and CPUWeight of 34 to burstable. This means, that Burstable pods will have 97% () of CPU time and .
 # I didn't have bursta
@@ -332,9 +332,10 @@ So, with ~Delegate~ as a children of the pod and Qos cgroups, ~runc~ says: "Fuck
 
 The tricky question nagging me is: "Why is systemd removing this controller in the first place?".
 Following what systemd is doing is unsurprisingly hard to follow.
-Maybe you need to . Linux introduced ~cpuset~ in v2, and the same feature was in the ~cpu~ controller for v1.
-I'm probably not seeing the forest for the trees.
-I leave it again as an exercise for the reader to find out =P.
+Linux introduced ~cpuset~ in v2, and the same feature was in the ~cpu~ controller for v1.
+Perhaps it's not considering it when it restarts the controllers of non-delegated cgroup.
+I'm probably not seeing the forest for the trees and
+I leave it as an exercise for the reader to find out =P.
 
 In the end, this "bug" might be a feature; otherwise, kubelet wouldn't restart the pod, and I would think the control plane was healthy.
 
@@ -343,20 +344,21 @@ In the end, this "bug" might be a feature; otherwise, kubelet wouldn't restart t
 
 A short summary of the broken version events:
 1. containerd will create the container cgroup outside of ~kubepods-<qos>-<pod_id>.slice~
-2. kubelet writes the ~cpu.weight~ property in the QoS cgroups of the active pods
-3. systemd removes the ~cpuset~ controller for whatever reason
-4. kubelet will try to sync the pod and realize that a controller is missing
-5. kubelet restarts the pod because it thinks the cgroup is "gone."
-6. kubelet "syncs" the QoS cgroup again and adds the ~cpuset~ via file API
-7. the pod is up
-8. go back to 1. the control plane is broken
+1. kubelet sends a D-Bus message to systemd to change the ~CPUWeight~ property of the QoS cgroup
+1. systemd writes this value to ~cpu.weight~ file
+1. systemd removes the ~cpuset~ controller for whatever reason
+1. kubelet will try to sync the pod and realize that a controller is missing
+1. kubelet kills the pod because it thinks the cgroup is "gone."
+1. kubelet "syncs" the QoS cgroup again and adds the ~cpuset~ via file API
+1. the pod is up
+1. go back to 1. the control plane is broken
 
 The version with ~SystemdCgroup~ in containerd config:
 1. containerd creates the container cgroup inside the pod cgroup with the ~Delegate~ option
-2. kubelet writes the ~cpu.weight~ property in the QoS cgroups of the active pods
-3. systemd won't mess up with the parents of the delegated cgroup
-4. kubelet doesn't kill the pod because the ~cpuset~ controller is still there
-5. the control plane is healthy
+1. kubelet sends a D-Bus message and systemd writes the value to ~cpu.weight~ file
+1. systemd won't mess up with the parents of the delegated cgroup
+1. kubelet doesn't kill the pod because the ~cpuset~ controller is still there
+1. the control plane is healthy
 
 I think it's kubelet's responsibility to not allow the container manager and runtime to use a different cgroup driver.
 For instance, kubelet [[https://github.com/kubernetes/kubernetes/blob/cb303e613a121a29364f75cc67d3d580833a7479/pkg/kubelet/dockershim/docker_service.go#L274][returned an error]] when docker didn't match the driver.
@@ -403,6 +405,6 @@ I made some wrong assumptions (as usual), and I couldn't imagine that I would ne
 
 I'm surprised at how libvirt-terraform-provider helped me.
 Investing some time to set up a declarative approach paid dividends.
-It's easy to run multiple hosts, try out new OSes and have multiple machines running simultaneously with different cgroup versions.
+It was useful to run multiple hosts, try out new OSes and have multiple machines running simultaneously with different cgroup versions.
 
 Let's see what the future holds now that I can bootstrap my own cluster in an isolated environment =).
