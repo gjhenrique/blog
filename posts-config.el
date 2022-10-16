@@ -13,7 +13,7 @@
            :section-numbers nil
            :table-of-contents nil
            :author "Guilherme Henrique"
-           :email "gjhenrique@gmail.com")
+           :email "me@gjhenrique.com")
           ("org-static-zezin"
            :base-directory ,org-path
            :base-extension "css\\|js\\|png\\|jpg\\|ico\\|gif\\|pdf\\|mp3\\|flac\\|ogg\\|swf\\|php\\|markdown\\|md\\|html\\|htm\\|sh\\|xml\\|gz\\|bz2\\|vcf\\|zip\\|txt\\|tex\\|otf\\|ttf\\|eot\\|rb\\|yml\\|htaccess\\|gitignore\\|svg"

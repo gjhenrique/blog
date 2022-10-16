@@ -13,6 +13,7 @@
 (package-install 'clojure-mode)
 (package-install 'go-mode)
 (package-install 'toml-mode)
+(package-install 'dockerfile-mode)
 
 (require 'org)
 (require 'htmlize)
@@ -21,6 +22,7 @@
 (require 'clojure-mode)
 (require 'go-mode)
 (require 'toml-mode)
+(require 'dockerfile-mode)
 
 (defun org-publish-with-different-timestamp-directory ()
   (setq org-publish-timestamp-directory ".timestamps/")

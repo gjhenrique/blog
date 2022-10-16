@@ -271,3 +271,8 @@ footer {
     width: 100%;
   }
 }
+// No way of disabling Listing in other than via CSS
+// https://github.com/bzg/org-mode/blob/main/lisp/ox-html.el#L3502
+.listing-number {
+  display: none;
+}
