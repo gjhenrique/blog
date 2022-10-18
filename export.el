@@ -41,4 +41,4 @@
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
   (setq org-html-htmlize-output-type 'css)
   (load-file "posts-config.el")
-  (zezin-set-posts-info "org" "_posts" "."))
+  (zezin-set-posts-info "org" "./content/posts" "assets") )
