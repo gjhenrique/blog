@@ -40,5 +40,17 @@
   (setq org-export-with-sub-superscripts nil)
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
   (setq org-html-htmlize-output-type 'css)
+  (setq org-html-html5-fancy t
+        org-html-doctype "html5")
   (load-file "posts-config.el")
-  (zezin-set-posts-info "org" "./content/posts" "assets") )
+  (let ((root-dir (locate-dominating-file buffer-file-name ".dir-locals.el")))
+    (zezin-set-posts-info (concat root-dir "org") (concat root-dir "content/posts") (concat root-dir "assets")))
+
+  (defun zezin-rewrite-link (orig-fun &rest args )
+    "Replaces org-html-link images with absolue URLs"
+    (let ((res (apply orig-fun args)))
+      (if (and (stringp res) (string-match-p "<img src=" res))
+          (replace-regexp-in-string "./res" "/res" res)
+        res)))
+
+  (advice-add #'org-html-link :around #'zezin-rewrite-link))
