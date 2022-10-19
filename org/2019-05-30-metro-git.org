@@ -32,6 +32,7 @@ In a nutshell, we need to transform a bunch of stations, lines and connections i
 As an example, running the algorithm with this piece of the
 @@html:<a href="https://pt.saopaulomap360.com/mapa-metro-sao-paulo" target="_blank">São Paulo</a>@@
 metro system would generate the following shell commands:
+
 [[./res/metro/metro-sp.png]]
 
 #+BEGIN_SRC shell-script :exports result

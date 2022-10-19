@@ -75,6 +75,18 @@ a:visited {
     color: inherit;
 }
 
+.post {
+    a, a:visited {
+        color: #DD514C;
+    }
+}
+
+header {
+    a, a:visited {
+        color: #DD514C;
+    }
+}
+
 a:hover,
 a.heading-link {
     text-decoration: none
@@ -91,7 +103,6 @@ code, pre {
     font-family: San Francisco Mono, Monaco, "Consolas", "Lucida Console","DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
     font-size: normal;
     font-size: small;
-    background: #eee
 }
 
 code {
@@ -200,4 +211,8 @@ hr {
 img {
     max-width: 100%;
     height: auto;
+}
+
+figure {
+    text-align: center;
 }

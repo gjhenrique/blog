@@ -1,58 +1,27 @@
-var fs = require('fs');
-var cheerio = require('cheerio');
-var css = require('css');
-var Set = require('jsclass/src/set').Set;
+// var fs = require('fs');
+// var cheerio = require('cheerio');
+// var css = require('css');
+// var Set = require('jsclass/src/set').Set;
 
-var postsPath  = __dirname + '/../_posts';
+const { PurgeCSS } = require("purgecss");
+const { resolve } = require('path')
+const fs = require('fs')
 
-var syntaxOrgFile  = __dirname + '/' + process.argv.slice(2)[0] + '.css';
-var syntaxFinalFile = __dirname + '/../_assets/css/syntax.scss';
+const postsPath  = resolve(__dirname, '../content/posts');
+const completeSyntaxFile  = resolve(__dirname, 'base16-default-oceanic.css');
+const syntaxFinalFile = resolve(__dirname, '../assets/scss/_syntax.scss');
 
-function getSrcClasses(file, classes) {
-  fs.readFile(file, 'utf-8', function(err, contents) {
-    var $ = cheerio.load(contents);
-    // var classes = new Set();
-    $('.org-src-container').each(function(index, element) {
-      addClassesToSet(element, classes);
-    });
-    searchClasses(classes);
+const purge = async () => {
+  const result = await new PurgeCSS().purge({
+    content: [`${postsPath}/**/*.html`],
+    css: [completeSyntaxFile],
+    blocklist: ["a"]
   });
+
+  const finalCss = result.map(r => r.css).join();
+  fs.writeFileSync(syntaxFinalFile, finalCss);
 }
 
-function searchClasses(classes) {
-  fs.readFile(syntaxOrgFile, 'utf-8', function(err, contents) {
-    var cssDeclarations = css.parse(contents);
-    var rules = cssDeclarations.stylesheet.rules;
-    var tokens = [];
-
-    for (var i = 0; i < rules.length; i++) {
-      var selectors = new Set(rules[i].selectors);
-      if (!classes.intersection(selectors).isEmpty())
-        tokens.push(rules[i]);
-    }
-
-    cssDeclarations.stylesheet.rules = tokens;
-    var fileContent = css.stringify(cssDeclarations);
-    fs.writeFile(syntaxFinalFile, fileContent, function(err){
-      if(err) {
-        console.log("File not saved " + err);
-      }});
-  });
-}
-
-function addClassesToSet(element, set) {
-  var el = cheerio(element);
-  set.add('.' + el.attr('class'));
-  el.children().each(function(index, element) {
-    addClassesToSet(element, set);
-  });
-  return set;
-}
-
-const classes = new Set();
-
-fs.readdir(postsPath, function(err, files) {
-  files
-    .filter(function(file) { return file.substr(-5) === '.html'; })
-    .map(function(file) { getSrcClasses(postsPath + '/' + file, classes); });
-});
+(async () => {
+  await purge()
+})()

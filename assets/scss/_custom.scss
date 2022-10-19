@@ -1,0 +1,92 @@
+
+.underline {
+    text-decoration: underline;
+}
+
+.org-src-container {
+    overflow-y: auto;
+    margin-bottom: 2em;
+    padding: 0 1em;
+    font-size: 0.9em;
+}
+
+.org-src-container + .org-src-container {
+    margin-top: -1.5em;
+}
+
+#icons {
+  a + a  {
+    margin-left: 20px;
+  }
+}
+
+// Workaround to hide figure_numbers in captions
+.figure-number, .listing-number {
+    display: none;
+}
+
+.icon-play {
+  position: relative;
+  z-index: 1
+}
+
+// Metro style
+.metro-animation {
+  margin-top: -20px;
+  display: flex;
+  height: 300px;
+  justify-content: center;
+}
+
+.metro-animation-git {
+  margin-top: -20px;
+  display: flex;
+  height: 300px;
+}
+
+.metro-graph {
+  position: relative;
+  z-index: 0;
+  margin-top: -20px;
+  width: 48%;
+  height: 100%;
+  display: inline-block;
+}
+
+.metro-git-container {
+  font-family: 'Source Code Pro', monospace;
+  width: 48%;
+  height: 100%;
+  overflow: auto;
+
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
+  span {
+    display: inline-block;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 480px) {
+  .metro-animation-git {
+    flex-direction: column;
+    height: 500px;
+  }
+
+  .metro-animation-git {
+    .metro-graph {
+      height: 70%;
+    }
+  }
+
+  .metro-graph {
+    min-width: 100%;
+  }
+
+  .metro-git-container {
+    height: 29%;
+    min-width: 100%;
+    justify-content: flex-start;
+  }
+}
