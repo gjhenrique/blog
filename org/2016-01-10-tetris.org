@@ -125,7 +125,7 @@ With the [[https://kripken.github.io/emscripten-site/][Emscripten]] project, we 
 
 Basically, this image show how this source-to-source compilation works:
 
-#+BEGIN_SRC dot :file ./res/tetris/asm_js.png :cmdline -Kdot -Tpng
+#+BEGIN_SRC dot :file /res/tetris/asm_js.png :cmdline -Kdot -Tpng
 digraph {
     // graph from left to right
     rankdir=LR;

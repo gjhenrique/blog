@@ -5,10 +5,9 @@ stages:
 
 org-generation:
   image:
-    name: iquiw/alpine-emacs
+    name: silex/emacs:28.1-alpine-ci
   before_script:
-    - apk update
-    - apk add graphviz ttf-freefont
+    - apk update && apk add graphviz ttf-freefont
     # If cache succeeded, copy to emacs home
     - if [ -d elpa ]; then cp -rf elpa /root/.emacs.d; fi
   cache:

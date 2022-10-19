@@ -1,12 +1,10 @@
 (require 'package)
 
 (package-initialize)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "http://orgmode.org/elpa/")))
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")))
 
 (package-refresh-contents)
 
-(package-install 'org-plus-contrib)
 (package-install 'htmlize)
 (package-install 'rainbow-delimiters)
 (package-install 'yaml-mode)
@@ -43,8 +41,7 @@
   (setq org-html-html5-fancy t
         org-html-doctype "html5")
   (load-file "posts-config.el")
-  (let ((root-dir (locate-dominating-file buffer-file-name ".dir-locals.el")))
-    (zezin-set-posts-info (concat root-dir "org") (concat root-dir "content/posts") (concat root-dir "static")))
+  (zezin-set-posts-info "org" "content/posts" "static")
 
   (defun zezin-rewrite-link (orig-fun &rest args )
     "Replaces org-html-link images with absolue URLs"
