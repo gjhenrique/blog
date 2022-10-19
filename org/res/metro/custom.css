@@ -1,0 +1,72 @@
+.fa-play {
+  content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>');
+  height: 30px;
+}
+
+.fa-pause {
+  content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z" /></svg>');
+  height: 30px;
+}
+
+.icon-play {
+  // Add background
+  position: relative;
+  z-index: 1
+}
+
+.metro-animation {
+  display: flex;
+  height: 300px;
+  justify-content: center;
+}
+
+.metro-animation-git {
+  display: flex;
+  height: 300px;
+}
+
+.metro-graph {
+  position: relative;
+  z-index: 0;
+  width: 48%;
+  height: 100%;
+  display: inline-block;
+}
+
+.metro-git-container {
+  font-family: San Francisco Mono, Monaco, "Consolas", "Lucida Console","DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
+  width: 48%;
+  height: 100%;
+  overflow: auto;
+
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
+  span {
+    display: inline-block;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 480px) {
+  .metro-animation-git {
+    flex-direction: column;
+    height: 500px;
+  }
+
+  .metro-animation-git {
+    .metro-graph {
+      height: 70%;
+    }
+  }
+
+  .metro-graph {
+    min-width: 100%;
+  }
+
+  .metro-git-container {
+    height: 29%;
+    min-width: 100%;
+    justify-content: flex-start;
+  }
+}

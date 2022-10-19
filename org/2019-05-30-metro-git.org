@@ -10,8 +10,8 @@ categories:
 tags:
   - clojure
   - subway
-styles:
-  - "https://fonts.googleapis.com/css?family=Source+Code+Pro"
+custom_styles:
+  - /res/metro/custom.css
 ---
 #+END_EXPORT
 
