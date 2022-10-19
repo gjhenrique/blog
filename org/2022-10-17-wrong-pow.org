@@ -1,6 +1,5 @@
 #+BEGIN_EXPORT html
 ---
-layout: post
 title: The day Alpine broke exponentiation
 comments: false
 categories:

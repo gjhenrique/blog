@@ -1,6 +1,5 @@
 #+BEGIN_EXPORT html 
 ---
-layout: post
 title: Giving (emacs-)purpose to i3wm
 comments: false
 categories:

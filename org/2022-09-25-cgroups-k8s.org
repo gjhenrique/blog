@@ -1,7 +1,6 @@
 #+OPTIONS: ^:{}
 #+BEGIN_EXPORT html
 ---
-layout: post
 title: Who's killing my pods?
 comments: false
 categories:

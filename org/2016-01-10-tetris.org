@@ -1,6 +1,5 @@
 #+BEGIN_EXPORT html 
 ---
-layout: post
 title: A Modular Tetris Library
 comments: false
 categories:

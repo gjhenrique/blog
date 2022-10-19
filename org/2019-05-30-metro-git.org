@@ -1,6 +1,5 @@
 #+BEGIN_EXPORT html
 ---
-layout: post
 title: From metro connections to a git graph
 comments: false
 custom_js:

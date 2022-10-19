@@ -1,6 +1,5 @@
 #+BEGIN_EXPORT html 
 ---
-layout: post
 title: Blogging with org-mode and Gitlab Pages
 comments: false
 categories:

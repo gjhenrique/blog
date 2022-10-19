@@ -1,6 +1,5 @@
 #+BEGIN_EXPORT html
 ---
-layout: post
 title: Bluetooth, PipeWire and Whatsapp calls
 comments: false
 categories:
