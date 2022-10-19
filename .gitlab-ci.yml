@@ -37,7 +37,7 @@ css-theme:
   stage: filter-css-classes
 
 pages:
-  image: ruby:2.7.4-alpine3.14
+  image: klakegg/hugo:alpine-ci
   cache:
     key: jekyll
     paths:
