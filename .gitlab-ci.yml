@@ -17,8 +17,8 @@ org-generation:
       - elpa/
   artifacts:
     paths:
-      - _posts
-      - res
+      - content/posts
+      - static/res
   script:
     - emacs -batch -q -l export.el -f org-publish-with-different-timestamp-directory
     # Copy elpa packages to current directory for cache
@@ -26,19 +26,14 @@ org-generation:
   stage: build-org
 
 css-theme:
-  image: node:6.11.3-alpine
-  cache:
-    key: node-libraries
-    paths:
-      - .npm_cache/
+  image: node:16-alpine
   before_script:
-    - npm config set cache $(pwd)/.npm_cache
-    - cd syntax-extractor && npm install && cd ..
+    - cd syntax-extractor && yarn install && cd ..
   script:
-    - node syntax-extractor/index.js base16-default-oceanic
+    - node syntax-extractor
   artifacts:
     paths:
-      - _assets/css/syntax.scss
+      - assets/scss/_syntax.scss
   stage: filter-css-classes
 
 pages:
