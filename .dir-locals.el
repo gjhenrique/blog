@@ -3,4 +3,4 @@
                     (let ((root-dir (locate-dominating-file buffer-file-name ".dir-locals.el")))
                       (zezin-set-posts-info (concat root-dir "org")
                                             (concat root-dir "content/posts")
-                                            (concat root-dir "assets"))))))
+                                            (concat root-dir "static"))))))

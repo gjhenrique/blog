@@ -44,7 +44,7 @@
         org-html-doctype "html5")
   (load-file "posts-config.el")
   (let ((root-dir (locate-dominating-file buffer-file-name ".dir-locals.el")))
-    (zezin-set-posts-info (concat root-dir "org") (concat root-dir "content/posts") (concat root-dir "assets")))
+    (zezin-set-posts-info (concat root-dir "org") (concat root-dir "content/posts") (concat root-dir "static")))
 
   (defun zezin-rewrite-link (orig-fun &rest args )
     "Replaces org-html-link images with absolue URLs"
