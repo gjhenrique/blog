@@ -8,7 +8,10 @@
   <link rel="canonical" href="{{ .Permalink | absURL }}">
   <link rel="alternate" type="application/atom+xml" title="{{ .Site.Title }}" href="{{ .Site.BaseURL }}atom.xml" />
   <link rel="alternate" type="application/json" title="{{ .Site.Title }}" href="{{ .Site.BaseURL }}feed.json" />
-  <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=">
+
+  {{ $favicon := resources.Get "favicon.ico" }}
+  <link rel="shortcut icon" type="{{ $favicon.MediaType }}" href="data:{{ $favicon.MediaType }};base64, {{ $favicon.Content | base64Encode }}">
+
   {{ $style := resources.Get "scss/main.scss" | resources.ExecuteAsTemplate "style.main.scss" . | toCSS | minify | fingerprint }}
   <link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}" crossorigin="anonymous" media="screen,print" />
 
@@ -79,7 +82,7 @@
 </script>
 {{ end }}
 
-<{{ if isset .Params "custom_js" }}
+{{ if isset .Params "custom_js" }}
   {{ range .Params.custom_js }}
     <script src="{{ . }}" type="text/javascript"></script>
   {{ end }}

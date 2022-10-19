@@ -2,10 +2,10 @@
   "version": "https://jsonfeed.org/version/1",
   "title": "{{ .Site.Title }}",
   "home_page_url": "{{ .Site.BaseURL }}",
-  "feed_url": "https://ronaldsvilcins.com/feed.json",
+  "feed_url": "https://gjhenrique.com/feed.json",
   "description": "{{ .Site.Params.description }}",
   "icon": "https://ronaldsvilcins.com/assets/apple-touch-icon.png",
-  "favicon": "https://ronaldsvilcins.com/assets/favicon.ico",
+  "favicon": "https://gjhenrique.com/assets/favicon.ico",
   "expired": false,
   "author": {
     "name": "Guilherme Henrique",
