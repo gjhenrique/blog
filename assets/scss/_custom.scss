@@ -17,3 +17,12 @@
 .figure-number, .listing-number {
     display: none;
 }
+
+// Override some syntax rules
+.org-comment {
+  color: #949494;
+}
+
+.org-comment-delimiter {
+  color: #949494;
+}
