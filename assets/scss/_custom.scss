@@ -4,7 +4,7 @@
 }
 
 .org-src-container {
-    overflow-y: auto;
+    overflow: auto;
     margin-bottom: 2em;
     padding: 0 1em;
     font-size: 0.9em;
@@ -14,23 +14,17 @@
     margin-top: -1.5em;
 }
 
-#icons {
-  a + a  {
-    margin-left: 20px;
-  }
-}
-
 // Workaround to hide figure_numbers in captions
 .figure-number, .listing-number {
     display: none;
 }
 
+// Metro style
 .icon-play {
   position: relative;
   z-index: 1
 }
 
-// Metro style
 .metro-animation {
   display: flex;
   height: 300px;
