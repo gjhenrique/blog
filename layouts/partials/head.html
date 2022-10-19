@@ -79,4 +79,11 @@
 </script>
 {{ end }}
 
+<{{ if isset .Params "custom_js" }}
+  {{ range .Params.custom_js }}
+    <script src="{{ . }}" type="text/javascript"></script>
+  {{ end }}
+{{ end }}
+
+
 </head>

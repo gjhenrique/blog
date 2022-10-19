@@ -3,8 +3,8 @@
 title: From metro connections to a git graph
 comments: false
 custom_js:
-  - ./res/metro/metro.js
-  - ./res/metro/custom.js
+  - /res/metro/metro.js
+  - /res/metro/custom.js
 categories:
   - programming
 tags:
