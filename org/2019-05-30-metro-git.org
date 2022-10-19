@@ -17,8 +17,7 @@ custom_styles:
 
 A few years ago, I was learning Clojure, had read some books and was looking
 for an interesting project to practice what I've learned.
-Then I remembered reading about the project
-@@html:<a href="https://github.com/vbarbaresi/MetroGit" target="_blank">MetroGit</a>@@
+Then I remembered reading about the project [[https://github.com/vbarbaresi/MetroGit][MetroGit]],
 which consists of building a Git graph from the metro system of Paris.
 In my opinion, this project is so creative that the original scope could be extended.
 
@@ -29,8 +28,8 @@ The branches are represented as lines, commits are stations and merge commits ar
 * Illustration of the idea
 In a nutshell, we need to transform a bunch of stations, lines and connections into a git graph.
 As an example, running the algorithm with this piece of the
-@@html:<a href="https://pt.saopaulomap360.com/mapa-metro-sao-paulo" target="_blank">São Paulo</a>@@
-metro system would generate the following shell commands:
+[[https://pt.saopaulomap360.com/mapa-metro-sao-paulo][São Paulo]] metro system would generate the following shell commands:
+
 
 [[./res/metro/metro-sp.png]]
 
@@ -75,10 +74,8 @@ The next sections are gonna focus on the journey of achieving this:
 4. Improve the API with the Clojure ~seq~ abstraction
 
 * Build the acyclic graph
-A git graph is a
-@@html:<a href="https://eagain.net/articles/git-for-computer-scientists/" target="_blank">Directed <b>Acyclic</b> Graphs</a>@@,
-which means that we need to
-build a graph with directions from stations and connections and remove the *minimum* number of cycles in case it's needed.
+A git graph is a [[https://eagain.net/articles/git-for-computer-scientists/][Directed *Acyclic* Graph]],
+which means that we need to build a graph with directions from stations and connections and remove the *minimum* number of cycles in case it's needed.
 
 ** Input data format
 The data format is simply an array of lines and its stations.
@@ -96,8 +93,7 @@ The data format is simply an array of lines and its stations.
 By the way, to avoid the mental overhead, the fictitious lines are gonna be represented with colors and stations with letters.
 
 ** Loom, our fellow graph library
-For Clojure(script), there is an awesome library called
-@@html:<a href="https://github.com/aysylu/loom" target="_blank">loom</a>@@,
+For Clojure(script), there is an awesome library called [[https://github.com/aysylu/loom][loom]],
 which provides an interface for creating and manipulating graphs.
 Take a look at the examples of some functions we're gonna use in the future.
 
@@ -238,9 +234,7 @@ all the connections of that specific line could be reversed.
 #+END_SRC
 
 Keep in mind that the call to ~loom.graph/dag?~ represents the most expensive operation of the algorithm.
-It does a
-@@html:<a href="https://en.wikipedia.org/wiki/Topological_sorting" target="_blank">Topological Sorting</a>@@
-to confirm if the graph is a DAG or not.
+It does a [[https://en.wikipedia.org/wiki/Topological_sorting][Topological Sorting]] to confirm if the graph is a DAG or not.
 It takes ~O(E+V)~,
 where ~E~ (edges) are the stations and ~V~ (vertex) are the connections among them.
 Therefore, this algorithm run in ~O(Line*(Stations+Connections))~.
@@ -752,21 +746,14 @@ Later on, we're gonna plug them together.
 #+END_SRC
 
 We're changing the variable ~commands~ in two different places of the same function.
-The
-@@html:<a href="https://clojure.org/reference/atoms" target="_blank">atom</a>@@
-construct was used to update a value in two different places of the same function,
+The [[https://clojure.org/reference/atoms][atom]] construct was used to update a value in two different places of the same function,
 but it doesn't make our function less immutable or pure to the outside world.
-This
-@@html:<a href="https://clojure.org/reference/transients" target="_blank">quote</a>@@
-from Rich Hickey explains why this is not a problem.
+This [[https://clojure.org/reference/transients][quote]] from Rich Hickey explains why this is not a problem.
 
 #+BEGIN_QUOTE
-#+BEGIN_EXPORT html
-<p>
-If a tree falls in the woods, does it make a sound? <br/>
+If a tree falls in the woods, does it make a sound?
+
 If a pure function mutates some local data in order to produce an immutable return value, is that ok?
-</p>
-#+END_EXPORT
 #+END_QUOTE
 
 #+BEGIN_EXPORT html
@@ -1114,20 +1101,10 @@ Now we've accomplished the goal of transforming some input data into a git repos
 We reached the end of the journey of mapping git commands from a metro system.
 I hope it was a pleasant experience and you've learned something new just as I did.
 
-I'm grateful for the creators of
-@@html:<a href="https://github.com/vbarbaresi/MetroGit" target="_blank">MetroGit</a>@@
-(Paris) from where I got the original idea
-and
-@@html:<a href="https://github.com/bburky/git-dc-metro" target="_blank">git-dc-metro</a>@@
-(Washington) for providing me the correct format of the commands =P
+I'm grateful for the creators of [[https://github.com/vbarbaresi/MetroGit][MetroGit]] (Paris) from where I got the original idea
+and [[https://github.com/bburky/git-dc-metro][git-dc-metro]] (Washington) for providing me the correct format of the commands =P
 
-If you're interested, the code for the project
-@@html:<a href="https://github.com/gjhenrique/metro-clojure" target="_blank">metro-clojure</a>@@
-is in github.
+If you're interested, the code for the project [[https://github.com/gjhenrique/metro-clojure][metro-clojure]] is in github.
 If you want to, you can open an issue requesting a new city.
-
-# Another bright side are the animations 
-# that demonstrate the step by step traversal and command creation
-# share the same code that the algorithm that generates the shell script with the commands.
 
 Also, sorry for the CPU usage of the animations. ;)
