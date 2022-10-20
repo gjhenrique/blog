@@ -32,4 +32,5 @@ Creating the CSS file to code snippets follows the process:
 It works with any [Emacs theme](https://emacsthemes.com/popular/index.html) exportable via htmlize.
 
 ## Posts
-- [Initial setup on Jekyll and Gitlab Pages](https://gjhenrique.com/meta.html)
+- [Initial setup on Jekyll and Gitlab Pages](https://gjhenrique.com/meta/)
+- [Migration to Hugo and Github Pages](https://gjhenrique.com/meta2/)

@@ -1,0 +1,135 @@
+#+BEGIN_EXPORT html
+---
+title: Blogging with org-mode, Hugo and Cloudflare Pages
+categories:
+  - programming
+tags:
+  - org-mode
+  - meta
+  - cloudflare-pages
+  - blog
+custom_styles:
+  - /res/meta2/theme.css
+  - /res/meta2/override-theme.css
+---
+#+END_EXPORT
+
+
+Five years ago, I published [[https://gjhenrique.com/meta/][a post]] about the setup of this blog.
+Satisfied with it, I added some posts until I read this [[https://labs.cybozu.co.jp/blog/akky/2019/06/metro-clojure-generates-metro-graph-on-git-repository/][japanese post]].
+In there, a mate read my [[https://gjhenrique.com/metro-git/][metro-clojure]] post describing the step by step of how to convert a generic metro map into a git graph. He then included the Tokyo metro system and wrote about it.
+
+It was gratifying but at the same time terrifying because I started this blog to improve my writing skills, but it has a real impact, albeit small, on real people.
+The kanji only aggravated the feeling.
+The annoying /you-need-to-improve-this-ASAP/ bug bit me, and I needed to make this blog production-ready ™️.
+
+Let's use it as a retrospective to discuss what was good (aged like wine) and what was bugging me (aged like milk) with the new additions to address those issues.
+
+* Wine 🍷
+- *org-mode*
+
+The deep integration of ~org-mode~ with Emacs and the endless integrations make it the GOAT of note-taking apps.
+~org-mode~ is not comparable to Markdown, ~org~ files are.
+Think of ~org-mode~ as a text editor plugin on steroids handling its own markup language.
+
+Honestly, I'm not a power user and only write notes about tasks and TODO lists of the tickets I'm working on because my memory sucks. Obviously, writing blog posts as well.
+
+#+CAPTION: Postception: How this blog post looks like
+[[./res/meta2/post.png]]
+
+- *publishing in CI*
+
+Like Jekyll and Hugo, a Static Site Generator (SSG) takes HTML or Markdown files and assembles them into the final blog artefact containing the homepage with the list of posts, RSS feed, etc.
+They heavily use a templating language like liquid or mustache to make the layout dynamic.
+
+The original post discusses how I'm using ~ox-html~, the ~org-mode~ built-in publishing system to convert all the ~org~ files to HTML and move the resource files, like images, to a directory that Jekyll expects to do its job.
+
+I then created a [[https://github.com/gjhenrique/blog/blob/main/export.el][small elisp file]] to only include the libraries that will affect the blog generation.
+Using this configuration in CI is advantageous because the day-to-day Emacs brings tons of packages that might interfere with the export. Moreover, I can pin the exact Emacs version in CI to avoid unwanted surprises.
+
+- *syntax colouring with htmlize*
+A writer has some options to decorate the code snippets of their blog.
+One can bring an external dependency like pygments
+or change the DOM in runtime with a Javascript library like [[https://prismjs.com/][prismjs]].
+Or don't give a fuck and outsource this to Github Gist like Medium (Yikes).
+
+One good part of using Emacs to have syntax colouring in HTML is that there is no external dependency.
+The library ~htmlize~ together with ~org-mode~ converts all the faces — Emacs abstraction to colourize text — of the current theme into a big CSS file.
+
+Let me give an example of how this powerful setup can yield some benefits.
+I use the package [[https://github.com/Fanael/highlight-numbers][highlight-numbers]] to colourize numbers in code.
+Adding [[https://github.com/gjhenrique/blog/blob/009c89cf4ff33da4cde0b77364086a7cf30c39ba/export.el#L57-L58][a couple of lines]] to install and configure the package enables it automatically in the HTML.
+
+#+INCLUDE: "./res/meta2/highlight-numbers.html" export html
+
+A downside of going with this approach is bloat.
+Having all the faces of the theme as CSS rules and using only a handful of them creates waste.
+In the previous post, I mentioned how I was using the [[https://cheerio.js.org/][cheerio]] library, an HTML parser that ships with a jquery-like API in node, to get only the used files and remove these unused rules.
+It was so hard to understand that I had to remove it (this one aged like milk).
+
+I changed it to use the [[https://purgecss.com/][purgecss]] library.
+I point to the directory with the posts in HTML and the theme file in a node script. Then, like magic, it returns only the used CSS rules from 36KB to 2.2KB. So tell me about using the right tool for the job.
+
+#+begin_src typescript
+const result = await new PurgeCSS().purge({
+  content: [`${postsPath}/**/*.html`],
+  css: ["exported-theme.css"],
+  blocklist: ["a"]
+});
+
+const finalCss = result.map(r => r.css).join();
+fs.writeFileSync("slim-theme.css", finalCss);
+#+end_src
+
+Maybe going too deep into this topic, but do you want to hear about an ingenuous hack?
+To export all the available faces into a final CSS file, ~ox-html~ lists all available faces with the ~(face-list)~ function and prints a ~1~ character on a temporary buffer with the iterated face. Then, it calls ~htmlize~ to convert that buffer to HTML. Finally, ~htmlize~ gets the faces of each character and creates all the ~color~ and ~background-color~ CSS rules corresponding to the ~foreground~ and ~background~ face attributes. Neat.
+
+#+INCLUDE: "./res/meta2/one.html" export html
+
+* Milk 🥛
+- *Jekyll*
+
+People generally have issues with Jekyll because it's slow.
+Or because it's hard to maintain a ruby dependency, since it can't compete with a single binary installation.
+But, my main beef with Jekyll is maintainability, actually.
+I tried to upgrade to Ruby 3, but the ~jekyll-assets~ gem had some incompatibilities, and the project looks abandoned.
+Besides, it looks like the community is less active than it was in the old days.
+In the end, the SSG choice is a commodity because ~org-mode~ handles this conversion from "rich" text to HTML for us.
+
+I migrated to Hugo with the [[https://github.com/ronv/listed][minimalistic listed theme]] and couldn't be happier.
+Initially, I typed ~hugo~ expecting it to show me the options for starting a server.
+It took me a while to notice that it generated the final blog in some milliseconds.
+The developer experience they provide is superb.
+Highly recommended.
+
+- *Gitlab Pages*
+
+Back then, Gitlab Pages was a precursor for users to have a non-Jekyll blog augmented by its innovative CI.
+Github Pages was more famous, but you had zero flexibility in deploying your blog.
+
+However, my main pain point with the current setup is that a HAProxy in the USA delivered the HTML to the whole world.
+I could cache the HTML in Cloudflare, but I was already using all my free page rules.
+It's 2022, and it's inexcusable to have this setup.
+
+In a couple of hours, I migrated everything to [[https://pages.cloudflare.com/][Cloudflare Pages]], and the setup was pretty straightforward.
+It's possible to have protected preview pages and privacy-friendly analytics.
+I can even have server-side logic with Cloudflare functions if needed.
+And the best part is that Cloudflare globally distributes every single resource.
+
+I migrated the CI and the repository from Gitlab to Github.
+Not because Gitlab sucks but simply because I use Github for my job and open-source projects.
+Every rare Gitlab visit surprises me with many changes in the UI and new ways of doing old things.
+
+It would be better if I could connect Github with [[https://developers.cloudflare.com/pages/platform/git-integration/][Cloudflare Pages]] directly, so I don't need to configure CI myself.
+But I needed to configurel the ~wrangler~ tool instead because this blog is not a [[https://www.cloudflare.com/learning/performance/what-is-jamstack/][JAMStack]].
+Cloudflare Pages still needs to be ~org-mode~ aware ;).
+
+The [[https://githubcopilotlitigation.com/][ongoing issue]] with Github Copilot and copyright is annoying, and maybe I migrate the whole setup to sourcehut or self-hosted Gitea. But let's wait for the following chapters.
+
+* Bye
+You're probably thinking: "What if instead of wasting your time setting up yet another static site, you write stuff on Medium instead".
+You're probably correct, but what can I do?! It's so fun to tinker with this setup and make it better for my readers.
+Feel free to fork [[https://github.com/gjhenrique/blog][the repo]] if you want to try it out.
+
+I hope everyone, including my Japanese friends, enjoys the improvements.
+See you in five years for our next retrospective.

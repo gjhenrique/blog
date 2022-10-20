@@ -9,6 +9,8 @@ const syntaxFinalFile = resolve(__dirname, '../assets/scss/_syntax.scss');
 const purge = async () => {
   const result = await new PurgeCSS().purge({
     content: [`${postsPath}/**/*.html`],
+    // Exclude meta2 post because of ones snippet. It includes all faces
+    skippedContentGlobs: `${postsPath}/*meta2.html`,
     css: [completeSyntaxFile],
     blocklist: ["a"]
   });
