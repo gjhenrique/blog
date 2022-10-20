@@ -2,6 +2,15 @@
     text-decoration: underline;
 }
 
+// Not sure why new versions aren't exporting this anymore
+// Maybe it's not a face anymore, but it's a container
+// Check the bg and fg values and change them here
+//https://github.com/doomemacs/themes/blob/535800fd6ca7f5af56f7aa3d0e8f46fef8b7999b/themes/doom-one-theme.el#L48
+.org-src-container {
+  background-color: #282c34;
+  color: #bbc2cf;
+}
+
 .org-src-container {
     overflow: auto;
     margin-bottom: 2em;

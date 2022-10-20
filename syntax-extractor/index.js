@@ -3,7 +3,7 @@ const { resolve } = require('path')
 const fs = require('fs')
 
 const postsPath  = resolve(__dirname, '../content/posts');
-const completeSyntaxFile  = resolve(__dirname, 'base16-default-oceanic.css');
+const completeSyntaxFile  = resolve(__dirname, 'doom-one.css');
 const syntaxFinalFile = resolve(__dirname, '../assets/scss/_syntax.scss');
 
 const purge = async () => {

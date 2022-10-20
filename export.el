@@ -12,6 +12,7 @@
 (package-install 'go-mode)
 (package-install 'toml-mode)
 (package-install 'dockerfile-mode)
+(package-install 'highlight-numbers)
 
 (require 'org)
 (require 'htmlize)
@@ -21,6 +22,29 @@
 (require 'go-mode)
 (require 'toml-mode)
 (require 'dockerfile-mode)
+(require 'highlight-numbers)
+
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+
+(defun zezin-load-theme ()
+  (package-install 'doom-themes)
+  (require 'doom-themes)
+  (load-theme 'doom-one 'no-confirm) )
+
+(defun zezin-generate-themefile ()
+  (zezin-load-theme)
+
+  ;; Fix "Invalid face: tab-line-tab"
+  (require 'tab-line)
+
+  ;; Looks like a bug where default face inherit is nil
+  (set-face-attribute 'default nil :inherit 'unspecified)
+
+  (org-html-htmlize-generate-css)
+  (with-current-buffer "*html*"
+    (message "%s" (buffer-string))))
 
 (defun org-publish-with-different-timestamp-directory ()
   (setq org-publish-timestamp-directory ".timestamps/")
