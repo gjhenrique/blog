@@ -1,7 +1,6 @@
 #+BEGIN_EXPORT html 
 ---
 title: A Modular Tetris Library
-comments: false
 categories:
   - programming
 tags:

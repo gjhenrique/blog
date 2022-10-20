@@ -1,7 +1,6 @@
 #+BEGIN_EXPORT html 
 ---
 title: Blogging with org-mode, Jekyll and Gitlab Pages
-comments: false
 categories:
   - programming
 tags:

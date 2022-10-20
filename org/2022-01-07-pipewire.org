@@ -1,7 +1,6 @@
 #+BEGIN_EXPORT html
 ---
 title: Bluetooth, PipeWire and Whatsapp calls
-comments: false
 categories:
   - programming
 tags:

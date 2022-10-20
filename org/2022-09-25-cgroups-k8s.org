@@ -2,7 +2,6 @@
 #+BEGIN_EXPORT html
 ---
 title: Who's killing my pods?
-comments: false
 categories:
   - programming
   - devops

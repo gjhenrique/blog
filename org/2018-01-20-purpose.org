@@ -1,7 +1,6 @@
 #+BEGIN_EXPORT html 
 ---
 title: Giving (emacs-)purpose to i3wm
-comments: false
 categories:
   - programming
 tags:

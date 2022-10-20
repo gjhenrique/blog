@@ -1,7 +1,6 @@
 #+BEGIN_EXPORT html
 ---
 title: The day Alpine broke exponentiation
-comments: false
 categories:
   - programming
   - devops
