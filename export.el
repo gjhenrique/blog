@@ -53,6 +53,9 @@
 (with-eval-after-load 'rainbow-delimiters
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
+(with-eval-after-load 'highlight-numbers
+  (add-hook 'prog-mode-hook #'highlight-numbers-mode))
+
 (with-eval-after-load 'org
   (org-babel-do-load-languages
    'org-babel-load-languages
