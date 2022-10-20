@@ -23,6 +23,7 @@
           ("zezin" :components ("org-zezin" "org-static-zezin")))))
 
 ;; Shinning face
+;; Used in the meta post
 (defface shinning-face
   '((t (:background "white" :foreground "red")))
   "Face to highlight the Axe word")

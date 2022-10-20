@@ -1,8 +1,3 @@
-// var fs = require('fs');
-// var cheerio = require('cheerio');
-// var css = require('css');
-// var Set = require('jsclass/src/set').Set;
-
 const { PurgeCSS } = require("purgecss");
 const { resolve } = require('path')
 const fs = require('fs')

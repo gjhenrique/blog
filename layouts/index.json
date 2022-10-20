@@ -4,7 +4,7 @@
   "home_page_url": "{{ .Site.BaseURL }}",
   "feed_url": "https://gjhenrique.com/feed.json",
   "description": "{{ .Site.Params.description }}",
-  "icon": "https://ronaldsvilcins.com/assets/apple-touch-icon.png",
+  "icon": "https://gjhenrique.com/assets/favicon.ico",
   "favicon": "https://gjhenrique.com/assets/favicon.ico",
   "expired": false,
   "author": {
@@ -28,8 +28,8 @@
       "date_published": "{{ .Date.Format `2016-02-09T14:22:00-07:00` | safeHTML }}",
       "date_modified": "{{ .Date.Format `2016-02-09T14:22:00-07:00` | safeHTML }}",
       "author": {
-        "name": "Ronalds Vilcins",
-        "url": "https://ronaldsvilcins.com/"
+        "name": "Herr GuiGui",
+        "url": "https://gjhenrique.com/"
       }
     }{{ if ne (add $index 1) $len }},{{ end }}
     {{ end }}
