@@ -46,9 +46,6 @@
   (with-current-buffer "*html*"
     (message "%s" (buffer-string))))
 
-(defun org-publish-with-different-timestamp-directory ()
-  (org-publish-all))
-
 (with-eval-after-load 'rainbow-delimiters
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 

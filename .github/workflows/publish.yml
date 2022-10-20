@@ -13,7 +13,7 @@ jobs:
         run: apk update && apk add graphviz ttf-freefont
 
       - name: Generate images
-        run: emacs -batch -q -l export.el -f org-publish-with-different-timestamp-directory
+        run: emacs -batch -q -l export.el -f org-publish-all
 
       - uses: actions/upload-artifact@v3
         with:
