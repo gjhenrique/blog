@@ -73,7 +73,7 @@ If, instead of ~org-html-publish-to-html~, we had specified ~org-beamer-publish-
 This is a programming blog, so the way that code snippets are presented here is really important.
 There are tons of methods of displaying code in a blog: with [[https://github.com/isagalaev/highlight.js][Javascript]], [[https://github.com/jneen/rouge][Ruby]] or [[https://gist.github.com][Github gist]].
 
-But, with org-mode, there's a funnier way to highlight the code.
+But, with org-mode, there's a better way to highlight this code.
 With the [[https://www.emacswiki.org/emacs/Htmlize][htmlize]] package and org-mode itself, it's possible to take a "snapshot" of the Emacs appearance and translate it to the browser.
 
 Basically, htmlize converts all existing [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Faces.html][Emacs faces]] into CSS properties.
@@ -139,7 +139,7 @@ class Axe:
 
 #+END_SRC
 
-By the way, these colors are from the [[https://github.com/doomemacs/themes/blob/master/themes/doom-one-theme.elhttps://github.com/belak/base16-emacs][doom-one theme]],
+By the way, these colors are from the [[https://github.com/doomemacs/themes/blob/master/themes/doom-one-theme.el][doom-one theme]],
 but you're free to use any available theme.
 
 * Hosting with Gitlab Pages
