@@ -47,7 +47,6 @@
     (message "%s" (buffer-string))))
 
 (defun org-publish-with-different-timestamp-directory ()
-  (setq org-publish-timestamp-directory ".timestamps/")
   (org-publish-all))
 
 (with-eval-after-load 'rainbow-delimiters
