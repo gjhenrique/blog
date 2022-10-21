@@ -28,7 +28,7 @@ So, this post is about my experience of making these Whatsapp calls work on a Li
 Honestly, this doesn't bother me that much, but I'm using it as an excuse to learn more about these technologies.
 It's one of the cases where the journey is the reward, not the destination.
 
-#+CAPTION: Bose QC 35 ii, Pixel 3 and Blue Yeti Nano will be my companions in this adventure. Honourable mention goes to the Bluetooth controller Intel AX200. Unfortunately, I was lazy to unplug it from the motherboard to include it in the photo.
+#+CAPTION: Bose QC 35 ii, Pixel 3 and Blue Yeti Nano will be my companions in this adventure. Honourable mention goes to the Bluetooth controller Intel AX200. However, I was too lazy to unplug it from the motherboard to include it in the photo.
 [[./res/pipewire/devices.jpg]]
 
 * Yet another Audio recap
@@ -77,16 +77,16 @@ They use mathematical algorithms to represent PCM data with fidelity but generat
 
 Interestingly, other domains also applies this compression.
 JPEG or PNG for image files and gzip for files, for example, decreases significantly the size of this data.
-Again, humans create algorithms in computers to solve an issue.
+Again, humans create algorithms in computers to solve a constraint or limitation.
 
 * Bluetooth
 Bluetooth is a technology created in the late 1990s for devices to communicate with a low power consumption over short distances.
 It's also a somewhat unreliable technology that has pissed people ever since.
 I think everyone ever faced an issue with pairing a device at least once.
 
-Understanding the Bluetooth stack and how it transfers audio might be a little bit overwhelming with lots of abbreviations, but fear not, we'll get there.
+Understanding the Bluetooth stack and how it transfers audio might be overwhelming with lots of abbreviations, but fear not, we'll get there.
 
-/Low-Energy Bluetooth is a different beast, and it's out-of-scope of this tutorial. This post only discusses Classic or BR/EDR /
+/Low-Energy Bluetooth is a different beast, and it's out-of-scope of this tutorial. This post only discusses Classic or BR/EDR/
 
 ** Profiles, profiles, profiles
 With a headphone, it's possible to listen to high-quality audio, but also talk and listen to phone calls, and pause the music you're listening with its buttons.
@@ -126,7 +126,7 @@ SBC is very flexible and might provide a poor performance out of the box, but th
 AAC (Advanced Audio Encoding) is a popular codec found in many videos and music on the web. In addition, Apple products, such as macOS, iOS, iTunes, and Apple Music, are famous for this codec support.
 It is less configurable than SBC, but it provides a better audio experience in theory.
 
-For the Whatsapp calls, I chose AAC because it's the default after connecting to the headphone, but both would fit because my ordinary ears can't notice a difference between the two.
+For the Whatsapp calls, I chose AAC because it's the default after connecting to the headphone, but both would fit because my ordinary ears can't notice a difference between them.
 
 *** HSP/HFP codecs
 HSP/HFP codec choices are stricter.
@@ -142,7 +142,7 @@ Therefore, mSBC codec is the way to go.
 ** Bluetooth protocol stack
 Besides defining the functionality of the profile, SIG also specifies how devices should make the sausages.
 A staggering three thousand page PDF document called core specification defines the lower level protocols of how devices must communicate with each other, from the transport to the physical layer.
-Drawing a parallel would be the same as if TCP, IP and Ethernet standards were all in the same PDF document.
+Drawing a parallel with TCP/IP protocol, it would be the same as if TCP, IP and Ethernet specifications were all in the same PDF document.
 
 *** Controller layer - The lowest layer
 Classic or BR/EDR (Basic Rate / Enhanced Data Rate) Bluetooth operates on the 2.4 GHz band and has adjacent channels to avoid signal interference, just like Wifi.
@@ -174,7 +174,7 @@ Three types of links can be established, ACL (Asynchronous Connection-Oriented),
 
 SCO links reserves a certain amount of slots to guarantee a constant transmission rate.
 Besides having the same reserved slots, the newer eSCO links support a retransmission window to offer more reliability to the connection.
-Practically, bidirectional audio a.k.a, phone calls uses SCO and eSCO.
+Practically, bidirectional audio; a.k.a phone calls, uses SCO and eSCO.
 
 The ACL links use the remaining slots not used by SCO/eSCO and leave the most complex part of multiplexing and ordering to a protocol in an above layer called L2CAP.
 But we'll get there eventually.
@@ -194,7 +194,7 @@ In Linux, the kernel implements the host layer and the userspace communicates wi
 
 *** HCI - A protocol to glue them all
 Be it with L2CAP and ACL or directly sending or receiving voice packets through SCO/eSCO, the host layer needs a way to communicate with the Bluetooth controller.
-To allow both pieces to talk to each other, SIG created the HCI (Host Controller Interface) interface.
+To allow both pieces to talk to each other, SIG created the HCI (Host Controller Interface) protocol.
 
 One of the ways that the Linux kernel implements the HCI layer is through the [[https://www.kernel.org/doc/html/v4.15/driver-api/usb/index.html][Linux USB API]].
 The kernel encapsulates the incoming ACL/SCO packets into HCI packets and then to USB packets.
@@ -203,7 +203,7 @@ As a sender, the controller performs the opposite flow.
 Even when using a Bluetooth keyboard or mouse in Linux, you're somehow using USB to make it work. How wild is that?
 (This might not be the case when the controller uses UART or RS232 for the HCI transport).
 
-In Linux, the translation of ACL/SCO packets and USB packets is done in the [[https://github.com/torvalds/linux/blob/v5.15/drivers/bluetooth/btusb.c][btusb module]].
+In Linux, the translation of ACL/SCO packets and USB packets happens in the [[https://github.com/torvalds/linux/blob/v5.15/drivers/bluetooth/btusb.c][btusb module]].
 
 The most relevant HCI packets for these calls are:
 - Commands and Events: The host can modify the controller state or receive events. Similar to Netlink sockets changing the network configuration in Linux.

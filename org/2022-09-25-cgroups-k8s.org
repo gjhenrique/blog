@@ -24,7 +24,7 @@ This post follows the story of how I tried to fix this issue.
 Instead of using docker and avoiding the container inside the container rabbit hole, I wanted an actual virtual machine to mirror a production cluster as close to reality as possible.
 I had some experience with Libvirt and QEMU/KVM, but wasn't in the mood to configure my cluster in XML.
 
-I could use vagrant with libvirt plugin to generate the XML for me but decided to go with [[https://github.com/dmacvicar/terraform-provider-libvirt][terraform-provider-libvirt]] instead. Mainly as an excuse to mess around with Terraform.
+I could use vagrant with libvirt plugin to manage these XML files for me but decided to go with [[https://github.com/dmacvicar/terraform-provider-libvirt][terraform-provider-libvirt]] instead. Mainly as an excuse to mess around with Terraform.
 You can see the result of the experiments in [[https://github.com/gjhenrique/k8s-experiments][this repo]].
 
 # But there are too many layers to debug
@@ -41,7 +41,7 @@ You can see the result of the experiments in [[https://github.com/gjhenrique/k8s
 The first challenge I had to tackle was not using containerd from the official Debian repository because it was too old.
 
 At first, the cluster initialized correctly, and I could see the pods.
-Then, after some minutes, something was restarting the pods until it was impossible to query the apiserver to get information about it.
+Then, after some minutes, something was restarting the pods until it was impossible to query the apiserver to fetch any information about it.
 At first, I thought an OOM trigger was the culprit, but the virtual machine wasn't memory-constrained.
 Besides, no logs in Kubernetes pointed to this fact.
 I looked at the logs and assumed the OS was terminating the etcd process for some reason, wreaking havoc on the apiserver and consequently all its dependencies.
@@ -58,11 +58,11 @@ One thing that the original poster thought was weird is that he's using the late
 But hold that thought for a moment.
 
 * Difference between cgroups v1 and v2
-cgroups (from control groups) is a Linux kernel mechanism to manage the resources a process can access.
-Together with namespaces, they are the foundation of how a container works under the hood.
+cgroups (control groups) is a Linux kernel mechanism to manage the resources a process can access.
+Together with namespaces, they are the technologies that containers use under the hood.
 
 Besides constraining resources, it also exposes data about the process resources. As an example, [[https://github.com/google/cadvisor][cadvisor]] heavily uses it to report the stats of the pods.
-So, whenever you're reading some beautiful Grafana about your pod memory or CPU, this data is probably coming from cgroups.
+So, whenever you're reading some beautiful Grafana panel about your pod memory or CPU, this data is probably coming from cgroups.
 
 The cgroups API, like a lot of Linux abstractions, uses files to interface with userspace.
 You can limit the amount of memory of a process, CPU usage and the number of children a process might have, for example.
@@ -139,11 +139,11 @@ version = 2
 #+end_src
 
 And voilá. After restarting containerd, nothing was killing the pods anymore.
-I don't need to fiddle with kernel arguments, and I can use the more recent cgroups v2. So I'm happy with that.
+I don't need to fiddle with kernel arguments, and I can use the more recent cgroups v2. I'm happy with that.
 
 * What's this config doing under the hood?
 
-kubelet doesn't create the container processes or set up the cgroups for the pods.
+kubelet doesn't create the container processes or set up the cgroups for them.
 It communicates with containerd via the [[https://kubernetes.io/docs/concepts/architecture/cri/][CRI (Container Runtime Interface)]] specification. ~containerd~ in turn delegates the heavy lifting of creating the container cgroups to ~runc~ via the ~systemd-cgroup~ option.
 ~runc~, based on this option, sends a message to ~systemd~ through D-Bus.
 # https://github.com/containerd/containerd/blob/79fcc38b1117814fee65fb287b7b5069325d4e92/runtime/v1/shim/client/client.go#L204
@@ -251,7 +251,7 @@ With the systemd option working correctly:
 
 #+end_src
 
-One thing that I thought it was strange is that the pod cgroup does exist.
+One thing that I thought it was strange is that the pod cgroup does exist in the v2 format.
 Putting a log with the error there surprised me with the following message:
 
 ~cgroup [\"kubepods\" \"besteffort\" \"pod7149273f-1369-42ff-ae1f-79b1529bba7b\"] has some missing controllers: cpuset~
@@ -355,11 +355,11 @@ A short summary of the broken version events:
 The version with ~SystemdCgroup~ in containerd config:
 1. containerd creates the container cgroup inside the pod cgroup with the ~Delegate~ option
 1. kubelet sends a D-Bus message and systemd writes the value to ~cpu.weight~ file
-1. systemd won't mess up with the parents of the delegated cgroup
+1. systemd won't mess up with the parents of the delegated container cgroup
 1. kubelet doesn't kill the pod because the ~cpuset~ controller is still there
 1. the control plane is healthy
 
-I think it's kubelet's responsibility to not allow the container manager and runtime to use a different cgroup driver.
+In my opinion, it's kubelet's responsibility to not allow the container manager and runtime to use a different cgroup driver.
 For instance, kubelet [[https://github.com/kubernetes/kubernetes/blob/cb303e613a121a29364f75cc67d3d580833a7479/pkg/kubelet/dockershim/docker_service.go#L274][returned an error]] when docker didn't match the driver.
 Since 1.22, kubelet removed the docker integration, and it only supports managers implementing the CRI now.
 Apparently, the [[https://github.com/kubernetes/cri-api/blob/master/pkg/apis/runtime/v1/api.proto][CRI specification]] doesn't provide an agnostic way to identify the cgroup driver of the container runtime.
