@@ -576,7 +576,6 @@ I found an interesting quote from the specification searching how to achieve tha
 
 #+BEGIN_QUOTE
 eSCO traffic should be given priority over ACL traffic in the retransmission window.
-
           -- Bluetooth Core Specification Version 5.3 | Vol 2, Part B. Section 8.6.3
 #+END_QUOTE
 
