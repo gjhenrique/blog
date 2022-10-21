@@ -1,6 +1,6 @@
 # (blog 'zezin)
 
-House of [gjhenrique.com](https://gjhenrique.com)
+Home of [gjhenrique.com](https://gjhenrique.com)
 
 ## From org-mode to HTML
 It uses the [built-in publishing management system](https://orgmode.org/manual/Publishing.html) from org-mode. [org-publish-project-alist](https://github.com/gjhenrique/blog/blob/main/posts-config.el#L2) defines where org-mode should look into to convert org and resource files and the respective folders.

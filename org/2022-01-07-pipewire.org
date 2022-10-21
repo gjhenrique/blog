@@ -152,7 +152,7 @@ In Bluetooth, this frequency hopping may happen hundreds of times every second a
 #+BEGIN_EXPORT html
 <div class="figure">
   <p>
-    <img src="./res/pipewire/frequency-hopping.png" alt="frequency-hopping.png">
+    <img src="/res/pipewire/frequency-hopping.png" alt="frequency-hopping.png">
   </p>
   <p>
     Image with coexistence from Wifi and Bluetooth. This image shows the 39 channels of LE Bluetooth, but Classic Bluetooth uses 70 channels instead. The idea is the same, though. Taken from <a href="https://microchipdeveloper.com/wireless:ble-link-layer-channels">Microchip</a> developer docs.

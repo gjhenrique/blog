@@ -35,3 +35,21 @@
 .org-comment-delimiter {
   color: #949494;
 }
+
+.figure {
+  // Image Caption
+  p:last-child {
+    text-align: center;
+    font-style: italic;
+    margin: auto;
+    width: 80%;
+    font-size: 0.95em;
+    margin-bottom: 1em;
+    margin-top: -1em;
+  }
+
+  // Undo the first rule when there are no captions
+  p:first-child {
+    width: 100%;
+  }
+}
