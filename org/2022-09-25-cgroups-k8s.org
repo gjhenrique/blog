@@ -115,7 +115,7 @@ In the end, systemd will perform roughly the following commands on boot time dep
 # Rest of the mount for all controllers
 
 # If cg_is_unified_wanted is true, it means the user wants v2
-mount -t cgroup2 cgroup2 /sys/fs/cgroup
+> mount -t cgroup2 cgroup2 /sys/fs/cgroup
 #+end_src
 
 Obviously, systemd doesn't use shell commands but mounts via ~sys/mount.h~. The result is the same, though.
@@ -288,16 +288,12 @@ Looking at the files of the QoS cgroup, I could see that the ~cgroup.subtree_con
 cgroups uses this file to block or allow what controllers the children can access.
 
 #+begin_src shell
-cd /sys/fs/cgroup
-
+> cd /sys/fs/cgroup
 > mkdir -p custom_parent/custom_child
-
 > ls -l custom_parent/custom_child/cpu*
 2
-
 > cat custom_parent/custom_child/cgroup.controllers
 # Nothing is returned
-
 > echo +cpu > custom_parent/cgroup.subtree_control
 > cat custom_parent/custom_child/cgroup.controllers
 cpu

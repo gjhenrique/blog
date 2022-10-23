@@ -22,6 +22,38 @@
   /* font-lock-constant-face */
   color: #a9a1e1;
 }
+.org-css-property {
+  /* css-property */
+  color: #98be65;
+}
+.org-css-selector {
+  /* css-selector */
+  color: #51afef;
+}
+.org-diff-added {
+  /* diff-added */
+  color: #98be65;
+  background-color: #21242b;
+}
+.org-diff-context {
+  /* diff-context */
+  color: #a4aab6;
+}
+.org-diff-indicator-added {
+  /* diff-indicator-added */
+  color: #22aa22;
+  background-color: #21242b;
+}
+.org-diff-indicator-removed {
+  /* diff-indicator-removed */
+  color: #aa2222;
+  background-color: #23272e;
+}
+.org-diff-removed {
+  /* diff-removed */
+  color: #ff6c6b;
+  background-color: #23272e;
+}
 .org-doc {
   /* font-lock-doc-face */
   color: #83898d;
@@ -34,6 +66,14 @@
   /* highlight-numbers-number */
   color: #da8548;
   font-weight: bold;
+}
+.org-highlight-quoted-quote {
+  /* highlight-quoted-quote */
+  color: #51afef;
+}
+.org-highlight-quoted-symbol {
+  /* highlight-quoted-symbol */
+  color: #ECBE7B;
 }
 .org-keyword {
   /* font-lock-keyword-face */
@@ -59,6 +99,14 @@
 .org-rainbow-delimiters-depth-4 {
   /* rainbow-delimiters-depth-4-face */
   color: #a9a1e1;
+}
+.org-rainbow-delimiters-depth-5 {
+  /* rainbow-delimiters-depth-5-face */
+  color: #4db5bd;
+}
+.org-rainbow-delimiters-depth-6 {
+  /* rainbow-delimiters-depth-6-face */
+  color: #51afef;
 }
 .org-regexp-grouping-backslash {
   /* font-lock-regexp-grouping-backslash */
