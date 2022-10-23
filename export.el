@@ -5,6 +5,7 @@
 
 (package-refresh-contents)
 
+(package-install 'htmlize)
 (package-install 'rainbow-delimiters)
 (package-install 'yaml-mode)
 (package-install 'clojure-mode)
