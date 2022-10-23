@@ -124,45 +124,49 @@ With the [[https://kripken.github.io/emscripten-site/][Emscripten]] project, we 
 
 Basically, this image show how this source-to-source compilation works:
 
-#+BEGIN_SRC dot :file /res/tetris/asm_js.png :cmdline -Kdot -Tpng
-digraph {
-    // graph from left to right
-    rankdir=LR;
-    bgcolor="transparent";
-    node [shape=box];
+[[./res/tetris/asm_js.png]]
 
-    graph [fontname = "helvetica"];
-    node [fontname = "helvetica"];
-    edge [fontname = "helvetica"]; 
+# Before this was being generated on-the-fly everytime
+# It was clashing with the advice that rewrites relative to absolute path
+# #+BEGIN_SRC dot :file /res/tetris/asm_js.png :cmdline -Kdot -Tpng
+# digraph {
+#     // graph from left to right
+#     rankdir=LR;
+#     bgcolor="transparent";
+#     node [shape=box];
 
-    subgraph cluster_0 {
-      style=filled
-      label="Emscripten compiler"
-      color=lightgrey
-		  node  [style=filled,color=white];
+#     graph [fontname = "helvetica"];
+#     node [fontname = "helvetica"];
+#     edge [fontname = "helvetica"];
 
-      c_file [label=".c file"]
-      llvm_ir [label="LLVM Bitcode"]
-      js_file [label=".js file"] 
+#     subgraph cluster_0 {
+#       style=filled
+#       label="Emscripten compiler"
+#       color=lightgrey
+# 		  node  [style=filled,color=white];
 
-      c_file -> llvm_ir [label="clang"]
-      llvm_ir -> js_file [label="Fastcomp"]
-    }
+#       c_file [label=".c file"]
+#       llvm_ir [label="LLVM Bitcode"]
+#       js_file [label=".js file"]
+
+#       c_file -> llvm_ir [label="clang"]
+#       llvm_ir -> js_file [label="Fastcomp"]
+#     }
     
-    browser [label="Web Browsers", shape=ellipse]
-    node_js [label="Node.js", shape=ellipse]
+#     browser [label="Web Browsers", shape=ellipse]
+#     node_js [label="Node.js", shape=ellipse]
 
-    js_file -> browser
-    js_file -> node_js
+#     js_file -> browser
+#     js_file -> node_js
 
-    /*emcc_1 [style=invis]
-    emcc_2 [style=invis]
-    {rank = same; emcc_1 ; c_file } 
-    {rank = same; emcc_2; js_file }
-    emcc_1 -> emcc_2 [label="emcc"; arrowtail=dot]*/
-}
+#     /*emcc_1 [style=invis]
+#     emcc_2 [style=invis]
+#     {rank = same; emcc_1 ; c_file }
+#     {rank = same; emcc_2; js_file }
+#     emcc_1 -> emcc_2 [label="emcc"; arrowtail=dot]*/
+# }
  
-#+END_SRC
+# #+END_SRC
 
 First, Emscripten calls [[http://clang.llvm.org/][clang]] to compile your C files and generate the [[https://en.wikipedia.org/wiki/LLVM#LLVM_Intermediate_Representation][LLVM bitcode]] from them.
 Then, the resulting bitcode is fed to the Emscripten LLVM backend called [[https://github.com/kripken/emscripten-fastcomp][Fastcomp]],
