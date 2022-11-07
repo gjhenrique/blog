@@ -1,6 +1,6 @@
 #+BEGIN_EXPORT html 
 ---
-title: Giving (emacs-)purpose to i3wm
+title: Giving (emacs-)purpose to your tiling window manager
 categories:
   - programming
 tags:
