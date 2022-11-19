@@ -86,7 +86,7 @@ special cases
    This way, C programs, like Ruby, don't need to reinvent the wheel.
 
 - *standard library*:
-   Some languages implement it themselves and don't rely on libc.
+   Some languages implement this operation themselves and don't rely on libc.
    For example, Golang has the feature of not depending on any libc (unless using ~cgo~), so it must implement exponentiation itself.
 
 * Where is this in Ruby?
@@ -140,13 +140,13 @@ ENTRYPOINT ["ruby"]
 When running this today with ~docker run <id> -e 'puts 1.01 ** 35'~, I receive the number with 2 in the end, just like Ubuntu.
 Uh-oh. What's going on? Was it all a dream, maybe?
 
-Travelling through musl git history, I can see that [[https://git.musl-libc.org/cgit/musl/commit/?h=v1.2.3&id=e4dd65305a04][a commit]]  replaced the existing algorithm to use what's on [[https://github.com/ARM-software/optimized-routines][arm-optimized-routines]].
-I didn't find the exact motivation in the mailing list for why they changed that, but my assumption is to improve performance.
+Travelling through musl git history, I can see that [[https://git.musl-libc.org/cgit/musl/commit/?h=v1.2.3&id=e4dd65305a04][a commit]]  replaced the previous algorithm to use what's on [[https://github.com/ARM-software/optimized-routines][arm-optimized-routines]].
+I didn't find the exact motivation in the mailing list for the reason changed that, but my assumption is to improve performance.
 
 The old logic still prints the different value when pointing to the latest Alpine version (~3.10~).
 
 The original C file had two interesting statements in the initial comment section:
-1. The algorithm results in *nearly rounded* numbers. So musl returning a different value from glibc is not a bug, according to my interpretation as a newbie,
+1. The algorithm results in *nearly rounded* numbers. So musl returning a different value from glibc is not a bug, according to my newbie interpretation,
 2. Alpine devs got this code from FreeBSD at the beginning of the project. I don't know the exact motivations,
    but maybe FreeBSD matched the BSD license from musl, while glibc is using the LGPL license.
 
