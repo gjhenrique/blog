@@ -86,8 +86,8 @@ special cases
    This way, C programs, like Ruby, don't need to reinvent the wheel.
 
 - *standard library*:
-   Some languages implement this operation themselves and don't rely on libc.
-   For example, Golang has the feature of not depending on any libc (unless using ~cgo~), so it must implement exponentiation itself.
+   Some languages implement this operation themselves and don't rely on any libc at all.
+   For example, Golang has this option (unless using ~cgo~), so it must implement exponentiation itself.
 
 * Where is this in Ruby?
 Influenced by Smalltalk, all Ruby types are objects, even a class.
@@ -119,7 +119,7 @@ Let's dig a bit deeper and see the bytecode of this operation:
 YARV (Yet another Ruby VM) is a stack-based virtual machine.
 First, The VM calls the method ~**~ on the last popped object (~1.01~).
 Then, Ruby [[https://github.com/ruby/ruby/blob/fb4df44d1670e9d25aef6b235a7281199a177edb/numeric.c#L6395][defines the ** method for Float]] by forwarding it to the ~rb_float_pow~ C function.
-At the end of it, the [[https://github.com/ruby/ruby/blob/fb4df44d1670e9d25aef6b235a7281199a177edb/numeric.c#L1535][line]]: ~return DBL2NUM(pow(dx, dy));~ uses ~pow~ function from libc.
+At the end of it, the [[https://github.com/ruby/ruby/blob/fb4df44d1670e9d25aef6b235a7281199a177edb/numeric.c#L1535][line]]: ~return DBL2NUM(pow(dx, dy));~ uses the ~pow~ function from libc.
 
 * musl vs. glibc
 We found out that the issue lies in the libc.
@@ -143,18 +143,18 @@ Uh-oh. What's going on? Was it all a dream, maybe?
 Travelling through musl git history, I can see that [[https://git.musl-libc.org/cgit/musl/commit/?h=v1.2.3&id=e4dd65305a04][a commit]]  replaced the previous algorithm to use what's on [[https://github.com/ARM-software/optimized-routines][arm-optimized-routines]].
 I didn't find the exact motivation in the mailing list for the reason changed that, but my assumption is to improve performance.
 
-The old logic still prints the different value when pointing to the latest Alpine version (~3.10~).
+The old logic still prints the different value when pointing to an old Alpine version (at least ~3.10~).
 
-The original C file had two interesting statements in the initial comment section:
+As a sidenote, the original C file had two interesting statements in the initial comment section:
 1. The algorithm results in *nearly rounded* numbers. So musl returning a different value from glibc is not a bug, according to my newbie interpretation,
 2. Alpine devs got this code from FreeBSD at the beginning of the project. I don't know the exact motivations,
    but maybe FreeBSD matched the BSD license from musl, while glibc is using the LGPL license.
-
-By the way, this "broken" value is still present in FreeBSD 13.
+   By the way, this "broken" value is still present in FreeBSD 13.
 
 * Conclusion
-Doing float-point calculations is always complicated.
-I'm still wondering what's different with the FreeBSD algorithm.
+Floating-point calculations are always tricky.
+Doing exponentiation with them is a recipe for imprecision.
+I'm still curious about what's different with the FreeBSD algorithm.
 But musl and glibc sharing values since 2019 don't motivate me enough to investigate it.
 This fact, and debugging 300 lines of cryptic math operations, is not what I consider a fun side project for Saturday.
 
