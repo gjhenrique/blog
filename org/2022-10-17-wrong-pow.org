@@ -142,7 +142,6 @@ Uh-oh. What's going on? Was it all a dream, maybe?
 
 Travelling through musl git history, I can see that [[https://git.musl-libc.org/cgit/musl/commit/?h=v1.2.3&id=e4dd65305a04][a commit]]  replaced the previous algorithm to use what's on [[https://github.com/ARM-software/optimized-routines][arm-optimized-routines]].
 I didn't find the exact motivation in the mailing list for the reason changed that, but my assumption is to improve performance.
-
 The old logic still prints the different value when pointing to an old Alpine version (at least ~3.10~).
 
 As a sidenote, the original C file had two interesting statements in the initial comment section:
