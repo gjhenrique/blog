@@ -34,7 +34,7 @@ Think of ~org-mode~ as a text editor plugin on steroids handling its own markup 
 
 Honestly, I'm not a power user and only write notes about tasks and TODO lists of the tickets I'm working on because my memory sucks. Obviously, writing blog posts as well.
 
-#+CAPTION: Postception: How this blog post looks like
+#+CAPTION: Postception: How I used org-mode to edit this blog post
 [[./res/meta2/post.png]]
 
 - *publishing in CI*
@@ -42,10 +42,10 @@ Honestly, I'm not a power user and only write notes about tasks and TODO lists o
 Like Jekyll and Hugo, a Static Site Generator (SSG) takes HTML or Markdown files and assembles them into the final blog artefact containing the homepage with the list of posts, RSS feed, etc.
 They heavily use a templating language like liquid or mustache to make the layout dynamic.
 
-The original post discusses how I'm using ~ox-html~, the ~org-mode~ built-in publishing system to convert all the ~org~ files to HTML and move the resource files, like images, to a directory that Jekyll expects to do its job.
+The original post discusses how I'm using ~ox-html~, the ~org-mode~ built-in publishing system to convert all the ~org~ files to HTML and move the resource files, like images, to a directory that Jekyll uses to create the blog assets.
 
 I then created a [[https://github.com/gjhenrique/blog/blob/main/export.el][small elisp file]] to only include the libraries that will affect the blog generation.
-Using this configuration in CI is advantageous because the day-to-day Emacs brings tons of packages that might interfere with the export. Moreover, I can pin the exact Emacs version in CI to avoid unwanted surprises.
+Using this configuration in CI is advantageous because the day-to-day Emacs brings tons of packages that might interfere with this export. Moreover, I can pin the exact Emacs version in CI to avoid unwanted surprises.
 
 - *syntax colouring with htmlize*
 A writer has some options to decorate the code snippets of their blog.
@@ -58,17 +58,17 @@ The library ~htmlize~ together with ~org-mode~ converts all the faces — Emacs 
 
 Let me give an example of how this powerful setup can yield some benefits.
 I use the package [[https://github.com/Fanael/highlight-numbers][highlight-numbers]] to colourize numbers in code.
-Adding [[https://github.com/gjhenrique/blog/blob/009c89cf4ff33da4cde0b77364086a7cf30c39ba/export.el#L57-L58][a couple of lines]] to install and configure the package enables it automatically in the HTML.
+Adding [[https://github.com/gjhenrique/blog/blob/009c89cf4ff33da4cde0b77364086a7cf30c39ba/export.el#L57-L58][a couple of lines]] to install and configure the package enables the same feature automatically in the blog code snippet.
 
 #+INCLUDE: "./res/meta2/highlight-numbers.html" export html
 
 A downside of going with this approach is bloat.
 Having all the faces of the theme as CSS rules and using only a handful of them creates waste.
-In the previous post, I mentioned how I was using the [[https://cheerio.js.org/][cheerio]] library, an HTML parser that ships with a jquery-like API in node, to get only the used files and remove these unused rules.
-It was so hard to understand that I had to remove it (this one aged like milk).
+In the previous post, I mentioned how I was using the [[https://cheerio.js.org/][cheerio]] library, a node HTML parser, to get only the used files and remove these unused rules.
+It was so hard to understand that I had to replace it (this one aged like milk).
 
 I changed it to use the [[https://purgecss.com/][purgecss]] library.
-I point to the directory with the posts in HTML and the theme file in a node script. Then, like magic, it returns only the used CSS rules from 36KB to 2.2KB. So tell me about using the right tool for the job.
+Like magic, it returns only the used CSS rules from 36KB to 2.2KB. So tell me about using the right tool for the job.
 
 #+begin_src typescript
 const result = await new PurgeCSS().purge({
@@ -81,7 +81,7 @@ const finalCss = result.map(r => r.css).join();
 fs.writeFileSync("slim-theme.css", finalCss);
 #+end_src
 
-Maybe going too deep into this topic, but do you want to hear about an ingenuous hack?
+Maybe going too deep into this topic, but do you want to read about an ingenuous hack?
 To export all the available faces into a final CSS file, ~ox-html~ lists all available faces with the ~(face-list)~ function and prints a ~1~ character on a temporary buffer with the iterated face. Then, it calls ~htmlize~ to convert that buffer to HTML. Finally, ~htmlize~ gets the faces of each character and creates all the ~color~ and ~background-color~ CSS rules corresponding to the ~foreground~ and ~background~ face attributes. Neat.
 
 #+INCLUDE: "./res/meta2/one.html" export html
